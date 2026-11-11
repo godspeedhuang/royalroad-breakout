@@ -15,7 +15,7 @@ Stakeholder 是 Royal Road 的推薦團隊：新連載很多、推薦位有限�
 |---|---|
 | EDA（`eda/`） | 完成 |
 | Embedding 與口味漂移分析（`embedding/`） | 完成 |
-| 公開版 Atlas（`docs/atlas/`） | 已匯出，等 GitHub Pages 開啟 |
+| 公開版 Atlas（`docs/atlas/`） | 已上線：https://godspeedhuang.github.io/royalroad-breakout/（main 分支 /docs，push 後自動重新部署） |
 | 主預測模型（`modeling/`） | 完成第一版：規則、LR、gradient boosting、MLP。主模型 `lr_SAT`，2023 測試年 AUC 0.887、Recall@名額 0.482（最好的規則 0.261） |
 | AUC 漂移測試（固定測試年、換訓練年代） | 完成：訓練資料每舊一年，tags 模型 AUC 掉 0.026，文字模型掉 0.008 |
 | 簡報、影片 | 還沒做 |
