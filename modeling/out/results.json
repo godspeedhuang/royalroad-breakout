@@ -1,0 +1,407 @@
+{
+ "test_year": 2023,
+ "n_test": 8075,
+ "n_positive": 811,
+ "main_model": "lr_SAT",
+ "best_rule": "rule_hot_genre",
+ "test": {
+  "rule_fast_update": {
+   "auc": 0.625,
+   "ap": 0.145,
+   "recall_at_slots": 0.17,
+   "recall_ci95": [
+    0.144,
+    0.196
+   ],
+   "leak_prone": false
+  },
+  "rule_hot_genre": {
+   "auc": 0.742,
+   "ap": 0.216,
+   "recall_at_slots": 0.261,
+   "recall_ci95": [
+    0.239,
+    0.295
+   ],
+   "leak_prone": false
+  },
+  "rule_known_author": {
+   "auc": 0.565,
+   "ap": 0.12,
+   "recall_at_slots": 0.148,
+   "recall_ci95": [
+    0.127,
+    0.176
+   ],
+   "leak_prone": false
+  },
+  "lr_S": {
+   "auc": 0.81,
+   "ap": 0.345,
+   "recall_at_slots": 0.387,
+   "recall_ci95": [
+    0.359,
+    0.42
+   ],
+   "leak_prone": false
+  },
+  "lr_SA": {
+   "auc": 0.814,
+   "ap": 0.36,
+   "recall_at_slots": 0.398,
+   "recall_ci95": [
+    0.372,
+    0.436
+   ],
+   "leak_prone": false
+  },
+  "lr_SAT": {
+   "auc": 0.887,
+   "ap": 0.486,
+   "recall_at_slots": 0.482,
+   "recall_ci95": [
+    0.455,
+    0.515
+   ],
+   "leak_prone": false
+  },
+  "lr_T": {
+   "auc": 0.856,
+   "ap": 0.402,
+   "recall_at_slots": 0.406,
+   "recall_ci95": [
+    0.376,
+    0.44
+   ],
+   "leak_prone": false
+  },
+  "gb_SAT": {
+   "auc": 0.865,
+   "ap": 0.468,
+   "recall_at_slots": 0.476,
+   "recall_ci95": [
+    0.445,
+    0.503
+   ],
+   "leak_prone": false
+  },
+  "mlp_T": {
+   "auc": 0.858,
+   "ap": 0.403,
+   "recall_at_slots": 0.425,
+   "recall_ci95": [
+    0.395,
+    0.457
+   ],
+   "leak_prone": false
+  },
+  "mlp_SAT": {
+   "auc": 0.886,
+   "ap": 0.493,
+   "recall_at_slots": 0.493,
+   "recall_ci95": [
+    0.466,
+    0.527
+   ],
+   "leak_prone": false
+  },
+  "lr_SATP": {
+   "auc": 0.896,
+   "ap": 0.536,
+   "recall_at_slots": 0.515,
+   "recall_ci95": [
+    0.491,
+    0.548
+   ],
+   "leak_prone": true
+  },
+  "lr_SATPD": {
+   "auc": 0.918,
+   "ap": 0.629,
+   "recall_at_slots": 0.573,
+   "recall_ci95": [
+    0.547,
+    0.603
+   ],
+   "leak_prone": true
+  },
+  "lr_D": {
+   "auc": 0.873,
+   "ap": 0.536,
+   "recall_at_slots": 0.506,
+   "recall_ci95": [
+    0.481,
+    0.538
+   ],
+   "leak_prone": true
+  }
+ },
+ "recent_2024": {
+  "rule_fast_update": {
+   "auc": 0.669,
+   "ap": 0.168,
+   "recall_at_slots": 0.195
+  },
+  "rule_hot_genre": {
+   "auc": 0.765,
+   "ap": 0.23,
+   "recall_at_slots": 0.282
+  },
+  "rule_known_author": {
+   "auc": 0.583,
+   "ap": 0.129,
+   "recall_at_slots": 0.177
+  },
+  "lr_S": {
+   "auc": 0.82,
+   "ap": 0.352,
+   "recall_at_slots": 0.405
+  },
+  "lr_SA": {
+   "auc": 0.825,
+   "ap": 0.37,
+   "recall_at_slots": 0.414
+  },
+  "lr_SAT": {
+   "auc": 0.87,
+   "ap": 0.435,
+   "recall_at_slots": 0.453
+  },
+  "lr_T": {
+   "auc": 0.832,
+   "ap": 0.342,
+   "recall_at_slots": 0.377
+  },
+  "gb_SAT": {
+   "auc": 0.868,
+   "ap": 0.457,
+   "recall_at_slots": 0.47
+  },
+  "mlp_T": {
+   "auc": 0.83,
+   "ap": 0.338,
+   "recall_at_slots": 0.388
+  },
+  "mlp_SAT": {
+   "auc": 0.873,
+   "ap": 0.448,
+   "recall_at_slots": 0.456
+  },
+  "lr_SATP": {
+   "auc": 0.882,
+   "ap": 0.497,
+   "recall_at_slots": 0.49
+  },
+  "lr_SATPD": {
+   "auc": 0.914,
+   "ap": 0.6,
+   "recall_at_slots": 0.566
+  },
+  "lr_D": {
+   "auc": 0.88,
+   "ap": 0.502,
+   "recall_at_slots": 0.491
+  }
+ },
+ "increments_pp": {
+  "model vs best rule": {
+   "a": "lr_SAT",
+   "b": "rule_hot_genre",
+   "diff": 22.1,
+   "ci95": [
+    18.2,
+    25.3
+   ]
+  },
+  "author experience": {
+   "a": "lr_SA",
+   "b": "lr_S",
+   "diff": 1.1,
+   "ci95": [
+    -0.2,
+    3.0
+   ]
+  },
+  "chapter text": {
+   "a": "lr_SAT",
+   "b": "lr_SA",
+   "diff": 8.4,
+   "ci95": [
+    4.8,
+    11.2
+   ]
+  },
+  "boosting vs LR": {
+   "a": "gb_SAT",
+   "b": "lr_SAT",
+   "diff": -0.6,
+   "ci95": [
+    -3.8,
+    1.8
+   ]
+  },
+  "MLP vs LR": {
+   "a": "mlp_SAT",
+   "b": "lr_SAT",
+   "diff": 1.1,
+   "ci95": [
+    -0.8,
+    2.8
+   ]
+  },
+  "prior-book success (leak-prone)": {
+   "a": "lr_SATP",
+   "b": "lr_SAT",
+   "diff": 3.3,
+   "ci95": [
+    1.5,
+    5.5
+   ]
+  },
+  "blurb (leak-prone)": {
+   "a": "lr_SATPD",
+   "b": "lr_SATP",
+   "diff": 5.8,
+   "ci95": [
+    3.2,
+    8.5
+   ]
+  }
+ },
+ "by_group": {
+  "all": {
+   "n": 8075,
+   "n_positive": 811,
+   "rule_hot_genre": {
+    "auc": 0.742,
+    "ap": 0.216,
+    "recall_at_slots": 0.261
+   },
+   "lr_S": {
+    "auc": 0.81,
+    "ap": 0.345,
+    "recall_at_slots": 0.387
+   },
+   "lr_SA": {
+    "auc": 0.814,
+    "ap": 0.36,
+    "recall_at_slots": 0.398
+   },
+   "lr_SAT": {
+    "auc": 0.887,
+    "ap": 0.486,
+    "recall_at_slots": 0.482
+   }
+  },
+  "first_time_author": {
+   "n": 5383,
+   "n_positive": 451,
+   "rule_hot_genre": {
+    "auc": 0.724,
+    "ap": 0.182,
+    "recall_at_slots": 0.246
+   },
+   "lr_S": {
+    "auc": 0.794,
+    "ap": 0.288,
+    "recall_at_slots": 0.341
+   },
+   "lr_SA": {
+    "auc": 0.793,
+    "ap": 0.288,
+    "recall_at_slots": 0.344
+   },
+   "lr_SAT": {
+    "auc": 0.878,
+    "ap": 0.433,
+    "recall_at_slots": 0.43
+   }
+  },
+  "returning_author": {
+   "n": 2692,
+   "n_positive": 360,
+   "rule_hot_genre": {
+    "auc": 0.769,
+    "ap": 0.288,
+    "recall_at_slots": 0.317
+   },
+   "lr_S": {
+    "auc": 0.831,
+    "ap": 0.44,
+    "recall_at_slots": 0.464
+   },
+   "lr_SA": {
+    "auc": 0.833,
+    "ap": 0.445,
+    "recall_at_slots": 0.461
+   },
+   "lr_SAT": {
+    "auc": 0.894,
+    "ap": 0.552,
+    "recall_at_slots": 0.536
+   }
+  }
+ },
+ "leak_checks": {
+  "watermark": {
+   "share_of_test": 0.097,
+   "top10_rate_if_flagged": 0.111,
+   "auc_of_flag_alone": 0.506,
+   "without_flagged_books": {
+    "lr_SA": {
+     "auc": 0.824,
+     "ap": 0.366,
+     "recall_at_slots": 0.403
+    },
+    "lr_T": {
+     "auc": 0.858,
+     "ap": 0.401,
+     "recall_at_slots": 0.403
+    },
+    "lr_SAT": {
+     "auc": 0.889,
+     "ap": 0.486,
+     "recall_at_slots": 0.479
+    }
+   }
+  },
+  "blurb_marker": {
+   "share_of_test": 0.078,
+   "top10_rate_if_flagged": 0.455,
+   "auc_of_flag_alone": 0.652,
+   "without_flagged_books": {
+    "lr_SAT": {
+     "auc": 0.878,
+     "ap": 0.374,
+     "recall_at_slots": 0.392
+    },
+    "lr_D": {
+     "auc": 0.837,
+     "ap": 0.325,
+     "recall_at_slots": 0.363
+    },
+    "lr_SATPD": {
+     "auc": 0.899,
+     "ap": 0.462,
+     "recall_at_slots": 0.46
+    }
+   }
+  }
+ },
+ "impact": {
+  "quarters": 4,
+  "books_per_quarter": 2019,
+  "slots_per_quarter": 203,
+  "hits_per_quarter": {
+   "random": 20.3,
+   "rule_hot_genre": 53.0,
+   "lr_SAT": 97.8
+  },
+  "eventual_followers_of_picks_per_quarter": {
+   "random": 42081,
+   "rule_hot_genre": 118459,
+   "lr_SAT": 237615,
+   "oracle": 372252
+  }
+ }
+}
