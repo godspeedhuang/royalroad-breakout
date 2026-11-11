@@ -1,0 +1,4455 @@
+{
+ "periods": {
+  "early": [
+   2016,
+   2018
+  ],
+  "late": [
+   2021,
+   2023
+  ]
+ },
+ "n": {
+  "early_all": 5112,
+  "late_all": 16679,
+  "early_top": 528,
+  "late_top": 1659
+ },
+ "direction_norm": {
+  "supply": 0.09433645009994507,
+  "hot": 0.09809330105781555,
+  "pref": 0.04792409762740135
+ },
+ "direction_cos": {
+  "supply~hot": 0.8998560905456543,
+  "supply~pref": -0.14265304803848267,
+  "hot~pref": 0.3033415675163269
+ },
+ "ends": {
+  "supply": {
+   "negative_end": [
+    {
+     "title": "Awakened Cheater",
+     "year": 2017,
+     "followers": 1854,
+     "tags": [
+      "LitRPG",
+      "Wuxia",
+      "Comedy",
+      "Male Lead",
+      "Action",
+      "Fantasy"
+     ],
+     "opening": "Adam Kodak was pulling an all-nighter in his dormitory, playing video games. After finish playing and acquiring all the trophies, he did the thing he enjoyed the most which was to beat the game again but with cheats. As he was getting ready for bed, he muttered under his breath, \"Man, I wish I could have cheats in real"
+    },
+    {
+     "title": "The Broken World",
+     "year": 2018,
+     "followers": 266,
+     "tags": [
+      "LitRPG",
+      "Anti-Hero Lead",
+      "Strategy",
+      "Wuxia",
+      "Grimdark",
+      "Action"
+     ],
+     "opening": "In a certain house, In a certain room sits the 16 year old David Claw. He is a little weird, Or odd you could say. Not like he is a retard or psychopath, He is very smart and certainly isn't a psychopath, His thoughtline is just abnormal. 'This is such a boring world' 'I wish it would turn into a game or something' Wel"
+    },
+    {
+     "title": "The Two-faced Otaku",
+     "year": 2017,
+     "followers": 324,
+     "tags": [
+      "LitRPG",
+      "Reincarnation",
+      "Male Lead",
+      "Harem",
+      "Action",
+      "Fantasy"
+     ],
+     "opening": "The ceremony now is about to start, I'm currently walking to the magic circle looking thing it feels so majestic when I entered it and stood in the middlebof the circle, reminds me of the feeling I had when I first encountered ossan X. The magic circle started to glow and I felt like my bones are breaking and recreatin"
+    },
+    {
+     "title": "In Naruto With Gamer System",
+     "year": 2021,
+     "followers": 397,
+     "tags": [
+      "GameLit",
+      "Reincarnation",
+      "Time Travel",
+      "Progression",
+      "Anti-Hero Lead",
+      "Action"
+     ],
+     "opening": "Chapter 1 : New life and Exploring the system On a dark silent night with only the moon shining with a creepy pale light different from its usual serene shine in Konohagakure or the hidden leaf village, a weird event was currently happening in the Uchiha compound unnoticed by all in the village, a five years old orphan"
+    },
+    {
+     "title": "Mafia God!",
+     "year": 2016,
+     "followers": 562,
+     "tags": [
+      "Martial Arts",
+      "Comedy",
+      "Psychological",
+      "Sci-fi",
+      "Drama",
+      "Action"
+     ],
+     "opening": "Please tell me what you think in the comment section it will only take 30 sec to make a comment Thanks in advance! ________________________________________________________________________________________ ****Unknown**** ~Claus POV~ Who am I? Where am I? I kept asking myself this over and over again, as I floated into t"
+    },
+    {
+     "title": "Requiem of Souls",
+     "year": 2017,
+     "followers": 2108,
+     "tags": [
+      "LitRPG",
+      "Anti-Hero Lead",
+      "Harem",
+      "Strong Lead",
+      "Adventure",
+      "Horror"
+     ],
+     "opening": "Main characters Name Daiki Genkaku Primary Class N/A Race Unspecified Secondary Class N/A Health 9966 Gender Male Soul energy 11000/11000 Mana 4850 Level 400 Strength 5922 Agility 3855 Wisdom 3250 Intelligence 3900 Stamina Unlimited Vitality 3250 Luck 30 Fortitude 44% (+1%) Willpower Unlimited Honor N/A Elemental resis"
+    },
+    {
+     "title": "I Get A System, But I'm Still On Earth.",
+     "year": 2018,
+     "followers": 372,
+     "tags": [
+      "LitRPG",
+      "Comedy",
+      "Slice of Life",
+      "Action",
+      "Fantasy"
+     ],
+     "opening": "Ho Lee Fuk was laying on his bed when a voice suddenly echoed inside of his head. System installed... Confused, Fuk grabbed his phone, thinking that something was installed on it. \"Nothing installed... Don't tell me..\" But because he knew too much about this kind of tropes, he would say that a god was talking to him an"
+    },
+    {
+     "title": "Rise of the Goblin Dungeon",
+     "year": 2016,
+     "followers": 1169,
+     "tags": [
+      "Anti-Hero Lead",
+      "Non-Human Lead",
+      "Harem",
+      "Action",
+      "Adventure",
+      "Fantasy"
+     ],
+     "opening": "“You have repelled the intruders!” was the pompous message that conveyed my victory. With a yawn i leaned back into my chair and looked at the big writing that stretched across my monitor. I had played the Dungeon Lord game now for a while. It was still one of my favorite games but it slowly offered no new things anymo"
+    },
+    {
+     "title": "Nomad Dungeon",
+     "year": 2017,
+     "followers": 561,
+     "tags": [
+      "LitRPG",
+      "Strategy",
+      "Non-Human Lead",
+      "Action",
+      "Adventure",
+      "Fantasy"
+     ],
+     "opening": "... Cold... It's cold... Why does it feel cold? Wait... Who am I? ... ... ... Oh well, I'll remember eventually. First off can't I get just a bit warmer? ... Do I just have to endure this cold? Where even am I? --<Dungeon System Installation Complete>-- --<Would you like to start the tutorial?>-- --<Yes/No>-- ... What?"
+    },
+    {
+     "title": "Rise of the Undead Legion",
+     "year": 2018,
+     "followers": 1712,
+     "tags": [
+      "Virtual Reality",
+      "Strategy",
+      "Action",
+      "Fantasy",
+      "LitRPG"
+     ],
+     "opening": "Chapter 1 And so the days passed. Dave managed to leave the hospital and went back to his small town. However his injuries were never healed, his leg and right hand were truly a mess right now. He would limp every time he tried to move and his right hand was unable to even properly hold a cup. Truth to be told, he beca"
+    },
+    {
+     "title": "Evolve and Adapt",
+     "year": 2016,
+     "followers": 547,
+     "tags": [
+      "LitRPG",
+      "Reincarnation",
+      "Non-Human Lead",
+      "Adventure",
+      "Fantasy",
+      "Magic"
+     ],
+     "opening": "Prologue oOo Ahhh this is so relaxing, it feels like I’m floating am I in heaven? Yeah I’m definitely in heaven right now. I can’t believe it but I’m sure that it was not a dream. School was over and I had nothing much to do, I’ve read all the newly updated manga and pretty much lazy to do anything. I was also bored fr"
+    },
+    {
+     "title": "Hero? I'm assassin, but that's the same right?",
+     "year": 2017,
+     "followers": 436,
+     "tags": [
+      "LitRPG",
+      "Portal Fantasy / Isekai",
+      "Anti-Hero Lead",
+      "Comedy",
+      "Male Lead",
+      "Fantasy"
+     ],
+     "opening": "Being assassin has it's own perks. High salary, a lot of traveling, new acquaintances, free soda... well last one can be achieved even by a bum, so... Oh my target. “Steady... now...” *plink*... *plink* *plink* *plink*... hoh... how it burns... “[Target neutralized]” [What about the body?] “[Burned... along with the ca"
+    }
+   ],
+   "positive_end": [
+    {
+     "title": "Chasing Sunlight",
+     "year": 2023,
+     "followers": 3937,
+     "tags": [
+      "Male Lead",
+      "Action",
+      "Adventure",
+      "Horror",
+      "Mythos"
+     ],
+     "opening": "“Sunlight is a myth.” “I assure you, captain, it is not,” Jonathan Heights said, brushing an imaginary speck of dust off the sleeve of his immaculately tailored suit. “I have seen it with my own eyes, and my eyes are very, very good.” “Yeah?” Captain Montgomery said doubtfully, squinting at him. “What’s it look like?” "
+    },
+    {
+     "title": "In Sekhmet's Wake (Not All Heroes) [STUBBING: Part 1 29/06, Part 2 30/07]",
+     "year": 2023,
+     "followers": 428,
+     "tags": [
+      "Urban Fantasy",
+      "Progression",
+      "Post Apocalyptic",
+      "Anti-Hero Lead",
+      "Super Heroes",
+      "Action"
+     ],
+     "opening": "A Thought ​The question ‘what brought us here’ is long and winding and often treacherous. Prologue ​‘To preserve is to destroy,’ that is what she taught me. With her lesson, a proof: that love is the most powerful force on our planet, and therefore the most destructive. And The Destroyer went by many names, but I first"
+    },
+    {
+     "title": "The Winds of Tepr",
+     "year": 2023,
+     "followers": 400,
+     "tags": [
+      "Progression",
+      "Anti-Hero Lead",
+      "War and Military",
+      "Wuxia",
+      "Multiple Lead Characters",
+      "Action"
+     ],
+     "opening": "PART 1 The wind does not merely blow here—it sings . It howls across the Tepr plateau like a chorus of ancient spirits, bending the endless sea of golden grasses into rippling waves that crash silently against the horizon. This is a land where the earth and sky are lovers, locked in an eternal embrace. By day, the sun "
+    },
+    {
+     "title": "Sailor's Rise: Cultivation in a Merchant Republic",
+     "year": 2023,
+     "followers": 553,
+     "tags": [
+      "Progression",
+      "Strategy",
+      "Steampunk",
+      "Male Lead",
+      "Strong Lead",
+      "Adventure"
+     ],
+     "opening": "PROLOGUE The pigeon made no sense. A seagull might fly a hundred miles from the coast, but they were much farther out than that, and this was certainly no seagull. Perhaps someone could have stowed a pigeon below deck, but the sailor had sharp eyes, and he knew what he had just seen: a pigeon flying toward him from the"
+    },
+    {
+     "title": "Void Runner (Sci-Fi Survival Adventure)",
+     "year": 2023,
+     "followers": 893,
+     "tags": [
+      "Strategy",
+      "Male Lead",
+      "Sci-fi",
+      "Action",
+      "Adventure",
+      "Cyberpunk"
+     ],
+     "opening": "Part I: Outsider Few tragedies can be more extensive than the stunting of life, few injustices deeper than the denial of an opportunity to strive or even to hope, by a limit imposed from without, but falsely identified as lying within. —Stephen Jay Gould, The Mismeasure of Man The Void, Outside of Prime Dome Planet Irk"
+    },
+    {
+     "title": "The Riyria Chronicles [WITTY BANTER | EPIC FANTASY | ASSASSINS | THIEVES | MERCENARIES]",
+     "year": 2023,
+     "followers": 1086,
+     "tags": [
+      "Anti-Hero Lead",
+      "Male Lead",
+      "Action",
+      "Adventure",
+      "Fantasy",
+      "Historical"
+     ],
+     "opening": "If anyone had asked Royce Melborn what he hated most at that moment, he would’ve said dogs. Dogs and dwarves topped his list, both equally despised for having so much in common — each was short, vicious, and inexcusably hairy. Royce’s contempt for them had grown over the years for the same reason: They had caused him a"
+    },
+    {
+     "title": "Empire of Night",
+     "year": 2023,
+     "followers": 445,
+     "tags": [
+      "Progression",
+      "Xianxia",
+      "Multiple Lead Characters",
+      "Strong Lead",
+      "Adventure",
+      "Fantasy"
+     ],
+     "opening": "Chapter One Command For the first time in months, the Breadth between Mistwatch and the foot of the Endari Wilds lay clear. It was strange, seeing the near six-league swath of open land with his own eyes, rather than the spiritual sense Rhydian had come to rely upon over the past year. Mentally, he knew the terrain lik"
+    },
+    {
+     "title": "Peculiar Soul",
+     "year": 2021,
+     "followers": 5791,
+     "tags": [
+      "Urban Fantasy",
+      "Grimdark",
+      "Male Lead",
+      "Drama",
+      "Action",
+      "Adventure"
+     ],
+     "opening": "Stellar shines through winter’s cloak, b ut embered night belongs to Smoke. Sibyl knows where secrets stray, s ave those held by Sobriquet. Sustain will stand, enduring ever, n one else holds when cut by Sever. Stanza’s words engrave their mark, a nd every heart belongs to Spark. Eight there are, from Eight began, E ig"
+    },
+    {
+     "title": "Shadow of the Spyre",
+     "year": 2022,
+     "followers": 601,
+     "tags": [
+      "Post Apocalyptic",
+      "War and Military",
+      "Multiple Lead Characters",
+      "Sci-fi",
+      "Strong Lead",
+      "Action"
+     ],
+     "opening": "Saebrya Saebrya hesitated over the bejeweled cradle and glanced at the door to make sure she was alone. After several moments with no sound in the hall of the inn, she hastily returned her attention to the blonde baby within. It panted up at her, its ice-blue Vethyle eyes unmistakable even at its tender age, its face s"
+    },
+    {
+     "title": "Path of the Godscourge [Cultivation Progression Epic]",
+     "year": 2023,
+     "followers": 851,
+     "tags": [
+      "Progression",
+      "Strategy",
+      "Xianxia",
+      "Non-Human Lead",
+      "Strong Lead",
+      "Action"
+     ],
+     "opening": "Vayra’s hands had been tingling all afternoon, and she couldn’t blame it entirely on the cold breeze. If all went to plan, this would be their biggest score yet. If all went to plan. She grimaced. Already, they were off-schedule. She tapped her boot on the cobblestone street and leaned against the wall of knotted wood "
+    },
+    {
+     "title": "The Nested Worlds",
+     "year": 2023,
+     "followers": 423,
+     "tags": [
+      "Multiple Lead Characters",
+      "Action",
+      "Adventure",
+      "Fantasy",
+      "High Fantasy",
+      "Magic"
+     ],
+     "opening": "above the world-sphere of Talvi 09.05.13.19.04 Nils Civorage didn’t believe in the calm before the storm. Airshipmen didn’t, as a rule: a storm on the way was a race against time to make the ship ready, and even if that race was won and everything that could be made ready was ready, the rest was tense anticipation. Nev"
+    },
+    {
+     "title": "Identify",
+     "year": 2023,
+     "followers": 993,
+     "tags": [
+      "LitRPG",
+      "Urban Fantasy",
+      "Dungeon",
+      "Post Apocalyptic",
+      "Male Lead",
+      "Action"
+     ],
+     "opening": "Jeremy followed a set of rules to avoid this kind of thing. He wiped his palm over his pressed slacks before shaking the man’s hand. He kept eye contact and shook with a firm grip. The man’s smile widened. He had perfect, shiny white teeth. “A pleasure. Any friend of Moira’s is a friend of mine. Just call me Uncle Howa"
+    }
+   ],
+   "tags_positive": {
+    "Female Lead": 0.229,
+    "Multiple Lead Characters": 0.206,
+    "Drama": 0.169,
+    "Sci-fi": 0.145,
+    "Soft Sci-fi": 0.142,
+    "Urban Fantasy": 0.134,
+    "Low Fantasy": 0.122,
+    "Dystopia": 0.119
+   },
+   "tags_negative": {
+    "Reincarnation": -0.278,
+    "LitRPG": -0.254,
+    "Martial Arts": -0.217,
+    "Harem": -0.185,
+    "Action": -0.138,
+    "Fantasy": -0.128,
+    "Xianxia": -0.118,
+    "Male Lead": -0.117
+   }
+  },
+  "hot": {
+   "negative_end": [
+    {
+     "title": "The Two-faced Otaku",
+     "year": 2017,
+     "followers": 324,
+     "tags": [
+      "LitRPG",
+      "Reincarnation",
+      "Male Lead",
+      "Harem",
+      "Action",
+      "Fantasy"
+     ],
+     "opening": "The ceremony now is about to start, I'm currently walking to the magic circle looking thing it feels so majestic when I entered it and stood in the middlebof the circle, reminds me of the feeling I had when I first encountered ossan X. The magic circle started to glow and I felt like my bones are breaking and recreatin"
+    },
+    {
+     "title": "In Naruto With Gamer System",
+     "year": 2021,
+     "followers": 397,
+     "tags": [
+      "GameLit",
+      "Reincarnation",
+      "Time Travel",
+      "Progression",
+      "Anti-Hero Lead",
+      "Action"
+     ],
+     "opening": "Chapter 1 : New life and Exploring the system On a dark silent night with only the moon shining with a creepy pale light different from its usual serene shine in Konohagakure or the hidden leaf village, a weird event was currently happening in the Uchiha compound unnoticed by all in the village, a five years old orphan"
+    },
+    {
+     "title": "Awakened Cheater",
+     "year": 2017,
+     "followers": 1854,
+     "tags": [
+      "LitRPG",
+      "Wuxia",
+      "Comedy",
+      "Male Lead",
+      "Action",
+      "Fantasy"
+     ],
+     "opening": "Adam Kodak was pulling an all-nighter in his dormitory, playing video games. After finish playing and acquiring all the trophies, he did the thing he enjoyed the most which was to beat the game again but with cheats. As he was getting ready for bed, he muttered under his breath, \"Man, I wish I could have cheats in real"
+    },
+    {
+     "title": "The Broken World",
+     "year": 2018,
+     "followers": 266,
+     "tags": [
+      "LitRPG",
+      "Anti-Hero Lead",
+      "Strategy",
+      "Wuxia",
+      "Grimdark",
+      "Action"
+     ],
+     "opening": "In a certain house, In a certain room sits the 16 year old David Claw. He is a little weird, Or odd you could say. Not like he is a retard or psychopath, He is very smart and certainly isn't a psychopath, His thoughtline is just abnormal. 'This is such a boring world' 'I wish it would turn into a game or something' Wel"
+    },
+    {
+     "title": "Mafia God!",
+     "year": 2016,
+     "followers": 562,
+     "tags": [
+      "Martial Arts",
+      "Comedy",
+      "Psychological",
+      "Sci-fi",
+      "Drama",
+      "Action"
+     ],
+     "opening": "Please tell me what you think in the comment section it will only take 30 sec to make a comment Thanks in advance! ________________________________________________________________________________________ ****Unknown**** ~Claus POV~ Who am I? Where am I? I kept asking myself this over and over again, as I floated into t"
+    },
+    {
+     "title": "Reborn with the All-Seeing-Eyes",
+     "year": 2016,
+     "followers": 1655,
+     "tags": [
+      "Reincarnation",
+      "Female Lead",
+      "Action",
+      "Adventure",
+      "Fantasy",
+      "Gender Bender"
+     ],
+     "opening": "That was what greeted me right after I succeeded killing myself. Normally people wouldn't be necessarily happy about being congratulated on a succeessful death, but I certainly am beyond happy. For one not only did I finally free myself from a lot of expectations, but that blue screen can only signify *that* and with *"
+    },
+    {
+     "title": "Daily life of reincarnated goblin [Dropped]",
+     "year": 2017,
+     "followers": 276,
+     "tags": [
+      "LitRPG",
+      "Reincarnation",
+      "Strategy",
+      "Non-Human Lead",
+      "Harem",
+      "Action"
+     ],
+     "opening": "Well looking student is calmly walking through hallways with his usual smile gracefully, he is an honor student and the most good looking guy in the whole school - Kyaah, I wonder if he has a girlfriend - It's him? It's my first time seeing him... he's better than rumors say, can you introduce me to him? - Are you kidd"
+    },
+    {
+     "title": "Rise of the Goblin Dungeon",
+     "year": 2016,
+     "followers": 1169,
+     "tags": [
+      "Anti-Hero Lead",
+      "Non-Human Lead",
+      "Harem",
+      "Action",
+      "Adventure",
+      "Fantasy"
+     ],
+     "opening": "“You have repelled the intruders!” was the pompous message that conveyed my victory. With a yawn i leaned back into my chair and looked at the big writing that stretched across my monitor. I had played the Dungeon Lord game now for a while. It was still one of my favorite games but it slowly offered no new things anymo"
+    },
+    {
+     "title": "Slaanesh-chan in another world.",
+     "year": 2018,
+     "followers": 358,
+     "tags": [
+      "Portal Fantasy / Isekai",
+      "Anti-Hero Lead",
+      "Strategy",
+      "Martial Arts",
+      "Grimdark",
+      "Action"
+     ],
+     "opening": "-\"All right guys, hold him tight.\" -\"How rude, am I not beautiful woman?\" - Said a woman in handcuffs. -\"Shut up!\"- The prison guard hit her in the back with an electric batton. She screamed in pain or pleasure. They did not know. -\"Boby, do not be so brutal. I am a very delicate girl.\" - Her begging eyes could melt th"
+    },
+    {
+     "title": "Naruto : The Wind Calamity",
+     "year": 2023,
+     "followers": 503,
+     "tags": [
+      "Progression",
+      "War and Military",
+      "Martial Arts",
+      "Comedy",
+      "Male Lead",
+      "Action"
+     ],
+     "opening": "Konoha : In the most famous building in Konoha, an old man, smoking with a smoking pipe, was staring out of the window. Behind him was a table full of papers, which needed his signature. Hiruzen Sarutobi, however, continued to stare out of the window at the 4th Hokage's monument. Today was exactly a year since Konoha h"
+    },
+    {
+     "title": "I will absolutely cultivate",
+     "year": 2016,
+     "followers": 635,
+     "tags": [
+      "Reincarnation",
+      "Anti-Hero Lead",
+      "Comedy",
+      "Female Lead",
+      "Action",
+      "Fantasy"
+     ],
+     "opening": "Formerly known Sheila ****, now as Cheng Rui Wei, 3rd Wife of the Great General that gained the nickname of \"God of War\"! Dou Chang You! I'm currently half-sitting on my bed, with my back leaning on the pillows, I stared listlessly on my feet which is covered by a thick blanket. '...' my 'memories' flashed through my e"
+    },
+    {
+     "title": "Nomad Dungeon",
+     "year": 2017,
+     "followers": 561,
+     "tags": [
+      "LitRPG",
+      "Strategy",
+      "Non-Human Lead",
+      "Action",
+      "Adventure",
+      "Fantasy"
+     ],
+     "opening": "... Cold... It's cold... Why does it feel cold? Wait... Who am I? ... ... ... Oh well, I'll remember eventually. First off can't I get just a bit warmer? ... Do I just have to endure this cold? Where even am I? --<Dungeon System Installation Complete>-- --<Would you like to start the tutorial?>-- --<Yes/No>-- ... What?"
+    }
+   ],
+   "positive_end": [
+    {
+     "title": "Chasing Sunlight",
+     "year": 2023,
+     "followers": 3937,
+     "tags": [
+      "Male Lead",
+      "Action",
+      "Adventure",
+      "Horror",
+      "Mythos"
+     ],
+     "opening": "“Sunlight is a myth.” “I assure you, captain, it is not,” Jonathan Heights said, brushing an imaginary speck of dust off the sleeve of his immaculately tailored suit. “I have seen it with my own eyes, and my eyes are very, very good.” “Yeah?” Captain Montgomery said doubtfully, squinting at him. “What’s it look like?” "
+    },
+    {
+     "title": "Sailor's Rise: Cultivation in a Merchant Republic",
+     "year": 2023,
+     "followers": 553,
+     "tags": [
+      "Progression",
+      "Strategy",
+      "Steampunk",
+      "Male Lead",
+      "Strong Lead",
+      "Adventure"
+     ],
+     "opening": "PROLOGUE The pigeon made no sense. A seagull might fly a hundred miles from the coast, but they were much farther out than that, and this was certainly no seagull. Perhaps someone could have stowed a pigeon below deck, but the sailor had sharp eyes, and he knew what he had just seen: a pigeon flying toward him from the"
+    },
+    {
+     "title": "Path of the Godscourge [Cultivation Progression Epic]",
+     "year": 2023,
+     "followers": 851,
+     "tags": [
+      "Progression",
+      "Strategy",
+      "Xianxia",
+      "Non-Human Lead",
+      "Strong Lead",
+      "Action"
+     ],
+     "opening": "Vayra’s hands had been tingling all afternoon, and she couldn’t blame it entirely on the cold breeze. If all went to plan, this would be their biggest score yet. If all went to plan. She grimaced. Already, they were off-schedule. She tapped her boot on the cobblestone street and leaned against the wall of knotted wood "
+    },
+    {
+     "title": "In Sekhmet's Wake (Not All Heroes) [STUBBING: Part 1 29/06, Part 2 30/07]",
+     "year": 2023,
+     "followers": 428,
+     "tags": [
+      "Urban Fantasy",
+      "Progression",
+      "Post Apocalyptic",
+      "Anti-Hero Lead",
+      "Super Heroes",
+      "Action"
+     ],
+     "opening": "A Thought ​The question ‘what brought us here’ is long and winding and often treacherous. Prologue ​‘To preserve is to destroy,’ that is what she taught me. With her lesson, a proof: that love is the most powerful force on our planet, and therefore the most destructive. And The Destroyer went by many names, but I first"
+    },
+    {
+     "title": "The Gods are Bastards",
+     "year": 2023,
+     "followers": 3401,
+     "tags": [
+      "Dungeon",
+      "Steampunk",
+      "Multiple Lead Characters",
+      "Sci-fi",
+      "Action",
+      "Adventure"
+     ],
+     "opening": "“The gods are bastards.” The scene of the death was quite beautiful, now, years after the fact. A small creek cut through a little hollow in the prairie; the bowl-shaped depression had probably been a crater centuries ago before rain and wind had blunted its edges and nature filled it with field grasses and singing cic"
+    },
+    {
+     "title": "Trial of the Alchemist",
+     "year": 2022,
+     "followers": 523,
+     "tags": [
+      "Urban Fantasy",
+      "Psychological",
+      "Steampunk",
+      "Male Lead",
+      "Strong Lead",
+      "Drama"
+     ],
+     "opening": "THE TRIAL The courtroom feels like a church as Aurora’s good citizens file into the cavernous chamber, fixing their expressions, trying to look more sober than sober—particularly the ones who are not. If you had asked the man whose untimely death brings them here this morning, he would have said that people make a plac"
+    },
+    {
+     "title": "The Riyria Chronicles [WITTY BANTER | EPIC FANTASY | ASSASSINS | THIEVES | MERCENARIES]",
+     "year": 2023,
+     "followers": 1086,
+     "tags": [
+      "Anti-Hero Lead",
+      "Male Lead",
+      "Action",
+      "Adventure",
+      "Fantasy",
+      "Historical"
+     ],
+     "opening": "If anyone had asked Royce Melborn what he hated most at that moment, he would’ve said dogs. Dogs and dwarves topped his list, both equally despised for having so much in common — each was short, vicious, and inexcusably hairy. Royce’s contempt for them had grown over the years for the same reason: They had caused him a"
+    },
+    {
+     "title": "Void Runner (Sci-Fi Survival Adventure)",
+     "year": 2023,
+     "followers": 893,
+     "tags": [
+      "Strategy",
+      "Male Lead",
+      "Sci-fi",
+      "Action",
+      "Adventure",
+      "Cyberpunk"
+     ],
+     "opening": "Part I: Outsider Few tragedies can be more extensive than the stunting of life, few injustices deeper than the denial of an opportunity to strive or even to hope, by a limit imposed from without, but falsely identified as lying within. —Stephen Jay Gould, The Mismeasure of Man The Void, Outside of Prime Dome Planet Irk"
+    },
+    {
+     "title": "Fox’s Tongue and Kirin’s Bone",
+     "year": 2021,
+     "followers": 3011,
+     "tags": [
+      "Anti-Hero Lead",
+      "Ruling Class",
+      "Secret Identity",
+      "Action",
+      "Adventure",
+      "Fantasy"
+     ],
+     "opening": "Aaron met his Death coming down King’s Street. He didn’t know how he recognized it. It— he —looked exactly like a man, walked exactly like a man, except that every bone in Aaron’s body went cold with the knowing: this was his Death. Aaron rounded the corner from Butcher’s Row and his Death rounded the corner from Weave"
+    },
+    {
+     "title": "Peculiar Soul",
+     "year": 2021,
+     "followers": 5791,
+     "tags": [
+      "Urban Fantasy",
+      "Grimdark",
+      "Male Lead",
+      "Drama",
+      "Action",
+      "Adventure"
+     ],
+     "opening": "Stellar shines through winter’s cloak, b ut embered night belongs to Smoke. Sibyl knows where secrets stray, s ave those held by Sobriquet. Sustain will stand, enduring ever, n one else holds when cut by Sever. Stanza’s words engrave their mark, a nd every heart belongs to Spark. Eight there are, from Eight began, E ig"
+    },
+    {
+     "title": "Rogue Dungeon: A LitRPG Adventure",
+     "year": 2018,
+     "followers": 805,
+     "tags": [
+      "Virtual Reality",
+      "Male Lead",
+      "Action",
+      "Adventure",
+      "Fantasy",
+      "LitRPG"
+     ],
+     "opening": "The last fiery red light of sunset glared over the peaked rooves of the village of Korvo, just violent and desperate enough to tear through the dark storm clouds that had been looming all day. In the snow blown streets, women in brightly colored dresses decorated with shiny tin coins and men in dark jerkins over vibran"
+    },
+    {
+     "title": "The Lions of Dawrtaine",
+     "year": 2021,
+     "followers": 431,
+     "tags": [
+      "Portal Fantasy / Isekai",
+      "Martial Arts",
+      "Multiple Lead Characters",
+      "Strong Lead",
+      "Action",
+      "Adventure"
+     ],
+     "opening": "The moon sleeps on her back, just a sliver in the sky. A handful of clouds sail past like ladies in their long dresses. The spirit of a dragon soars among them, flying through their misty garments. The woman he follows isn’t some dainty lady. She runs with a fierce animal joy matching his own, making a game of weaving "
+    }
+   ],
+   "tags_positive": {
+    "Female Lead": 0.186,
+    "Multiple Lead Characters": 0.175,
+    "Sci-fi": 0.146,
+    "Soft Sci-fi": 0.139,
+    "Urban Fantasy": 0.124,
+    "Dystopia": 0.112,
+    "Drama": 0.111,
+    "Low Fantasy": 0.108
+   },
+   "tags_negative": {
+    "Reincarnation": -0.262,
+    "Martial Arts": -0.218,
+    "Harem": -0.198,
+    "LitRPG": -0.135,
+    "Wuxia": -0.11,
+    "Xianxia": -0.108,
+    "Comedy": -0.098,
+    "Strong Lead": -0.097
+   }
+  },
+  "pref": {
+   "negative_end": [
+    {
+     "title": "Godly System",
+     "year": 2018,
+     "followers": 1076,
+     "tags": [
+      "Reincarnation",
+      "Anti-Hero Lead",
+      "Psychological",
+      "Male Lead",
+      "Slice of Life",
+      "Action"
+     ],
+     "opening": "Hi guys I'm back again. I've reworked the plot enough in order to make it not an action packed xianxia now I think. I'm going to try to write about 10-20 chapters this week and start taking the old chapters down. The new chapters will be released at the end of this week. Things to expect: - Less OP MC - Slightly differ"
+    },
+    {
+     "title": "The Emperor's Concubine",
+     "year": 2021,
+     "followers": 314,
+     "tags": [
+      "Psychological",
+      "Female Lead",
+      "Slice of Life",
+      "Drama",
+      "Historical",
+      "Romance"
+     ],
+     "opening": "The novel “To Be Empress” had become quite famous lately. Despite it being a historical romance book full of clichés, it had also addressed more serious topics. Thus, it quickly gained a great number of fans and the increasing popularity soon led to the announcement of another installment in the series. The story was w"
+    },
+    {
+     "title": "Tower of Hell [Progression Fantasy, Urban Dystopia, Tower Climbing]",
+     "year": 2022,
+     "followers": 245,
+     "tags": [
+      "Reincarnation",
+      "Urban Fantasy",
+      "Progression",
+      "Ruling Class",
+      "Martial Arts",
+      "Action"
+     ],
+     "opening": "The glowing full moon along with a cluster of radiant stars lit the midnight sky, while blackened smoke masked the stench of nose-pinching booze and the echoes of impulsive sex. It was another Halloween bonfire that doubled as a birthday celebration. Delicate strands of fate surrounded the attendees like a spider’s web"
+    },
+    {
+     "title": "Primogenitor in Marvel",
+     "year": 2022,
+     "followers": 418,
+     "tags": [
+      "Super Heroes",
+      "Sci-fi",
+      "Harem",
+      "Fantasy",
+      "Romance",
+      "Attractive Lead"
+     ],
+     "opening": "Outside the sacred timeline, in a futuristic city, inside an office with three giant heads in the background, there was a dark-skinned woman in a suit. The woman was going about her daily business when her door was violently opened. She couldn't help but furrow her brow as she looked neutrally at the person who entered"
+    },
+    {
+     "title": "Alviona (undergoing Rewrite).",
+     "year": 2017,
+     "followers": 664,
+     "tags": [
+      "Time Travel",
+      "Anti-Hero Lead",
+      "Grimdark",
+      "Multiple Lead Characters",
+      "Slice of Life",
+      "Adventure"
+     ],
+     "opening": "In a universe where distant stars have died out, and nothing but pitch black was visible floated a massive beam of energy. It radiated light brighter than the sun. This energy resembled the shape of a humanoid. Looking closely, you would state that this was a man for besides \"him\" floated an apparition of a moon-like c"
+    },
+    {
+     "title": "Glimpse of Eternity [A Reincarnation Isekai Fantasy]",
+     "year": 2022,
+     "followers": 2572,
+     "tags": [
+      "LitRPG",
+      "Portal Fantasy / Isekai",
+      "Urban Fantasy",
+      "Progression",
+      "Anti-Hero Lead",
+      "Action"
+     ],
+     "opening": "Ken slept unpeacefully in the opulent hospital room he'd been staying in for the past thirteen years. He'd been drifting along between the domains of sleep and consciousness for a while now. And his patience was, understandably, wearing thin. When was a terminally ill patient supposed to catch a break and actually get "
+    },
+    {
+     "title": "Renewal : A Daughter of Fate - VILLAINESS/LITRPG/CULTIVATION/OTOME - (Book One Stubbed)",
+     "year": 2023,
+     "followers": 2253,
+     "tags": [
+      "LitRPG",
+      "Reincarnation",
+      "Time Loop",
+      "Progression",
+      "Villainous Lead",
+      "Action"
+     ],
+     "opening": "Hi! Just thought I would make a thread / Chapter for some of my cover Art! 1. Original Cover - Lynettes Bracelet 2. Cover Art by Proxybaba 3. AI Art anime style 4. AI Art Illustration style - Current Cover"
+    },
+    {
+     "title": "Erind x Deen Alternate Reality Spin-Off of REND",
+     "year": 2022,
+     "followers": 460,
+     "tags": [
+      "Comedy",
+      "Psychological",
+      "Female Lead",
+      "Slice of Life",
+      "Drama",
+      "Romance"
+     ],
+     "opening": "Ice cream...sugar makes me so happy , I sang in my head as I stored the half-full tub of chocolate ice cream in the freezer. With a satisfied grin on my face, I fondly gazed at the strawberry-flavored pint beside it, planning to eat that one tomorrow, or maybe later if Deen wouldn't judge me for bingeing sweets. Enough"
+    },
+    {
+     "title": "My Demonic Farm: A Progression Fantasy LitRPG",
+     "year": 2023,
+     "followers": 2447,
+     "tags": [
+      "LitRPG",
+      "Progression",
+      "Male Lead",
+      "Action",
+      "Adventure",
+      "Fantasy"
+     ],
+     "opening": "In the bustling newsroom, where ringing phones and clattering keyboards reverberated, Sarah and Mark sat, poised professionally. They were ready to delve into the most discussed topic of the day. Dressed in her sharp blue jacket, Sarah began, \"Good evening, everyone. I'm Sarah Wilson, and beside me is Mark Robert. The "
+    },
+    {
+     "title": "This Slimy Melting Heart",
+     "year": 2021,
+     "followers": 350,
+     "tags": [
+      "Portal Fantasy / Isekai",
+      "Non-Human Lead",
+      "Tragedy",
+      "Action",
+      "Adventure",
+      "Fantasy"
+     ],
+     "opening": "The bright sky trembled as an interdimensional force tore space asunder. The rift opened a hole in reality, revealing the nothingness beyond the shadow of the world, where strange, unseen phenomena resided. Through the gap that lasted a mere instant, a meteor flew through the void and wrapped space around it with its e"
+    },
+    {
+     "title": "The House Beneath - A Progression Fantasy",
+     "year": 2023,
+     "followers": 882,
+     "tags": [
+      "Progression",
+      "Female Lead",
+      "Fantasy",
+      "Horror",
+      "Magic"
+     ],
+     "opening": "Hina staggered back from the blow, crashed into a cooling rack and fell against the counter. Her arms sent a mixing bowl and a rolling pin flying before she caught her balance. A huge scowling figure loomed over her in the humming electric light. Lagi clenched his fists, eyes bright and glistening. Pale light from Ofel"
+    },
+    {
+     "title": "I will absolutely cultivate",
+     "year": 2016,
+     "followers": 635,
+     "tags": [
+      "Reincarnation",
+      "Anti-Hero Lead",
+      "Comedy",
+      "Female Lead",
+      "Action",
+      "Fantasy"
+     ],
+     "opening": "Formerly known Sheila ****, now as Cheng Rui Wei, 3rd Wife of the Great General that gained the nickname of \"God of War\"! Dou Chang You! I'm currently half-sitting on my bed, with my back leaning on the pillows, I stared listlessly on my feet which is covered by a thick blanket. '...' my 'memories' flashed through my e"
+    }
+   ],
+   "positive_end": [
+    {
+     "title": "Accidental Champion: A LitRPG Apocalypse Tower Climber (Book 1 Amazon Release on June 25)",
+     "year": 2023,
+     "followers": 4860,
+     "tags": [
+      "LitRPG",
+      "Progression",
+      "Post Apocalyptic",
+      "Male Lead",
+      "Action",
+      "Adventure"
+     ],
+     "opening": "The sky turned a vivid, blood red. Xavier Collins stared at it, a frown lining his face. That’s odd. Some sort of blood sunrise, like a blood moon? He shook his head, shoved his ear buds back in and put his hands in the pockets of his plain black hoodie. He walked over the wide bridge that separated the two halves of h"
+    },
+    {
+     "title": "Druid Evolution (A Battle Royale, Druid MC LitRPG/Gamelit Adventure)",
+     "year": 2022,
+     "followers": 873,
+     "tags": [
+      "LitRPG",
+      "Portal Fantasy / Isekai",
+      "Dungeon",
+      "Post Apocalyptic",
+      "Anti-Hero Lead",
+      "Action"
+     ],
+     "opening": "It was the last day of ordinary life for Theodore Cross. It went as the last five years of his life had gone; he woke, drank coffee, dressed in a suit and tie, and went to work. Work was a private school only two miles from his house, so he huffed and puffed on his bicycle in the summer heat. By the time he got to his "
+    },
+    {
+     "title": "Isekai Butler [Hiatus pending rewrite]",
+     "year": 2021,
+     "followers": 1028,
+     "tags": [
+      "LitRPG",
+      "Portal Fantasy / Isekai",
+      "Dungeon",
+      "Ruling Class",
+      "Comedy",
+      "Action"
+     ],
+     "opening": "It was happening all over again. I ran through my mental checklist, hoping that this time would be different, and yet knowing that it would not be. After the tenth, maybe twelfth time going through the same process, I had nearly given up on trying to change my fate. “Nearly” being the operative word. Mental checklist t"
+    },
+    {
+     "title": "The Bureau of Isekai Affairs",
+     "year": 2021,
+     "followers": 1536,
+     "tags": [
+      "LitRPG",
+      "Portal Fantasy / Isekai",
+      "Progression",
+      "Strategy",
+      "Xianxia",
+      "Action"
+     ],
+     "opening": "My first thought is that the afterlife looks surprisingly like a normal, if oddly furnished, office building. The floor is dressed stone or tile covered with a patchwork of durable industrial rugs, the walls and ceiling are painted white, and the room is filled with rows of heavy wood desks. Huge windows on one wall fl"
+    },
+    {
+     "title": "Archmage Reborn: Reincarnated to Spellcraft (Secondary World LitRPG)",
+     "year": 2023,
+     "followers": 608,
+     "tags": [
+      "LitRPG",
+      "Reincarnation",
+      "Progression",
+      "Male Lead",
+      "Action",
+      "Adventure"
+     ],
+     "opening": "Saul’s magic rippled across the battlefield. His spell took the form of a phalanx of mounted soldiers made of fire. Flames blazed from the steeds’ streaming manes and tails and the tips of the riders’ spears. The ghostly fire cavalry galloped through the air over the soldiers who filled the field, diving straight into "
+    },
+    {
+     "title": "The Royal System: Ruler of the Poorest Kingdom (A 4X-Styled LitRPG)",
+     "year": 2022,
+     "followers": 1968,
+     "tags": [
+      "LitRPG",
+      "Portal Fantasy / Isekai",
+      "Progression",
+      "Ruling Class",
+      "Comedy",
+      "Drama"
+     ],
+     "opening": "They say it’s not the fall that kills you, but the landing. Personally, I think the fall helps. That’s based on my experience, though, which—given it wasn’t a very tall building—was poised to be a short one. I flipped and flailed, trying to scream but managing only a dry cough. My heart stuck in my throat. There’s a ch"
+    },
+    {
+     "title": "Hellbreaker[Grimdark LitRPG Isekai]",
+     "year": 2023,
+     "followers": 2149,
+     "tags": [
+      "LitRPG",
+      "Reincarnation",
+      "Progression",
+      "Grimdark",
+      "Action",
+      "Adventure"
+     ],
+     "opening": "The world of Telvaria had been embroiled in the fires of war for countless millennia. It was the result of the feuds of the many gods of the world, but mainly because of the endless squabbles between the Nine, the preeminent gods of the universe. They were the greatest beings in existence, the creators and the destroye"
+    },
+    {
+     "title": "The Hero Slayers [LitRPG, Portal Magic]",
+     "year": 2023,
+     "followers": 1327,
+     "tags": [
+      "LitRPG",
+      "Progression",
+      "Comedy",
+      "Male Lead",
+      "Action",
+      "Adventure"
+     ],
+     "opening": "Part I: A Hero In The (Un)making Like all great stories, it begins with a slaughter. I take no joy in starting at this point—it hardly sets the tone for events still to come—but it’s where my journey truly began. To gloss over it would be to remove a core part of my being, would be to remove the very motivation that se"
+    },
+    {
+     "title": "Elf Girl [A Non-OP Progression Fantasy Adventure]",
+     "year": 2023,
+     "followers": 957,
+     "tags": [
+      "LitRPG",
+      "Portal Fantasy / Isekai",
+      "Progression",
+      "Non-Human Lead",
+      "Adventure",
+      "Fantasy"
+     ],
+     "opening": "The dragon tracks are half the size of a person and starting to puddle with rain. There have to be dozens of them carefully stamped into the concrete of the Culver City sidewalk, which I suppose is the sort of thing a studio can manage if it’s the passion project for one of the richest men in the world. I pull up my ho"
+    },
+    {
+     "title": "The Legendary Fool : A Deckbuilding LITRPG (B2 Complete)",
+     "year": 2022,
+     "followers": 4595,
+     "tags": [
+      "LitRPG",
+      "Portal Fantasy / Isekai",
+      "Progression",
+      "Martial Arts",
+      "Male Lead",
+      "Action"
+     ],
+     "opening": "Thomas Lowe wore a listless expression on his face as he inanely flicked through social media posts on his smartphone. He was seated on an uncomfortable plastic chair, his legs crossed and resting on the billing counter. The convenience store he worked in was empty and to be honest, thomas still didn’t understand the p"
+    },
+    {
+     "title": "I am Just a Broken Machine [Factory Builder Apocalyptic LitRPG]",
+     "year": 2022,
+     "followers": 572,
+     "tags": [
+      "LitRPG",
+      "Progression",
+      "Post Apocalyptic",
+      "Strategy",
+      "Steampunk",
+      "Fantasy"
+     ],
+     "opening": "On the day the world ended, I had just flunked out of college and was driving down a long, empty highway. The doubts and anxiety that I had accumulated over the years at the school finally flared, and I broke down completely, leaving me to pack up all of my things into my cramped two door sedan and set out away from so"
+    },
+    {
+     "title": "Born for the Apocalypse [Old/Hiatus version]",
+     "year": 2022,
+     "followers": 1221,
+     "tags": [
+      "LitRPG",
+      "Progression",
+      "Post Apocalyptic",
+      "Xianxia",
+      "Psychological",
+      "Action"
+     ],
+     "opening": "Jack Fletcher was sipping a beer on his sofa, watching the highlights of a football game on his fancy home theater set-up when his phone started buzzing loudly. With a small sigh in irritation, Jack gave his smartphone a glance and then decided to accept the call. “Yeah Jeff? You got some good news for me?” Jack spoke,"
+    }
+   ],
+   "tags_positive": {
+    "LitRPG": 0.403,
+    "Fantasy": 0.26,
+    "GameLit": 0.239,
+    "Magic": 0.239,
+    "Adventure": 0.235,
+    "Portal Fantasy / Isekai": 0.164,
+    "Progression": 0.155,
+    "Action": 0.152
+   },
+   "tags_negative": {
+    "Romance": -0.25,
+    "Drama": -0.2,
+    "Female Lead": -0.155,
+    "Tragedy": -0.125,
+    "Contemporary": -0.115,
+    "Multiple Lead Characters": -0.113,
+    "Mystery": -0.111,
+    "Historical": -0.11
+   }
+  }
+ },
+ "words": {
+  "supply": {
+   "up": [
+    {
+     "word": "breath",
+     "z": 18.11,
+     "log_odds": 0.59,
+     "share_early": 0.535,
+     "share_late": 0.674
+    },
+    {
+     "word": "despite",
+     "z": 17.84,
+     "log_odds": 0.59,
+     "share_early": 0.365,
+     "share_late": 0.508
+    },
+    {
+     "word": "held",
+     "z": 17.26,
+     "log_odds": 0.56,
+     "share_early": 0.533,
+     "share_late": 0.667
+    },
+    {
+     "word": "began",
+     "z": 17.01,
+     "log_odds": 0.55,
+     "share_early": 0.537,
+     "share_late": 0.668
+    },
+    {
+     "word": "beneath",
+     "z": 16.92,
+     "log_odds": 0.63,
+     "share_early": 0.221,
+     "share_late": 0.348
+    },
+    {
+     "word": "leaned",
+     "z": 16.8,
+     "log_odds": 0.64,
+     "share_early": 0.205,
+     "share_late": 0.329
+    },
+    {
+     "word": "offered",
+     "z": 16.75,
+     "log_odds": 0.69,
+     "share_early": 0.167,
+     "share_late": 0.285
+    },
+    {
+     "word": "remained",
+     "z": 16.7,
+     "log_odds": 0.59,
+     "share_early": 0.261,
+     "share_late": 0.39
+    },
+    {
+     "word": "stepped",
+     "z": 16.5,
+     "log_odds": 0.55,
+     "share_early": 0.347,
+     "share_late": 0.479
+    },
+    {
+     "word": "fingers",
+     "z": 16.45,
+     "log_odds": 0.54,
+     "share_early": 0.361,
+     "share_late": 0.493
+    },
+    {
+     "word": "caught",
+     "z": 16.4,
+     "log_odds": 0.53,
+     "share_early": 0.471,
+     "share_late": 0.601
+    },
+    {
+     "word": "shook",
+     "z": 16.33,
+     "log_odds": 0.53,
+     "share_early": 0.39,
+     "share_late": 0.521
+    },
+    {
+     "word": "watched",
+     "z": 16.22,
+     "log_odds": 0.53,
+     "share_early": 0.391,
+     "share_late": 0.522
+    },
+    {
+     "word": "shoulder",
+     "z": 16.11,
+     "log_odds": 0.52,
+     "share_early": 0.42,
+     "share_late": 0.549
+    },
+    {
+     "word": "paused",
+     "z": 16.1,
+     "log_odds": 0.62,
+     "share_early": 0.201,
+     "share_late": 0.319
+    },
+    {
+     "word": "shifted",
+     "z": 16.08,
+     "log_odds": 0.69,
+     "share_early": 0.153,
+     "share_late": 0.264
+    },
+    {
+     "word": "gaze",
+     "z": 16.0,
+     "log_odds": 0.54,
+     "share_early": 0.327,
+     "share_late": 0.454
+    },
+    {
+     "word": "nodded",
+     "z": 15.7,
+     "log_odds": 0.51,
+     "share_early": 0.414,
+     "share_late": 0.54
+    },
+    {
+     "word": "silence",
+     "z": 15.7,
+     "log_odds": 0.51,
+     "share_early": 0.409,
+     "share_late": 0.535
+    },
+    {
+     "word": "meant",
+     "z": 15.57,
+     "log_odds": 0.5,
+     "share_early": 0.427,
+     "share_late": 0.552
+    },
+    {
+     "word": "hung",
+     "z": 15.57,
+     "log_odds": 0.63,
+     "share_early": 0.181,
+     "share_late": 0.292
+    },
+    {
+     "word": "approached",
+     "z": 15.52,
+     "log_odds": 0.55,
+     "share_early": 0.263,
+     "share_late": 0.383
+    },
+    {
+     "word": "pulled",
+     "z": 15.48,
+     "log_odds": 0.5,
+     "share_early": 0.491,
+     "share_late": 0.613
+    },
+    {
+     "word": "response",
+     "z": 15.4,
+     "log_odds": 0.54,
+     "share_early": 0.269,
+     "share_late": 0.388
+    },
+    {
+     "word": "rolled",
+     "z": 15.35,
+     "log_odds": 0.55,
+     "share_early": 0.25,
+     "share_late": 0.367
+    },
+    {
+     "word": "weight",
+     "z": 15.26,
+     "log_odds": 0.54,
+     "share_early": 0.268,
+     "share_late": 0.385
+    },
+    {
+     "word": "distant",
+     "z": 15.25,
+     "log_odds": 0.69,
+     "share_early": 0.129,
+     "share_late": 0.229
+    },
+    {
+     "word": "whispered",
+     "z": 15.12,
+     "log_odds": 0.56,
+     "share_early": 0.235,
+     "share_late": 0.349
+    },
+    {
+     "word": "glanced",
+     "z": 15.05,
+     "log_odds": 0.56,
+     "share_early": 0.228,
+     "share_late": 0.34
+    },
+    {
+     "word": "returned",
+     "z": 14.83,
+     "log_odds": 0.5,
+     "share_early": 0.339,
+     "share_late": 0.457
+    },
+    {
+     "word": "attention",
+     "z": 14.83,
+     "log_odds": 0.48,
+     "share_early": 0.537,
+     "share_late": 0.652
+    },
+    {
+     "word": "edge",
+     "z": 14.79,
+     "log_odds": 0.5,
+     "share_early": 0.325,
+     "share_late": 0.442
+    },
+    {
+     "word": "led",
+     "z": 14.71,
+     "log_odds": 0.51,
+     "share_early": 0.293,
+     "share_late": 0.408
+    },
+    {
+     "word": "lay",
+     "z": 14.67,
+     "log_odds": 0.5,
+     "share_early": 0.299,
+     "share_late": 0.414
+    },
+    {
+     "word": "raised",
+     "z": 14.55,
+     "log_odds": 0.47,
+     "share_early": 0.418,
+     "share_late": 0.534
+    },
+    {
+     "word": "settled",
+     "z": 14.54,
+     "log_odds": 0.59,
+     "share_early": 0.176,
+     "share_late": 0.278
+    },
+    {
+     "word": "feet",
+     "z": 14.19,
+     "log_odds": 0.46,
+     "share_early": 0.561,
+     "share_late": 0.67
+    },
+    {
+     "word": "emerged",
+     "z": 14.18,
+     "log_odds": 0.71,
+     "share_early": 0.104,
+     "share_late": 0.19
+    },
+    {
+     "word": "pushed",
+     "z": 14.06,
+     "log_odds": 0.46,
+     "share_early": 0.36,
+     "share_late": 0.472
+    },
+    {
+     "word": "concern",
+     "z": 14.06,
+     "log_odds": 0.61,
+     "share_early": 0.147,
+     "share_late": 0.241
+    }
+   ],
+   "down": [
+    {
+     "word": "hahaha",
+     "z": -13.99,
+     "log_odds": -0.75,
+     "share_early": 0.121,
+     "share_late": 0.061
+    },
+    {
+     "word": "pov",
+     "z": -13.11,
+     "log_odds": -0.98,
+     "share_early": 0.066,
+     "share_late": 0.026
+    },
+    {
+     "word": "whats",
+     "z": -11.99,
+     "log_odds": -1.15,
+     "share_early": 0.043,
+     "share_late": 0.014
+    },
+    {
+     "word": "awhile",
+     "z": -11.78,
+     "log_odds": -0.9,
+     "share_early": 0.061,
+     "share_late": 0.026
+    },
+    {
+     "word": "prologue",
+     "z": -11.31,
+     "log_odds": -0.79,
+     "share_early": 0.07,
+     "share_late": 0.033
+    },
+    {
+     "word": "mana",
+     "z": -11.02,
+     "log_odds": -0.41,
+     "share_early": 0.274,
+     "share_late": 0.201
+    },
+    {
+     "word": "players",
+     "z": -10.67,
+     "log_odds": -0.59,
+     "share_early": 0.106,
+     "share_late": 0.061
+    },
+    {
+     "word": "stats",
+     "z": -10.37,
+     "log_odds": -0.45,
+     "share_early": 0.182,
+     "share_late": 0.124
+    },
+    {
+     "word": "hahahaha",
+     "z": -9.97,
+     "log_odds": -0.83,
+     "share_early": 0.049,
+     "share_late": 0.022
+    },
+    {
+     "word": "races",
+     "z": -9.82,
+     "log_odds": -0.44,
+     "share_early": 0.166,
+     "share_late": 0.114
+    },
+    {
+     "word": "race",
+     "z": -9.63,
+     "log_odds": -0.34,
+     "share_early": 0.302,
+     "share_late": 0.235
+    },
+    {
+     "word": "thats",
+     "z": -9.63,
+     "log_odds": -0.83,
+     "share_early": 0.046,
+     "share_late": 0.021
+    },
+    {
+     "word": "mmorpg",
+     "z": -9.09,
+     "log_odds": -1.11,
+     "share_early": 0.026,
+     "share_late": 0.009
+    },
+    {
+     "word": "player",
+     "z": -8.78,
+     "log_odds": -0.45,
+     "share_early": 0.123,
+     "share_late": 0.082
+    },
+    {
+     "word": "str",
+     "z": -8.69,
+     "log_odds": -0.73,
+     "share_early": 0.046,
+     "share_late": 0.023
+    },
+    {
+     "word": "dont",
+     "z": -8.68,
+     "log_odds": -0.8,
+     "share_early": 0.04,
+     "share_late": 0.018
+    },
+    {
+     "word": "demon",
+     "z": -8.6,
+     "log_odds": -0.34,
+     "share_early": 0.221,
+     "share_late": 0.168
+    },
+    {
+     "word": "haha",
+     "z": -8.54,
+     "log_odds": -0.43,
+     "share_early": 0.127,
+     "share_late": 0.087
+    },
+    {
+     "word": "suprised",
+     "z": -8.53,
+     "log_odds": -1.67,
+     "share_early": 0.013,
+     "share_late": 0.003
+    },
+    {
+     "word": "npc",
+     "z": -8.37,
+     "log_odds": -0.74,
+     "share_early": 0.042,
+     "share_late": 0.02
+    },
+    {
+     "word": "alot",
+     "z": -8.35,
+     "log_odds": -1.07,
+     "share_early": 0.023,
+     "share_late": 0.008
+    },
+    {
+     "word": "rpg",
+     "z": -8.29,
+     "log_odds": -0.61,
+     "share_early": 0.058,
+     "share_late": 0.033
+    },
+    {
+     "word": "vrmmorpg",
+     "z": -8.24,
+     "log_odds": -1.66,
+     "share_early": 0.013,
+     "share_late": 0.002
+    },
+    {
+     "word": "loli",
+     "z": -8.12,
+     "log_odds": -1.61,
+     "share_early": 0.013,
+     "share_late": 0.003
+    },
+    {
+     "word": "int",
+     "z": -8.09,
+     "log_odds": -0.69,
+     "share_early": 0.045,
+     "share_late": 0.023
+    },
+    {
+     "word": "reincarnate",
+     "z": -8.09,
+     "log_odds": -0.66,
+     "share_early": 0.049,
+     "share_late": 0.026
+    },
+    {
+     "word": "virtual",
+     "z": -8.06,
+     "log_odds": -0.5,
+     "share_early": 0.083,
+     "share_late": 0.052
+    },
+    {
+     "word": "meter",
+     "z": -7.94,
+     "log_odds": -0.41,
+     "share_early": 0.121,
+     "share_late": 0.084
+    },
+    {
+     "word": "lets",
+     "z": -7.94,
+     "log_odds": -0.35,
+     "share_early": 0.169,
+     "share_late": 0.125
+    },
+    {
+     "word": "gender",
+     "z": -7.87,
+     "log_odds": -0.48,
+     "share_early": 0.083,
+     "share_late": 0.053
+    },
+    {
+     "word": "female",
+     "z": -7.85,
+     "log_odds": -0.29,
+     "share_early": 0.255,
+     "share_late": 0.203
+    },
+    {
+     "word": "wis",
+     "z": -7.79,
+     "log_odds": -0.85,
+     "share_early": 0.028,
+     "share_late": 0.012
+    },
+    {
+     "word": "recieved",
+     "z": -7.71,
+     "log_odds": -1.43,
+     "share_early": 0.013,
+     "share_late": 0.003
+    },
+    {
+     "word": "hehe",
+     "z": -7.61,
+     "log_odds": -0.51,
+     "share_early": 0.07,
+     "share_late": 0.043
+    },
+    {
+     "word": "npcs",
+     "z": -7.6,
+     "log_odds": -0.76,
+     "share_early": 0.033,
+     "share_late": 0.016
+    },
+    {
+     "word": "regen",
+     "z": -7.6,
+     "log_odds": -0.83,
+     "share_early": 0.028,
+     "share_late": 0.012
+    },
+    {
+     "word": "increase",
+     "z": -7.58,
+     "log_odds": -0.29,
+     "share_early": 0.233,
+     "share_late": 0.184
+    },
+    {
+     "word": "depressed",
+     "z": -7.56,
+     "log_odds": -0.5,
+     "share_early": 0.071,
+     "share_late": 0.044
+    },
+    {
+     "word": "currently",
+     "z": -7.52,
+     "log_odds": -0.25,
+     "share_early": 0.362,
+     "share_late": 0.306
+    },
+    {
+     "word": "everytime",
+     "z": -7.52,
+     "log_odds": -0.77,
+     "share_early": 0.032,
+     "share_late": 0.015
+    }
+   ]
+  },
+  "hot": {
+   "up": [
+    {
+     "word": "paused",
+     "z": 7.95,
+     "log_odds": 0.89,
+     "share_early": 0.25,
+     "share_late": 0.448
+    },
+    {
+     "word": "breath",
+     "z": 7.51,
+     "log_odds": 0.79,
+     "share_early": 0.587,
+     "share_late": 0.758
+    },
+    {
+     "word": "shook",
+     "z": 7.42,
+     "log_odds": 0.75,
+     "share_early": 0.46,
+     "share_late": 0.644
+    },
+    {
+     "word": "shifted",
+     "z": 7.35,
+     "log_odds": 0.91,
+     "share_early": 0.184,
+     "share_late": 0.359
+    },
+    {
+     "word": "watched",
+     "z": 7.09,
+     "log_odds": 0.72,
+     "share_early": 0.455,
+     "share_late": 0.631
+    },
+    {
+     "word": "caught",
+     "z": 7.04,
+     "log_odds": 0.72,
+     "share_early": 0.534,
+     "share_late": 0.702
+    },
+    {
+     "word": "beneath",
+     "z": 6.93,
+     "log_odds": 0.75,
+     "share_early": 0.284,
+     "share_late": 0.457
+    },
+    {
+     "word": "stepped",
+     "z": 6.89,
+     "log_odds": 0.7,
+     "share_early": 0.405,
+     "share_late": 0.579
+    },
+    {
+     "word": "blinked",
+     "z": 6.77,
+     "log_odds": 0.79,
+     "share_early": 0.222,
+     "share_late": 0.385
+    },
+    {
+     "word": "feet",
+     "z": 6.75,
+     "log_odds": 0.73,
+     "share_early": 0.642,
+     "share_late": 0.789
+    },
+    {
+     "word": "muttered",
+     "z": 6.69,
+     "log_odds": 0.78,
+     "share_early": 0.223,
+     "share_late": 0.385
+    },
+    {
+     "word": "snapped",
+     "z": 6.55,
+     "log_odds": 0.73,
+     "share_early": 0.256,
+     "share_late": 0.417
+    },
+    {
+     "word": "held",
+     "z": 6.54,
+     "log_odds": 0.7,
+     "share_early": 0.621,
+     "share_late": 0.767
+    },
+    {
+     "word": "meant",
+     "z": 6.5,
+     "log_odds": 0.68,
+     "share_early": 0.58,
+     "share_late": 0.731
+    },
+    {
+     "word": "barely",
+     "z": 6.5,
+     "log_odds": 0.67,
+     "share_early": 0.57,
+     "share_late": 0.722
+    },
+    {
+     "word": "chest",
+     "z": 6.49,
+     "log_odds": 0.66,
+     "share_early": 0.513,
+     "share_late": 0.671
+    },
+    {
+     "word": "hung",
+     "z": 6.42,
+     "log_odds": 0.78,
+     "share_early": 0.191,
+     "share_late": 0.342
+    },
+    {
+     "word": "nodded",
+     "z": 6.35,
+     "log_odds": 0.64,
+     "share_early": 0.477,
+     "share_late": 0.634
+    },
+    {
+     "word": "stared",
+     "z": 6.29,
+     "log_odds": 0.63,
+     "share_early": 0.47,
+     "share_late": 0.626
+    },
+    {
+     "word": "raced",
+     "z": 6.23,
+     "log_odds": 1.25,
+     "share_early": 0.055,
+     "share_late": 0.171
+    },
+    {
+     "word": "hoped",
+     "z": 6.22,
+     "log_odds": 0.68,
+     "share_early": 0.273,
+     "share_late": 0.426
+    },
+    {
+     "word": "leaned",
+     "z": 6.08,
+     "log_odds": 0.69,
+     "share_early": 0.244,
+     "share_late": 0.392
+    },
+    {
+     "word": "hadn",
+     "z": 6.06,
+     "log_odds": 0.62,
+     "share_early": 0.386,
+     "share_late": 0.539
+    },
+    {
+     "word": "step",
+     "z": 6.04,
+     "log_odds": 0.61,
+     "share_early": 0.525,
+     "share_late": 0.671
+    },
+    {
+     "word": "edge",
+     "z": 5.93,
+     "log_odds": 0.6,
+     "share_early": 0.409,
+     "share_late": 0.558
+    },
+    {
+     "word": "dozen",
+     "z": 5.93,
+     "log_odds": 0.72,
+     "share_early": 0.193,
+     "share_late": 0.331
+    },
+    {
+     "word": "provided",
+     "z": 5.89,
+     "log_odds": 0.75,
+     "share_early": 0.17,
+     "share_late": 0.304
+    },
+    {
+     "word": "shoulder",
+     "z": 5.87,
+     "log_odds": 0.59,
+     "share_early": 0.473,
+     "share_late": 0.619
+    },
+    {
+     "word": "rolled",
+     "z": 5.85,
+     "log_odds": 0.62,
+     "share_early": 0.318,
+     "share_late": 0.464
+    },
+    {
+     "word": "cracked",
+     "z": 5.82,
+     "log_odds": 0.73,
+     "share_early": 0.176,
+     "share_late": 0.309
+    },
+    {
+     "word": "distant",
+     "z": 5.81,
+     "log_odds": 0.75,
+     "share_early": 0.163,
+     "share_late": 0.293
+    },
+    {
+     "word": "raised",
+     "z": 5.72,
+     "log_odds": 0.58,
+     "share_early": 0.485,
+     "share_late": 0.626
+    },
+    {
+     "word": "pulled",
+     "z": 5.72,
+     "log_odds": 0.59,
+     "share_early": 0.578,
+     "share_late": 0.712
+    },
+    {
+     "word": "fingers",
+     "z": 5.71,
+     "log_odds": 0.57,
+     "share_early": 0.441,
+     "share_late": 0.584
+    },
+    {
+     "word": "spun",
+     "z": 5.71,
+     "log_odds": 0.75,
+     "share_early": 0.155,
+     "share_late": 0.281
+    },
+    {
+     "word": "worked",
+     "z": 5.7,
+     "log_odds": 0.58,
+     "share_early": 0.496,
+     "share_late": 0.637
+    },
+    {
+     "word": "remained",
+     "z": 5.67,
+     "log_odds": 0.59,
+     "share_early": 0.331,
+     "share_late": 0.473
+    },
+    {
+     "word": "sense",
+     "z": 5.63,
+     "log_odds": 0.63,
+     "share_early": 0.684,
+     "share_late": 0.802
+    },
+    {
+     "word": "gestured",
+     "z": 5.57,
+     "log_odds": 0.82,
+     "share_early": 0.116,
+     "share_late": 0.23
+    },
+    {
+     "word": "pointed",
+     "z": 5.48,
+     "log_odds": 0.56,
+     "share_early": 0.39,
+     "share_late": 0.528
+    }
+   ],
+   "down": [
+    {
+     "word": "pov",
+     "z": -6.23,
+     "log_odds": -1.56,
+     "share_early": 0.076,
+     "share_late": 0.017
+    },
+    {
+     "word": "player",
+     "z": -5.62,
+     "log_odds": -0.79,
+     "share_early": 0.184,
+     "share_late": 0.093
+    },
+    {
+     "word": "races",
+     "z": -5.51,
+     "log_odds": -0.67,
+     "share_early": 0.256,
+     "share_late": 0.15
+    },
+    {
+     "word": "awhile",
+     "z": -5.41,
+     "log_odds": -1.47,
+     "share_early": 0.061,
+     "share_late": 0.014
+    },
+    {
+     "word": "hahaha",
+     "z": -5.33,
+     "log_odds": -1.02,
+     "share_early": 0.1,
+     "share_late": 0.039
+    },
+    {
+     "word": "players",
+     "z": -5.28,
+     "log_odds": -0.8,
+     "share_early": 0.155,
+     "share_late": 0.077
+    },
+    {
+     "word": "hahahaha",
+     "z": -5.22,
+     "log_odds": -1.66,
+     "share_early": 0.049,
+     "share_late": 0.01
+    },
+    {
+     "word": "virtual",
+     "z": -5.14,
+     "log_odds": -0.87,
+     "share_early": 0.123,
+     "share_late": 0.055
+    },
+    {
+     "word": "starts",
+     "z": -5.11,
+     "log_odds": -0.62,
+     "share_early": 0.252,
+     "share_late": 0.154
+    },
+    {
+     "word": "allows",
+     "z": -4.91,
+     "log_odds": -0.63,
+     "share_early": 0.216,
+     "share_late": 0.128
+    },
+    {
+     "word": "causes",
+     "z": -4.83,
+     "log_odds": -0.87,
+     "share_early": 0.108,
+     "share_late": 0.048
+    },
+    {
+     "word": "mmorpg",
+     "z": -4.82,
+     "log_odds": -1.44,
+     "share_early": 0.049,
+     "share_late": 0.012
+    },
+    {
+     "word": "slave",
+     "z": -4.64,
+     "log_odds": -0.75,
+     "share_early": 0.131,
+     "share_late": 0.066
+    },
+    {
+     "word": "npcs",
+     "z": -4.54,
+     "log_odds": -1.18,
+     "share_early": 0.057,
+     "share_late": 0.018
+    },
+    {
+     "word": "logout",
+     "z": -4.48,
+     "log_odds": -2.41,
+     "share_early": 0.028,
+     "share_late": 0.002
+    },
+    {
+     "word": "appears",
+     "z": -4.45,
+     "log_odds": -0.57,
+     "share_early": 0.212,
+     "share_late": 0.132
+    },
+    {
+     "word": "server",
+     "z": -4.44,
+     "log_odds": -1.15,
+     "share_early": 0.057,
+     "share_late": 0.019
+    },
+    {
+     "word": "hurts",
+     "z": -4.38,
+     "log_odds": -0.66,
+     "share_early": 0.152,
+     "share_late": 0.085
+    },
+    {
+     "word": "extremely",
+     "z": -4.35,
+     "log_odds": -0.45,
+     "share_early": 0.384,
+     "share_late": 0.284
+    },
+    {
+     "word": "throws",
+     "z": -4.26,
+     "log_odds": -0.9,
+     "share_early": 0.078,
+     "share_late": 0.033
+    },
+    {
+     "word": "demon",
+     "z": -4.25,
+     "log_odds": -0.51,
+     "share_early": 0.256,
+     "share_late": 0.172
+    },
+    {
+     "word": "gender",
+     "z": -4.21,
+     "log_odds": -0.71,
+     "share_early": 0.117,
+     "share_late": 0.061
+    },
+    {
+     "word": "regeneration",
+     "z": -4.16,
+     "log_odds": -0.58,
+     "share_early": 0.176,
+     "share_late": 0.107
+    },
+    {
+     "word": "female",
+     "z": -4.1,
+     "log_odds": -0.46,
+     "share_early": 0.295,
+     "share_late": 0.209
+    },
+    {
+     "word": "gameplay",
+     "z": -4.07,
+     "log_odds": -1.62,
+     "share_early": 0.03,
+     "share_late": 0.006
+    },
+    {
+     "word": "developers",
+     "z": -4.04,
+     "log_odds": -1.14,
+     "share_early": 0.047,
+     "share_late": 0.016
+    },
+    {
+     "word": "mana",
+     "z": -4.02,
+     "log_odds": -0.41,
+     "share_early": 0.462,
+     "share_late": 0.364
+    },
+    {
+     "word": "reaches",
+     "z": -4.01,
+     "log_odds": -0.6,
+     "share_early": 0.152,
+     "share_late": 0.09
+    },
+    {
+     "word": "reincarnated",
+     "z": -4.01,
+     "log_odds": -0.6,
+     "share_early": 0.152,
+     "share_late": 0.09
+    },
+    {
+     "word": "create",
+     "z": -4.0,
+     "log_odds": -0.41,
+     "share_early": 0.439,
+     "share_late": 0.343
+    },
+    {
+     "word": "girly",
+     "z": -3.99,
+     "log_odds": -1.41,
+     "share_early": 0.034,
+     "share_late": 0.008
+    },
+    {
+     "word": "basically",
+     "z": -3.99,
+     "log_odds": -0.45,
+     "share_early": 0.299,
+     "share_late": 0.215
+    },
+    {
+     "word": "stops",
+     "z": -3.99,
+     "log_odds": -0.63,
+     "share_early": 0.133,
+     "share_late": 0.075
+    },
+    {
+     "word": "breasts",
+     "z": -3.96,
+     "log_odds": -0.74,
+     "share_early": 0.095,
+     "share_late": 0.048
+    },
+    {
+     "word": "tries",
+     "z": -3.95,
+     "log_odds": -0.56,
+     "share_early": 0.165,
+     "share_late": 0.101
+    },
+    {
+     "word": "opens",
+     "z": -3.94,
+     "log_odds": -0.68,
+     "share_early": 0.112,
+     "share_late": 0.06
+    },
+    {
+     "word": "females",
+     "z": -3.92,
+     "log_odds": -0.89,
+     "share_early": 0.066,
+     "share_late": 0.028
+    },
+    {
+     "word": "strongest",
+     "z": -3.91,
+     "log_odds": -0.5,
+     "share_early": 0.214,
+     "share_late": 0.142
+    },
+    {
+     "word": "multiplayer",
+     "z": -3.91,
+     "log_odds": -1.7,
+     "share_early": 0.027,
+     "share_late": 0.005
+    },
+    {
+     "word": "npc",
+     "z": -3.91,
+     "log_odds": -0.95,
+     "share_early": 0.059,
+     "share_late": 0.024
+    }
+   ]
+  },
+  "pref": {
+   "up": [
+    {
+     "word": "stats",
+     "z": 3.46,
+     "log_odds": 0.42,
+     "share_early": 0.29,
+     "share_late": 0.269
+    },
+    {
+     "word": "register",
+     "z": 3.39,
+     "log_odds": 0.69,
+     "share_early": 0.062,
+     "share_late": 0.127
+    },
+    {
+     "word": "chest",
+     "z": 3.34,
+     "log_odds": 0.36,
+     "share_early": 0.513,
+     "share_late": 0.671
+    },
+    {
+     "word": "wis",
+     "z": 3.29,
+     "log_odds": 0.94,
+     "share_early": 0.04,
+     "share_late": 0.036
+    },
+    {
+     "word": "plucked",
+     "z": 3.23,
+     "log_odds": 1.09,
+     "share_early": 0.019,
+     "share_late": 0.094
+    },
+    {
+     "word": "screamed",
+     "z": 3.15,
+     "log_odds": 0.36,
+     "share_early": 0.282,
+     "share_late": 0.4
+    },
+    {
+     "word": "tip",
+     "z": 3.06,
+     "log_odds": 0.43,
+     "share_early": 0.152,
+     "share_late": 0.265
+    },
+    {
+     "word": "shone",
+     "z": 3.05,
+     "log_odds": 0.52,
+     "share_early": 0.093,
+     "share_late": 0.191
+    },
+    {
+     "word": "tie",
+     "z": 3.05,
+     "log_odds": 0.66,
+     "share_early": 0.051,
+     "share_late": 0.124
+    },
+    {
+     "word": "stared",
+     "z": 3.03,
+     "log_odds": 0.32,
+     "share_early": 0.47,
+     "share_late": 0.626
+    },
+    {
+     "word": "fifth",
+     "z": 3.03,
+     "log_odds": 0.54,
+     "share_early": 0.085,
+     "share_late": 0.163
+    },
+    {
+     "word": "str",
+     "z": 2.99,
+     "log_odds": 0.7,
+     "share_early": 0.059,
+     "share_late": 0.051
+    },
+    {
+     "word": "dex",
+     "z": 2.99,
+     "log_odds": 0.8,
+     "share_early": 0.042,
+     "share_late": 0.048
+    },
+    {
+     "word": "int",
+     "z": 2.98,
+     "log_odds": 0.75,
+     "share_early": 0.047,
+     "share_late": 0.046
+    },
+    {
+     "word": "kills",
+     "z": 2.98,
+     "log_odds": 0.78,
+     "share_early": 0.036,
+     "share_late": 0.066
+    },
+    {
+     "word": "couldn",
+     "z": 2.97,
+     "log_odds": 0.32,
+     "share_early": 0.589,
+     "share_late": 0.697
+    },
+    {
+     "word": "dozen",
+     "z": 2.91,
+     "log_odds": 0.38,
+     "share_early": 0.193,
+     "share_late": 0.331
+    },
+    {
+     "word": "stage",
+     "z": 2.82,
+     "log_odds": 0.4,
+     "share_early": 0.15,
+     "share_late": 0.207
+    },
+    {
+     "word": "mildly",
+     "z": 2.81,
+     "log_odds": 0.81,
+     "share_early": 0.028,
+     "share_late": 0.082
+    },
+    {
+     "word": "prompt",
+     "z": 2.81,
+     "log_odds": 0.74,
+     "share_early": 0.036,
+     "share_late": 0.092
+    },
+    {
+     "word": "rpg",
+     "z": 2.81,
+     "log_odds": 0.57,
+     "share_early": 0.08,
+     "share_late": 0.071
+    },
+    {
+     "word": "big",
+     "z": 2.8,
+     "log_odds": 0.31,
+     "share_early": 0.646,
+     "share_late": 0.725
+    },
+    {
+     "word": "didn",
+     "z": 2.75,
+     "log_odds": 0.32,
+     "share_early": 0.686,
+     "share_late": 0.767
+    },
+    {
+     "word": "starter",
+     "z": 2.72,
+     "log_odds": 0.75,
+     "share_early": 0.034,
+     "share_late": 0.067
+    },
+    {
+     "word": "tier",
+     "z": 2.71,
+     "log_odds": 0.46,
+     "share_early": 0.11,
+     "share_late": 0.159
+    },
+    {
+     "word": "fancy",
+     "z": 2.7,
+     "log_odds": 0.43,
+     "share_early": 0.11,
+     "share_late": 0.197
+    },
+    {
+     "word": "cultivation",
+     "z": 2.67,
+     "log_odds": 0.5,
+     "share_early": 0.089,
+     "share_late": 0.093
+    },
+    {
+     "word": "potion",
+     "z": 2.65,
+     "log_odds": 0.54,
+     "share_early": 0.068,
+     "share_late": 0.101
+    },
+    {
+     "word": "boon",
+     "z": 2.64,
+     "log_odds": 0.79,
+     "share_early": 0.028,
+     "share_late": 0.085
+    },
+    {
+     "word": "trainer",
+     "z": 2.62,
+     "log_odds": 1.13,
+     "share_early": 0.011,
+     "share_late": 0.046
+    },
+    {
+     "word": "skidded",
+     "z": 2.61,
+     "log_odds": 2.19,
+     "share_early": 0.002,
+     "share_late": 0.042
+    },
+    {
+     "word": "class",
+     "z": 2.59,
+     "log_odds": 0.28,
+     "share_early": 0.447,
+     "share_late": 0.491
+    },
+    {
+     "word": "heavens",
+     "z": 2.59,
+     "log_odds": 0.41,
+     "share_early": 0.121,
+     "share_late": 0.151
+    },
+    {
+     "word": "bane",
+     "z": 2.58,
+     "log_odds": 1.33,
+     "share_early": 0.008,
+     "share_late": 0.024
+    },
+    {
+     "word": "fit",
+     "z": 2.58,
+     "log_odds": 0.28,
+     "share_early": 0.354,
+     "share_late": 0.482
+    },
+    {
+     "word": "palm",
+     "z": 2.58,
+     "log_odds": 0.32,
+     "share_early": 0.214,
+     "share_late": 0.332
+    },
+    {
+     "word": "grudgingly",
+     "z": 2.57,
+     "log_odds": 1.35,
+     "share_early": 0.008,
+     "share_late": 0.022
+    },
+    {
+     "word": "feet",
+     "z": 2.57,
+     "log_odds": 0.29,
+     "share_early": 0.642,
+     "share_late": 0.789
+    },
+    {
+     "word": "strife",
+     "z": 2.52,
+     "log_odds": 1.3,
+     "share_early": 0.008,
+     "share_late": 0.028
+    },
+    {
+     "word": "plated",
+     "z": 2.52,
+     "log_odds": 1.28,
+     "share_early": 0.008,
+     "share_late": 0.029
+    }
+   ],
+   "down": [
+    {
+     "word": "causes",
+     "z": -4.67,
+     "log_odds": -0.9,
+     "share_early": 0.108,
+     "share_late": 0.048
+    },
+    {
+     "word": "throws",
+     "z": -4.58,
+     "log_odds": -1.03,
+     "share_early": 0.078,
+     "share_late": 0.033
+    },
+    {
+     "word": "overlooking",
+     "z": -4.4,
+     "log_odds": -1.04,
+     "share_early": 0.066,
+     "share_late": 0.037
+    },
+    {
+     "word": "union",
+     "z": -4.19,
+     "log_odds": -1.25,
+     "share_early": 0.04,
+     "share_late": 0.023
+    },
+    {
+     "word": "won't",
+     "z": -4.18,
+     "log_odds": -0.5,
+     "share_early": 0.288,
+     "share_late": 0.221
+    },
+    {
+     "word": "tactics",
+     "z": -4.18,
+     "log_odds": -0.88,
+     "share_early": 0.087,
+     "share_late": 0.047
+    },
+    {
+     "word": "forces",
+     "z": -4.17,
+     "log_odds": -0.58,
+     "share_early": 0.193,
+     "share_late": 0.154
+    },
+    {
+     "word": "enchanting",
+     "z": -4.09,
+     "log_odds": -1.05,
+     "share_early": 0.059,
+     "share_late": 0.028
+    },
+    {
+     "word": "tries",
+     "z": -4.04,
+     "log_odds": -0.61,
+     "share_early": 0.165,
+     "share_late": 0.101
+    },
+    {
+     "word": "severely",
+     "z": -4.02,
+     "log_odds": -0.81,
+     "share_early": 0.097,
+     "share_late": 0.052
+    },
+    {
+     "word": "can't",
+     "z": -4.01,
+     "log_odds": -0.44,
+     "share_early": 0.364,
+     "share_late": 0.283
+    },
+    {
+     "word": "allowing",
+     "z": -4.01,
+     "log_odds": -0.48,
+     "share_early": 0.295,
+     "share_late": 0.263
+    },
+    {
+     "word": "sidearm",
+     "z": -3.95,
+     "log_odds": -1.85,
+     "share_early": 0.021,
+     "share_late": 0.011
+    },
+    {
+     "word": "reaches",
+     "z": -3.89,
+     "log_odds": -0.61,
+     "share_early": 0.152,
+     "share_late": 0.09
+    },
+    {
+     "word": "ann",
+     "z": -3.88,
+     "log_odds": -2.82,
+     "share_early": 0.013,
+     "share_late": 0.002
+    },
+    {
+     "word": "makes",
+     "z": -3.88,
+     "log_odds": -0.41,
+     "share_early": 0.506,
+     "share_late": 0.414
+    },
+    {
+     "word": "unconvinced",
+     "z": -3.79,
+     "log_odds": -1.79,
+     "share_early": 0.019,
+     "share_late": 0.007
+    },
+    {
+     "word": "stops",
+     "z": -3.77,
+     "log_odds": -0.63,
+     "share_early": 0.133,
+     "share_late": 0.075
+    },
+    {
+     "word": "distinguish",
+     "z": -3.71,
+     "log_odds": -1.0,
+     "share_early": 0.051,
+     "share_late": 0.03
+    },
+    {
+     "word": "autonomous",
+     "z": -3.71,
+     "log_odds": -1.47,
+     "share_early": 0.03,
+     "share_late": 0.014
+    },
+    {
+     "word": "errands",
+     "z": -3.7,
+     "log_odds": -1.32,
+     "share_early": 0.03,
+     "share_late": 0.014
+    },
+    {
+     "word": "controls",
+     "z": -3.7,
+     "log_odds": -0.77,
+     "share_early": 0.091,
+     "share_late": 0.049
+    },
+    {
+     "word": "druid",
+     "z": -3.68,
+     "log_odds": -1.24,
+     "share_early": 0.042,
+     "share_late": 0.015
+    },
+    {
+     "word": "exploit",
+     "z": -3.67,
+     "log_odds": -1.01,
+     "share_early": 0.051,
+     "share_late": 0.035
+    },
+    {
+     "word": "prostrated",
+     "z": -3.65,
+     "log_odds": -2.17,
+     "share_early": 0.019,
+     "share_late": 0.003
+    },
+    {
+     "word": "shakes",
+     "z": -3.62,
+     "log_odds": -0.77,
+     "share_early": 0.078,
+     "share_late": 0.042
+    },
+    {
+     "word": "jellyfish",
+     "z": -3.59,
+     "log_odds": -2.27,
+     "share_early": 0.013,
+     "share_late": 0.005
+    },
+    {
+     "word": "metals",
+     "z": -3.57,
+     "log_odds": -0.83,
+     "share_early": 0.072,
+     "share_late": 0.036
+    },
+    {
+     "word": "amid",
+     "z": -3.56,
+     "log_odds": -1.21,
+     "share_early": 0.028,
+     "share_late": 0.045
+    },
+    {
+     "word": "server",
+     "z": -3.55,
+     "log_odds": -0.99,
+     "share_early": 0.057,
+     "share_late": 0.019
+    },
+    {
+     "word": "flow",
+     "z": -3.55,
+     "log_odds": -0.42,
+     "share_early": 0.307,
+     "share_late": 0.251
+    },
+    {
+     "word": "disappearances",
+     "z": -3.54,
+     "log_odds": -1.96,
+     "share_early": 0.015,
+     "share_late": 0.004
+    },
+    {
+     "word": "puts",
+     "z": -3.52,
+     "log_odds": -0.75,
+     "share_early": 0.076,
+     "share_late": 0.044
+    },
+    {
+     "word": "kisses",
+     "z": -3.51,
+     "log_odds": -1.44,
+     "share_early": 0.023,
+     "share_late": 0.008
+    },
+    {
+     "word": "discovered",
+     "z": -3.48,
+     "log_odds": -0.41,
+     "share_early": 0.318,
+     "share_late": 0.267
+    },
+    {
+     "word": "sighs",
+     "z": -3.48,
+     "log_odds": -0.76,
+     "share_early": 0.076,
+     "share_late": 0.039
+    },
+    {
+     "word": "seaweed",
+     "z": -3.47,
+     "log_odds": -1.94,
+     "share_early": 0.013,
+     "share_late": 0.006
+    },
+    {
+     "word": "opens",
+     "z": -3.47,
+     "log_odds": -0.62,
+     "share_early": 0.112,
+     "share_late": 0.06
+    },
+    {
+     "word": "absence",
+     "z": -3.47,
+     "log_odds": -0.63,
+     "share_early": 0.098,
+     "share_late": 0.108
+    },
+    {
+     "word": "oppression",
+     "z": -3.46,
+     "log_odds": -1.72,
+     "share_early": 0.017,
+     "share_late": 0.006
+    }
+   ]
+  }
+ },
+ "concepts": {
+  "戀愛關係": {
+   "supply_change": 0.067,
+   "hot_change": -0.066,
+   "gap_early": -0.241,
+   "gap_late": -0.386,
+   "gap_change": -0.145,
+   "gap_change_lo": -0.207,
+   "gap_change_hi": -0.019
+  },
+  "喜劇吐槽": {
+   "supply_change": -0.117,
+   "hot_change": -0.185,
+   "gap_early": -0.156,
+   "gap_late": -0.232,
+   "gap_change": -0.076,
+   "gap_change_lo": -0.119,
+   "gap_change_hi": 0.082
+  },
+  "日常溫馨": {
+   "supply_change": 0.163,
+   "hot_change": 0.096,
+   "gap_early": 0.019,
+   "gap_late": -0.056,
+   "gap_change": -0.075,
+   "gap_change_lo": -0.15,
+   "gap_change_hi": 0.026
+  },
+  "女性主角情感": {
+   "supply_change": -0.226,
+   "hot_change": -0.266,
+   "gap_early": -0.019,
+   "gap_late": -0.063,
+   "gap_change": -0.045,
+   "gap_change_lo": -0.105,
+   "gap_change_hi": 0.079
+  },
+  "文學式描寫": {
+   "supply_change": 0.066,
+   "hot_change": 0.056,
+   "gap_early": -0.044,
+   "gap_late": -0.054,
+   "gap_change": -0.011,
+   "gap_change_lo": -0.119,
+   "gap_change_hi": 0.07
+  },
+  "戰爭與軍事": {
+   "supply_change": -0.024,
+   "hot_change": -0.029,
+   "gap_early": 0.092,
+   "gap_late": 0.086,
+   "gap_change": -0.006,
+   "gap_change_lo": -0.102,
+   "gap_change_hi": 0.066
+  },
+  "黑暗殘酷": {
+   "supply_change": -0.121,
+   "hot_change": -0.114,
+   "gap_early": 0.011,
+   "gap_late": 0.018,
+   "gap_change": 0.007,
+   "gap_change_lo": -0.06,
+   "gap_change_hi": 0.113
+  },
+  "第一人稱內心獨白": {
+   "supply_change": -0.008,
+   "hot_change": 0.026,
+   "gap_early": 0.143,
+   "gap_late": 0.178,
+   "gap_change": 0.035,
+   "gap_change_lo": -0.033,
+   "gap_change_hi": 0.131
+  },
+  "太空科幻": {
+   "supply_change": -0.12,
+   "hot_change": -0.061,
+   "gap_early": 0.159,
+   "gap_late": 0.222,
+   "gap_change": 0.064,
+   "gap_change_lo": -0.031,
+   "gap_change_hi": 0.16
+  },
+  "遊戲系統": {
+   "supply_change": -0.361,
+   "hot_change": -0.291,
+   "gap_early": 0.416,
+   "gap_late": 0.486,
+   "gap_change": 0.069,
+   "gap_change_lo": 0.03,
+   "gap_change_hi": 0.224
+  },
+  "異世界轉生": {
+   "supply_change": -0.495,
+   "hot_change": -0.42,
+   "gap_early": -0.005,
+   "gap_late": 0.078,
+   "gap_change": 0.083,
+   "gap_change_lo": -0.01,
+   "gap_change_hi": 0.179
+  },
+  "開場就打鬥": {
+   "supply_change": -0.001,
+   "hot_change": 0.08,
+   "gap_early": -0.157,
+   "gap_late": -0.065,
+   "gap_change": 0.092,
+   "gap_change_lo": -0.014,
+   "gap_change_hi": 0.183
+  },
+  "領地經營": {
+   "supply_change": -0.282,
+   "hot_change": -0.194,
+   "gap_early": 0.256,
+   "gap_late": 0.348,
+   "gap_change": 0.092,
+   "gap_change_lo": 0.006,
+   "gap_change_hi": 0.213
+  },
+  "地城與怪物": {
+   "supply_change": -0.267,
+   "hot_change": -0.173,
+   "gap_early": 0.333,
+   "gap_late": 0.432,
+   "gap_change": 0.099,
+   "gap_change_lo": -0.015,
+   "gap_change_hi": 0.207
+  },
+  "神與神話": {
+   "supply_change": -0.187,
+   "hot_change": -0.072,
+   "gap_early": 0.118,
+   "gap_late": 0.244,
+   "gap_change": 0.126,
+   "gap_change_lo": 0.029,
+   "gap_change_hi": 0.23
+  },
+  "現代都市奇幻": {
+   "supply_change": -0.104,
+   "hot_change": 0.016,
+   "gap_early": 0.02,
+   "gap_late": 0.152,
+   "gap_change": 0.132,
+   "gap_change_lo": 0.063,
+   "gap_change_hi": 0.266
+  },
+  "修仙宗門": {
+   "supply_change": -0.335,
+   "hot_change": -0.191,
+   "gap_early": 0.181,
+   "gap_late": 0.339,
+   "gap_change": 0.158,
+   "gap_change_lo": 0.03,
+   "gap_change_hi": 0.217
+  },
+  "魔法學院": {
+   "supply_change": -0.166,
+   "hot_change": -0.012,
+   "gap_early": 0.029,
+   "gap_late": 0.201,
+   "gap_change": 0.171,
+   "gap_change_lo": 0.054,
+   "gap_change_hi": 0.261
+  }
+ },
+ "concept_by_year": [
+  {
+   "concept": "遊戲系統",
+   "year": 2016,
+   "supply": 0.399,
+   "hot": 0.939,
+   "gap": 0.626,
+   "gap_lo": 0.394,
+   "gap_hi": 0.858
+  },
+  {
+   "concept": "地城與怪物",
+   "year": 2016,
+   "supply": 0.284,
+   "hot": 0.595,
+   "gap": 0.36,
+   "gap_lo": 0.162,
+   "gap_hi": 0.608
+  },
+  {
+   "concept": "修仙宗門",
+   "year": 2016,
+   "supply": 0.362,
+   "hot": 0.458,
+   "gap": 0.112,
+   "gap_lo": -0.1,
+   "gap_hi": 0.319
+  },
+  {
+   "concept": "異世界轉生",
+   "year": 2016,
+   "supply": 0.587,
+   "hot": 0.605,
+   "gap": 0.022,
+   "gap_lo": -0.217,
+   "gap_hi": 0.231
+  },
+  {
+   "concept": "領地經營",
+   "year": 2016,
+   "supply": 0.307,
+   "hot": 0.632,
+   "gap": 0.378,
+   "gap_lo": 0.099,
+   "gap_hi": 0.624
+  },
+  {
+   "concept": "戰爭與軍事",
+   "year": 2016,
+   "supply": 0.029,
+   "hot": 0.075,
+   "gap": 0.054,
+   "gap_lo": -0.13,
+   "gap_hi": 0.254
+  },
+  {
+   "concept": "太空科幻",
+   "year": 2016,
+   "supply": 0.175,
+   "hot": 0.353,
+   "gap": 0.206,
+   "gap_lo": 0.032,
+   "gap_hi": 0.41
+  },
+  {
+   "concept": "現代都市奇幻",
+   "year": 2016,
+   "supply": 0.113,
+   "hot": 0.228,
+   "gap": 0.134,
+   "gap_lo": -0.077,
+   "gap_hi": 0.343
+  },
+  {
+   "concept": "魔法學院",
+   "year": 2016,
+   "supply": 0.141,
+   "hot": 0.103,
+   "gap": -0.045,
+   "gap_lo": -0.229,
+   "gap_hi": 0.161
+  },
+  {
+   "concept": "戀愛關係",
+   "year": 2016,
+   "supply": -0.081,
+   "hot": -0.227,
+   "gap": -0.168,
+   "gap_lo": -0.369,
+   "gap_hi": 0.033
+  },
+  {
+   "concept": "日常溫馨",
+   "year": 2016,
+   "supply": -0.113,
+   "hot": -0.035,
+   "gap": 0.09,
+   "gap_lo": -0.103,
+   "gap_hi": 0.282
+  },
+  {
+   "concept": "黑暗殘酷",
+   "year": 2016,
+   "supply": 0.147,
+   "hot": 0.231,
+   "gap": 0.097,
+   "gap_lo": -0.127,
+   "gap_hi": 0.311
+  },
+  {
+   "concept": "喜劇吐槽",
+   "year": 2016,
+   "supply": 0.152,
+   "hot": 0.177,
+   "gap": 0.029,
+   "gap_lo": -0.156,
+   "gap_hi": 0.263
+  },
+  {
+   "concept": "神與神話",
+   "year": 2016,
+   "supply": 0.247,
+   "hot": 0.381,
+   "gap": 0.156,
+   "gap_lo": -0.07,
+   "gap_hi": 0.405
+  },
+  {
+   "concept": "第一人稱內心獨白",
+   "year": 2016,
+   "supply": 0.075,
+   "hot": 0.249,
+   "gap": 0.201,
+   "gap_lo": -0.042,
+   "gap_hi": 0.405
+  },
+  {
+   "concept": "文學式描寫",
+   "year": 2016,
+   "supply": 0.012,
+   "hot": 0.001,
+   "gap": -0.014,
+   "gap_lo": -0.2,
+   "gap_hi": 0.214
+  },
+  {
+   "concept": "開場就打鬥",
+   "year": 2016,
+   "supply": -0.013,
+   "hot": -0.146,
+   "gap": -0.154,
+   "gap_lo": -0.402,
+   "gap_hi": 0.088
+  },
+  {
+   "concept": "女性主角情感",
+   "year": 2016,
+   "supply": 0.236,
+   "hot": 0.292,
+   "gap": 0.065,
+   "gap_lo": -0.139,
+   "gap_hi": 0.3
+  },
+  {
+   "concept": "遊戲系統",
+   "year": 2017,
+   "supply": 0.36,
+   "hot": 0.648,
+   "gap": 0.318,
+   "gap_lo": 0.186,
+   "gap_hi": 0.453
+  },
+  {
+   "concept": "地城與怪物",
+   "year": 2017,
+   "supply": 0.263,
+   "hot": 0.532,
+   "gap": 0.297,
+   "gap_lo": 0.146,
+   "gap_hi": 0.44
+  },
+  {
+   "concept": "修仙宗門",
+   "year": 2017,
+   "supply": 0.267,
+   "hot": 0.396,
+   "gap": 0.143,
+   "gap_lo": 0.013,
+   "gap_hi": 0.271
+  },
+  {
+   "concept": "異世界轉生",
+   "year": 2017,
+   "supply": 0.441,
+   "hot": 0.435,
+   "gap": -0.007,
+   "gap_lo": -0.119,
+   "gap_hi": 0.13
+  },
+  {
+   "concept": "領地經營",
+   "year": 2017,
+   "supply": 0.253,
+   "hot": 0.419,
+   "gap": 0.184,
+   "gap_lo": 0.07,
+   "gap_hi": 0.299
+  },
+  {
+   "concept": "戰爭與軍事",
+   "year": 2017,
+   "supply": 0.004,
+   "hot": 0.102,
+   "gap": 0.109,
+   "gap_lo": -0.008,
+   "gap_hi": 0.225
+  },
+  {
+   "concept": "太空科幻",
+   "year": 2017,
+   "supply": 0.108,
+   "hot": 0.244,
+   "gap": 0.15,
+   "gap_lo": 0.005,
+   "gap_hi": 0.27
+  },
+  {
+   "concept": "現代都市奇幻",
+   "year": 2017,
+   "supply": 0.123,
+   "hot": 0.097,
+   "gap": -0.028,
+   "gap_lo": -0.164,
+   "gap_hi": 0.1
+  },
+  {
+   "concept": "魔法學院",
+   "year": 2017,
+   "supply": 0.173,
+   "hot": 0.214,
+   "gap": 0.045,
+   "gap_lo": -0.124,
+   "gap_hi": 0.182
+  },
+  {
+   "concept": "戀愛關係",
+   "year": 2017,
+   "supply": -0.128,
+   "hot": -0.302,
+   "gap": -0.192,
+   "gap_lo": -0.342,
+   "gap_hi": -0.055
+  },
+  {
+   "concept": "日常溫馨",
+   "year": 2017,
+   "supply": -0.202,
+   "hot": -0.185,
+   "gap": 0.019,
+   "gap_lo": -0.103,
+   "gap_hi": 0.158
+  },
+  {
+   "concept": "黑暗殘酷",
+   "year": 2017,
+   "supply": 0.099,
+   "hot": 0.076,
+   "gap": -0.026,
+   "gap_lo": -0.171,
+   "gap_hi": 0.119
+  },
+  {
+   "concept": "喜劇吐槽",
+   "year": 2017,
+   "supply": 0.179,
+   "hot": 0.004,
+   "gap": -0.193,
+   "gap_lo": -0.329,
+   "gap_hi": -0.047
+  },
+  {
+   "concept": "神與神話",
+   "year": 2017,
+   "supply": 0.172,
+   "hot": 0.21,
+   "gap": 0.041,
+   "gap_lo": -0.075,
+   "gap_hi": 0.149
+  },
+  {
+   "concept": "第一人稱內心獨白",
+   "year": 2017,
+   "supply": 0.002,
+   "hot": 0.151,
+   "gap": 0.165,
+   "gap_lo": 0.025,
+   "gap_hi": 0.301
+  },
+  {
+   "concept": "文學式描寫",
+   "year": 2017,
+   "supply": -0.125,
+   "hot": -0.16,
+   "gap": -0.038,
+   "gap_lo": -0.152,
+   "gap_hi": 0.091
+  },
+  {
+   "concept": "開場就打鬥",
+   "year": 2017,
+   "supply": -0.014,
+   "hot": -0.195,
+   "gap": -0.2,
+   "gap_lo": -0.333,
+   "gap_hi": -0.055
+  },
+  {
+   "concept": "女性主角情感",
+   "year": 2017,
+   "supply": 0.175,
+   "hot": 0.152,
+   "gap": -0.025,
+   "gap_lo": -0.151,
+   "gap_hi": 0.097
+  },
+  {
+   "concept": "遊戲系統",
+   "year": 2018,
+   "supply": 0.231,
+   "hot": 0.506,
+   "gap": 0.306,
+   "gap_lo": 0.191,
+   "gap_hi": 0.44
+  },
+  {
+   "concept": "地城與怪物",
+   "year": 2018,
+   "supply": 0.148,
+   "hot": 0.454,
+   "gap": 0.341,
+   "gap_lo": 0.204,
+   "gap_hi": 0.471
+  },
+  {
+   "concept": "修仙宗門",
+   "year": 2018,
+   "supply": 0.207,
+   "hot": 0.467,
+   "gap": 0.29,
+   "gap_lo": 0.17,
+   "gap_hi": 0.409
+  },
+  {
+   "concept": "異世界轉生",
+   "year": 2018,
+   "supply": 0.304,
+   "hot": 0.277,
+   "gap": -0.03,
+   "gap_lo": -0.158,
+   "gap_hi": 0.092
+  },
+  {
+   "concept": "領地經營",
+   "year": 2018,
+   "supply": 0.183,
+   "hot": 0.368,
+   "gap": 0.206,
+   "gap_lo": 0.075,
+   "gap_hi": 0.331
+  },
+  {
+   "concept": "戰爭與軍事",
+   "year": 2018,
+   "supply": 0.015,
+   "hot": 0.118,
+   "gap": 0.114,
+   "gap_lo": 0.001,
+   "gap_hi": 0.239
+  },
+  {
+   "concept": "太空科幻",
+   "year": 2018,
+   "supply": 0.109,
+   "hot": 0.216,
+   "gap": 0.12,
+   "gap_lo": 0.007,
+   "gap_hi": 0.244
+  },
+  {
+   "concept": "現代都市奇幻",
+   "year": 2018,
+   "supply": 0.011,
+   "hot": -0.028,
+   "gap": -0.044,
+   "gap_lo": -0.158,
+   "gap_hi": 0.075
+  },
+  {
+   "concept": "魔法學院",
+   "year": 2018,
+   "supply": 0.089,
+   "hot": 0.168,
+   "gap": 0.088,
+   "gap_lo": -0.036,
+   "gap_hi": 0.22
+  },
+  {
+   "concept": "戀愛關係",
+   "year": 2018,
+   "supply": -0.094,
+   "hot": -0.418,
+   "gap": -0.361,
+   "gap_lo": -0.474,
+   "gap_hi": -0.223
+  },
+  {
+   "concept": "日常溫馨",
+   "year": 2018,
+   "supply": -0.184,
+   "hot": -0.23,
+   "gap": -0.051,
+   "gap_lo": -0.173,
+   "gap_hi": 0.082
+  },
+  {
+   "concept": "黑暗殘酷",
+   "year": 2018,
+   "supply": 0.025,
+   "hot": -0.009,
+   "gap": -0.038,
+   "gap_lo": -0.178,
+   "gap_hi": 0.085
+  },
+  {
+   "concept": "喜劇吐槽",
+   "year": 2018,
+   "supply": 0.08,
+   "hot": -0.194,
+   "gap": -0.305,
+   "gap_lo": -0.441,
+   "gap_hi": -0.19
+  },
+  {
+   "concept": "神與神話",
+   "year": 2018,
+   "supply": 0.057,
+   "hot": 0.197,
+   "gap": 0.156,
+   "gap_lo": 0.023,
+   "gap_hi": 0.297
+  },
+  {
+   "concept": "第一人稱內心獨白",
+   "year": 2018,
+   "supply": -0.037,
+   "hot": 0.019,
+   "gap": 0.062,
+   "gap_lo": -0.062,
+   "gap_hi": 0.179
+  },
+  {
+   "concept": "文學式描寫",
+   "year": 2018,
+   "supply": -0.143,
+   "hot": -0.214,
+   "gap": -0.079,
+   "gap_lo": -0.199,
+   "gap_hi": 0.03
+  },
+  {
+   "concept": "開場就打鬥",
+   "year": 2018,
+   "supply": -0.023,
+   "hot": -0.128,
+   "gap": -0.117,
+   "gap_lo": -0.251,
+   "gap_hi": -0.017
+  },
+  {
+   "concept": "女性主角情感",
+   "year": 2018,
+   "supply": 0.124,
+   "hot": 0.039,
+   "gap": -0.095,
+   "gap_lo": -0.227,
+   "gap_hi": 0.028
+  },
+  {
+   "concept": "遊戲系統",
+   "year": 2019,
+   "supply": 0.112,
+   "hot": 0.531,
+   "gap": 0.466,
+   "gap_lo": 0.319,
+   "gap_hi": 0.599
+  },
+  {
+   "concept": "地城與怪物",
+   "year": 2019,
+   "supply": 0.052,
+   "hot": 0.392,
+   "gap": 0.379,
+   "gap_lo": 0.229,
+   "gap_hi": 0.518
+  },
+  {
+   "concept": "修仙宗門",
+   "year": 2019,
+   "supply": 0.055,
+   "hot": 0.237,
+   "gap": 0.202,
+   "gap_lo": 0.098,
+   "gap_hi": 0.321
+  },
+  {
+   "concept": "異世界轉生",
+   "year": 2019,
+   "supply": 0.084,
+   "hot": 0.164,
+   "gap": 0.089,
+   "gap_lo": -0.042,
+   "gap_hi": 0.197
+  },
+  {
+   "concept": "領地經營",
+   "year": 2019,
+   "supply": 0.061,
+   "hot": 0.346,
+   "gap": 0.317,
+   "gap_lo": 0.207,
+   "gap_hi": 0.429
+  },
+  {
+   "concept": "戰爭與軍事",
+   "year": 2019,
+   "supply": -0.033,
+   "hot": 0.119,
+   "gap": 0.169,
+   "gap_lo": 0.063,
+   "gap_hi": 0.273
+  },
+  {
+   "concept": "太空科幻",
+   "year": 2019,
+   "supply": 0.035,
+   "hot": 0.231,
+   "gap": 0.218,
+   "gap_lo": 0.106,
+   "gap_hi": 0.342
+  },
+  {
+   "concept": "現代都市奇幻",
+   "year": 2019,
+   "supply": -0.033,
+   "hot": 0.036,
+   "gap": 0.077,
+   "gap_lo": -0.033,
+   "gap_hi": 0.177
+  },
+  {
+   "concept": "魔法學院",
+   "year": 2019,
+   "supply": -0.002,
+   "hot": 0.03,
+   "gap": 0.036,
+   "gap_lo": -0.086,
+   "gap_hi": 0.148
+  },
+  {
+   "concept": "戀愛關係",
+   "year": 2019,
+   "supply": -0.072,
+   "hot": -0.421,
+   "gap": -0.388,
+   "gap_lo": -0.534,
+   "gap_hi": -0.263
+  },
+  {
+   "concept": "日常溫馨",
+   "year": 2019,
+   "supply": -0.087,
+   "hot": -0.156,
+   "gap": -0.077,
+   "gap_lo": -0.201,
+   "gap_hi": 0.046
+  },
+  {
+   "concept": "黑暗殘酷",
+   "year": 2019,
+   "supply": -0.043,
+   "hot": 0.107,
+   "gap": 0.167,
+   "gap_lo": 0.031,
+   "gap_hi": 0.295
+  },
+  {
+   "concept": "喜劇吐槽",
+   "year": 2019,
+   "supply": 0.056,
+   "hot": -0.096,
+   "gap": -0.169,
+   "gap_lo": -0.292,
+   "gap_hi": -0.044
+  },
+  {
+   "concept": "神與神話",
+   "year": 2019,
+   "supply": -0.047,
+   "hot": 0.146,
+   "gap": 0.214,
+   "gap_lo": 0.089,
+   "gap_hi": 0.336
+  },
+  {
+   "concept": "第一人稱內心獨白",
+   "year": 2019,
+   "supply": -0.046,
+   "hot": 0.157,
+   "gap": 0.226,
+   "gap_lo": 0.116,
+   "gap_hi": 0.336
+  },
+  {
+   "concept": "文學式描寫",
+   "year": 2019,
+   "supply": -0.145,
+   "hot": -0.23,
+   "gap": -0.094,
+   "gap_lo": -0.198,
+   "gap_hi": -0.004
+  },
+  {
+   "concept": "開場就打鬥",
+   "year": 2019,
+   "supply": -0.028,
+   "hot": -0.071,
+   "gap": -0.048,
+   "gap_lo": -0.165,
+   "gap_hi": 0.073
+  },
+  {
+   "concept": "女性主角情感",
+   "year": 2019,
+   "supply": 0.041,
+   "hot": -0.039,
+   "gap": -0.089,
+   "gap_lo": -0.218,
+   "gap_hi": 0.018
+  },
+  {
+   "concept": "遊戲系統",
+   "year": 2020,
+   "supply": 0.023,
+   "hot": 0.449,
+   "gap": 0.472,
+   "gap_lo": 0.361,
+   "gap_hi": 0.575
+  },
+  {
+   "concept": "地城與怪物",
+   "year": 2020,
+   "supply": -0.007,
+   "hot": 0.337,
+   "gap": 0.381,
+   "gap_lo": 0.278,
+   "gap_hi": 0.497
+  },
+  {
+   "concept": "修仙宗門",
+   "year": 2020,
+   "supply": -0.019,
+   "hot": 0.298,
+   "gap": 0.351,
+   "gap_lo": 0.232,
+   "gap_hi": 0.479
+  },
+  {
+   "concept": "異世界轉生",
+   "year": 2020,
+   "supply": 0.024,
+   "hot": 0.068,
+   "gap": 0.049,
+   "gap_lo": -0.053,
+   "gap_hi": 0.147
+  },
+  {
+   "concept": "領地經營",
+   "year": 2020,
+   "supply": 0.001,
+   "hot": 0.29,
+   "gap": 0.32,
+   "gap_lo": 0.226,
+   "gap_hi": 0.421
+  },
+  {
+   "concept": "戰爭與軍事",
+   "year": 2020,
+   "supply": -0.034,
+   "hot": 0.084,
+   "gap": 0.131,
+   "gap_lo": 0.04,
+   "gap_hi": 0.215
+  },
+  {
+   "concept": "太空科幻",
+   "year": 2020,
+   "supply": -0.005,
+   "hot": 0.169,
+   "gap": 0.192,
+   "gap_lo": 0.077,
+   "gap_hi": 0.308
+  },
+  {
+   "concept": "現代都市奇幻",
+   "year": 2020,
+   "supply": -0.034,
+   "hot": -0.001,
+   "gap": 0.037,
+   "gap_lo": -0.062,
+   "gap_hi": 0.133
+  },
+  {
+   "concept": "魔法學院",
+   "year": 2020,
+   "supply": 0.013,
+   "hot": 0.072,
+   "gap": 0.065,
+   "gap_lo": -0.042,
+   "gap_hi": 0.166
+  },
+  {
+   "concept": "戀愛關係",
+   "year": 2020,
+   "supply": -0.033,
+   "hot": -0.368,
+   "gap": -0.372,
+   "gap_lo": -0.478,
+   "gap_hi": -0.273
+  },
+  {
+   "concept": "日常溫馨",
+   "year": 2020,
+   "supply": -0.023,
+   "hot": -0.024,
+   "gap": -0.002,
+   "gap_lo": -0.099,
+   "gap_hi": 0.08
+  },
+  {
+   "concept": "黑暗殘酷",
+   "year": 2020,
+   "supply": -0.041,
+   "hot": -0.039,
+   "gap": 0.002,
+   "gap_lo": -0.099,
+   "gap_hi": 0.117
+  },
+  {
+   "concept": "喜劇吐槽",
+   "year": 2020,
+   "supply": 0.084,
+   "hot": -0.145,
+   "gap": -0.254,
+   "gap_lo": -0.362,
+   "gap_hi": -0.162
+  },
+  {
+   "concept": "神與神話",
+   "year": 2020,
+   "supply": -0.052,
+   "hot": 0.14,
+   "gap": 0.214,
+   "gap_lo": 0.103,
+   "gap_hi": 0.301
+  },
+  {
+   "concept": "第一人稱內心獨白",
+   "year": 2020,
+   "supply": -0.027,
+   "hot": 0.145,
+   "gap": 0.19,
+   "gap_lo": 0.092,
+   "gap_hi": 0.282
+  },
+  {
+   "concept": "文學式描寫",
+   "year": 2020,
+   "supply": -0.07,
+   "hot": -0.103,
+   "gap": -0.037,
+   "gap_lo": -0.122,
+   "gap_hi": 0.057
+  },
+  {
+   "concept": "開場就打鬥",
+   "year": 2020,
+   "supply": -0.01,
+   "hot": -0.115,
+   "gap": -0.117,
+   "gap_lo": -0.223,
+   "gap_hi": -0.0
+  },
+  {
+   "concept": "女性主角情感",
+   "year": 2020,
+   "supply": 0.033,
+   "hot": -0.017,
+   "gap": -0.055,
+   "gap_lo": -0.149,
+   "gap_hi": 0.051
+  },
+  {
+   "concept": "遊戲系統",
+   "year": 2021,
+   "supply": -0.004,
+   "hot": 0.382,
+   "gap": 0.428,
+   "gap_lo": 0.332,
+   "gap_hi": 0.524
+  },
+  {
+   "concept": "地城與怪物",
+   "year": 2021,
+   "supply": -0.046,
+   "hot": 0.344,
+   "gap": 0.432,
+   "gap_lo": 0.327,
+   "gap_hi": 0.528
+  },
+  {
+   "concept": "修仙宗門",
+   "year": 2021,
+   "supply": -0.03,
+   "hot": 0.302,
+   "gap": 0.368,
+   "gap_lo": 0.272,
+   "gap_hi": 0.475
+  },
+  {
+   "concept": "異世界轉生",
+   "year": 2021,
+   "supply": -0.011,
+   "hot": 0.004,
+   "gap": 0.016,
+   "gap_lo": -0.069,
+   "gap_hi": 0.116
+  },
+  {
+   "concept": "領地經營",
+   "year": 2021,
+   "supply": -0.031,
+   "hot": 0.28,
+   "gap": 0.346,
+   "gap_lo": 0.244,
+   "gap_hi": 0.445
+  },
+  {
+   "concept": "戰爭與軍事",
+   "year": 2021,
+   "supply": -0.042,
+   "hot": 0.015,
+   "gap": 0.063,
+   "gap_lo": -0.018,
+   "gap_hi": 0.141
+  },
+  {
+   "concept": "太空科幻",
+   "year": 2021,
+   "supply": 0.0,
+   "hot": 0.196,
+   "gap": 0.217,
+   "gap_lo": 0.137,
+   "gap_hi": 0.314
+  },
+  {
+   "concept": "現代都市奇幻",
+   "year": 2021,
+   "supply": -0.049,
+   "hot": -0.011,
+   "gap": 0.042,
+   "gap_lo": -0.045,
+   "gap_hi": 0.128
+  },
+  {
+   "concept": "魔法學院",
+   "year": 2021,
+   "supply": -0.024,
+   "hot": 0.12,
+   "gap": 0.159,
+   "gap_lo": 0.068,
+   "gap_hi": 0.271
+  },
+  {
+   "concept": "戀愛關係",
+   "year": 2021,
+   "supply": -0.039,
+   "hot": -0.407,
+   "gap": -0.408,
+   "gap_lo": -0.494,
+   "gap_hi": -0.32
+  },
+  {
+   "concept": "日常溫馨",
+   "year": 2021,
+   "supply": -0.007,
+   "hot": -0.003,
+   "gap": 0.005,
+   "gap_lo": -0.072,
+   "gap_hi": 0.082
+  },
+  {
+   "concept": "黑暗殘酷",
+   "year": 2021,
+   "supply": -0.044,
+   "hot": -0.097,
+   "gap": -0.059,
+   "gap_lo": -0.15,
+   "gap_hi": 0.035
+  },
+  {
+   "concept": "喜劇吐槽",
+   "year": 2021,
+   "supply": 0.058,
+   "hot": -0.198,
+   "gap": -0.283,
+   "gap_lo": -0.386,
+   "gap_hi": -0.195
+  },
+  {
+   "concept": "神與神話",
+   "year": 2021,
+   "supply": -0.061,
+   "hot": 0.143,
+   "gap": 0.226,
+   "gap_lo": 0.144,
+   "gap_hi": 0.301
+  },
+  {
+   "concept": "第一人稱內心獨白",
+   "year": 2021,
+   "supply": 0.0,
+   "hot": 0.182,
+   "gap": 0.202,
+   "gap_lo": 0.121,
+   "gap_hi": 0.283
+  },
+  {
+   "concept": "文學式描寫",
+   "year": 2021,
+   "supply": -0.051,
+   "hot": -0.046,
+   "gap": 0.006,
+   "gap_lo": -0.076,
+   "gap_hi": 0.086
+  },
+  {
+   "concept": "開場就打鬥",
+   "year": 2021,
+   "supply": -0.035,
+   "hot": -0.201,
+   "gap": -0.184,
+   "gap_lo": -0.277,
+   "gap_hi": -0.077
+  },
+  {
+   "concept": "女性主角情感",
+   "year": 2021,
+   "supply": -0.007,
+   "hot": -0.12,
+   "gap": -0.126,
+   "gap_lo": -0.229,
+   "gap_hi": -0.031
+  },
+  {
+   "concept": "遊戲系統",
+   "year": 2022,
+   "supply": -0.054,
+   "hot": 0.469,
+   "gap": 0.581,
+   "gap_lo": 0.476,
+   "gap_hi": 0.679
+  },
+  {
+   "concept": "地城與怪物",
+   "year": 2022,
+   "supply": -0.062,
+   "hot": 0.354,
+   "gap": 0.462,
+   "gap_lo": 0.377,
+   "gap_hi": 0.545
+  },
+  {
+   "concept": "修仙宗門",
+   "year": 2022,
+   "supply": -0.105,
+   "hot": 0.221,
+   "gap": 0.362,
+   "gap_lo": 0.28,
+   "gap_hi": 0.45
+  },
+  {
+   "concept": "異世界轉生",
+   "year": 2022,
+   "supply": -0.076,
+   "hot": 0.058,
+   "gap": 0.149,
+   "gap_lo": 0.072,
+   "gap_hi": 0.228
+  },
+  {
+   "concept": "領地經營",
+   "year": 2022,
+   "supply": -0.062,
+   "hot": 0.296,
+   "gap": 0.397,
+   "gap_lo": 0.316,
+   "gap_hi": 0.486
+  },
+  {
+   "concept": "戰爭與軍事",
+   "year": 2022,
+   "supply": -0.001,
+   "hot": 0.126,
+   "gap": 0.142,
+   "gap_lo": 0.063,
+   "gap_hi": 0.21
+  },
+  {
+   "concept": "太空科幻",
+   "year": 2022,
+   "supply": -0.001,
+   "hot": 0.252,
+   "gap": 0.281,
+   "gap_lo": 0.206,
+   "gap_hi": 0.365
+  },
+  {
+   "concept": "現代都市奇幻",
+   "year": 2022,
+   "supply": -0.04,
+   "hot": 0.224,
+   "gap": 0.293,
+   "gap_lo": 0.218,
+   "gap_hi": 0.374
+  },
+  {
+   "concept": "魔法學院",
+   "year": 2022,
+   "supply": -0.037,
+   "hot": 0.217,
+   "gap": 0.282,
+   "gap_lo": 0.187,
+   "gap_hi": 0.378
+  },
+  {
+   "concept": "戀愛關係",
+   "year": 2022,
+   "supply": -0.067,
+   "hot": -0.362,
+   "gap": -0.328,
+   "gap_lo": -0.405,
+   "gap_hi": -0.258
+  },
+  {
+   "concept": "日常溫馨",
+   "year": 2022,
+   "supply": -0.044,
+   "hot": -0.081,
+   "gap": -0.041,
+   "gap_lo": -0.114,
+   "gap_hi": 0.045
+  },
+  {
+   "concept": "黑暗殘酷",
+   "year": 2022,
+   "supply": -0.053,
+   "hot": 0.052,
+   "gap": 0.117,
+   "gap_lo": 0.037,
+   "gap_hi": 0.199
+  },
+  {
+   "concept": "喜劇吐槽",
+   "year": 2022,
+   "supply": 0.024,
+   "hot": -0.137,
+   "gap": -0.179,
+   "gap_lo": -0.269,
+   "gap_hi": -0.096
+  },
+  {
+   "concept": "神與神話",
+   "year": 2022,
+   "supply": -0.048,
+   "hot": 0.202,
+   "gap": 0.279,
+   "gap_lo": 0.213,
+   "gap_hi": 0.355
+  },
+  {
+   "concept": "第一人稱內心獨白",
+   "year": 2022,
+   "supply": -0.042,
+   "hot": 0.182,
+   "gap": 0.248,
+   "gap_lo": 0.178,
+   "gap_hi": 0.327
+  },
+  {
+   "concept": "文學式描寫",
+   "year": 2022,
+   "supply": -0.064,
+   "hot": -0.068,
+   "gap": -0.005,
+   "gap_lo": -0.083,
+   "gap_hi": 0.064
+  },
+  {
+   "concept": "開場就打鬥",
+   "year": 2022,
+   "supply": -0.016,
+   "hot": 0.014,
+   "gap": 0.033,
+   "gap_lo": -0.053,
+   "gap_hi": 0.112
+  },
+  {
+   "concept": "女性主角情感",
+   "year": 2022,
+   "supply": -0.098,
+   "hot": -0.089,
+   "gap": 0.01,
+   "gap_lo": -0.076,
+   "gap_hi": 0.088
+  },
+  {
+   "concept": "遊戲系統",
+   "year": 2023,
+   "supply": -0.033,
+   "hot": 0.37,
+   "gap": 0.447,
+   "gap_lo": 0.379,
+   "gap_hi": 0.518
+  },
+  {
+   "concept": "地城與怪物",
+   "year": 2023,
+   "supply": 0.001,
+   "hot": 0.364,
+   "gap": 0.403,
+   "gap_lo": 0.334,
+   "gap_hi": 0.468
+  },
+  {
+   "concept": "修仙宗門",
+   "year": 2023,
+   "supply": -0.034,
+   "hot": 0.226,
+   "gap": 0.288,
+   "gap_lo": 0.226,
+   "gap_hi": 0.353
+  },
+  {
+   "concept": "異世界轉生",
+   "year": 2023,
+   "supply": -0.065,
+   "hot": -0.004,
+   "gap": 0.068,
+   "gap_lo": 0.003,
+   "gap_hi": 0.125
+  },
+  {
+   "concept": "領地經營",
+   "year": 2023,
+   "supply": -0.009,
+   "hot": 0.262,
+   "gap": 0.301,
+   "gap_lo": 0.226,
+   "gap_hi": 0.361
+  },
+  {
+   "concept": "戰爭與軍事",
+   "year": 2023,
+   "supply": 0.019,
+   "hot": 0.067,
+   "gap": 0.054,
+   "gap_lo": -0.011,
+   "gap_hi": 0.108
+  },
+  {
+   "concept": "太空科幻",
+   "year": 2023,
+   "supply": 0.032,
+   "hot": 0.184,
+   "gap": 0.169,
+   "gap_lo": 0.103,
+   "gap_hi": 0.236
+  },
+  {
+   "concept": "現代都市奇幻",
+   "year": 2023,
+   "supply": 0.023,
+   "hot": 0.131,
+   "gap": 0.12,
+   "gap_lo": 0.041,
+   "gap_hi": 0.186
+  },
+  {
+   "concept": "魔法學院",
+   "year": 2023,
+   "supply": -0.034,
+   "hot": 0.111,
+   "gap": 0.16,
+   "gap_lo": 0.096,
+   "gap_hi": 0.23
+  },
+  {
+   "concept": "戀愛關係",
+   "year": 2023,
+   "supply": 0.005,
+   "hot": -0.375,
+   "gap": -0.422,
+   "gap_lo": -0.49,
+   "gap_hi": -0.349
+  },
+  {
+   "concept": "日常溫馨",
+   "year": 2023,
+   "supply": 0.041,
+   "hot": -0.077,
+   "gap": -0.131,
+   "gap_lo": -0.195,
+   "gap_hi": -0.065
+  },
+  {
+   "concept": "黑暗殘酷",
+   "year": 2023,
+   "supply": 0.005,
+   "hot": 0.002,
+   "gap": -0.004,
+   "gap_lo": -0.07,
+   "gap_hi": 0.069
+  },
+  {
+   "concept": "喜劇吐槽",
+   "year": 2023,
+   "supply": -0.021,
+   "hot": -0.231,
+   "gap": -0.234,
+   "gap_lo": -0.303,
+   "gap_hi": -0.163
+  },
+  {
+   "concept": "神與神話",
+   "year": 2023,
+   "supply": 0.023,
+   "hot": 0.228,
+   "gap": 0.227,
+   "gap_lo": 0.157,
+   "gap_hi": 0.299
+  },
+  {
+   "concept": "第一人稱內心獨白",
+   "year": 2023,
+   "supply": 0.057,
+   "hot": 0.133,
+   "gap": 0.084,
+   "gap_lo": 0.011,
+   "gap_hi": 0.154
+  },
+  {
+   "concept": "文學式描寫",
+   "year": 2023,
+   "supply": 0.058,
+   "hot": -0.09,
+   "gap": -0.164,
+   "gap_lo": -0.23,
+   "gap_hi": -0.101
+  },
+  {
+   "concept": "開場就打鬥",
+   "year": 2023,
+   "supply": -0.003,
+   "hot": -0.042,
+   "gap": -0.043,
+   "gap_lo": -0.112,
+   "gap_hi": 0.026
+  },
+  {
+   "concept": "女性主角情感",
+   "year": 2023,
+   "supply": -0.04,
+   "hot": -0.107,
+   "gap": -0.074,
+   "gap_lo": -0.15,
+   "gap_hi": 0.016
+  },
+  {
+   "concept": "遊戲系統",
+   "year": 2024,
+   "supply": -0.127,
+   "hot": 0.28,
+   "gap": 0.452,
+   "gap_lo": 0.392,
+   "gap_hi": 0.519
+  },
+  {
+   "concept": "地城與怪物",
+   "year": 2024,
+   "supply": -0.062,
+   "hot": 0.257,
+   "gap": 0.355,
+   "gap_lo": 0.306,
+   "gap_hi": 0.412
+  },
+  {
+   "concept": "修仙宗門",
+   "year": 2024,
+   "supply": -0.039,
+   "hot": 0.268,
+   "gap": 0.342,
+   "gap_lo": 0.277,
+   "gap_hi": 0.398
+  },
+  {
+   "concept": "異世界轉生",
+   "year": 2024,
+   "supply": -0.127,
+   "hot": 0.025,
+   "gap": 0.169,
+   "gap_lo": 0.114,
+   "gap_hi": 0.228
+  },
+  {
+   "concept": "領地經營",
+   "year": 2024,
+   "supply": -0.073,
+   "hot": 0.152,
+   "gap": 0.25,
+   "gap_lo": 0.194,
+   "gap_hi": 0.303
+  },
+  {
+   "concept": "戰爭與軍事",
+   "year": 2024,
+   "supply": 0.018,
+   "hot": 0.158,
+   "gap": 0.156,
+   "gap_lo": 0.094,
+   "gap_hi": 0.205
+  },
+  {
+   "concept": "太空科幻",
+   "year": 2024,
+   "supply": -0.082,
+   "hot": 0.058,
+   "gap": 0.156,
+   "gap_lo": 0.096,
+   "gap_hi": 0.218
+  },
+  {
+   "concept": "現代都市奇幻",
+   "year": 2024,
+   "supply": 0.009,
+   "hot": 0.057,
+   "gap": 0.053,
+   "gap_lo": 0.006,
+   "gap_hi": 0.11
+  },
+  {
+   "concept": "魔法學院",
+   "year": 2024,
+   "supply": -0.015,
+   "hot": 0.039,
+   "gap": 0.06,
+   "gap_lo": 0.007,
+   "gap_hi": 0.118
+  },
+  {
+   "concept": "戀愛關係",
+   "year": 2024,
+   "supply": 0.121,
+   "hot": -0.238,
+   "gap": -0.4,
+   "gap_lo": -0.459,
+   "gap_hi": -0.345
+  },
+  {
+   "concept": "日常溫馨",
+   "year": 2024,
+   "supply": 0.11,
+   "hot": -0.022,
+   "gap": -0.147,
+   "gap_lo": -0.206,
+   "gap_hi": -0.078
+  },
+  {
+   "concept": "黑暗殘酷",
+   "year": 2024,
+   "supply": 0.03,
+   "hot": 0.13,
+   "gap": 0.111,
+   "gap_lo": 0.055,
+   "gap_hi": 0.172
+  },
+  {
+   "concept": "喜劇吐槽",
+   "year": 2024,
+   "supply": -0.121,
+   "hot": -0.251,
+   "gap": -0.145,
+   "gap_lo": -0.196,
+   "gap_hi": -0.085
+  },
+  {
+   "concept": "神與神話",
+   "year": 2024,
+   "supply": -0.0,
+   "hot": 0.165,
+   "gap": 0.184,
+   "gap_lo": 0.129,
+   "gap_hi": 0.235
+  },
+  {
+   "concept": "第一人稱內心獨白",
+   "year": 2024,
+   "supply": 0.005,
+   "hot": 0.195,
+   "gap": 0.211,
+   "gap_lo": 0.16,
+   "gap_hi": 0.261
+  },
+  {
+   "concept": "文學式描寫",
+   "year": 2024,
+   "supply": 0.124,
+   "hot": 0.003,
+   "gap": -0.134,
+   "gap_lo": -0.197,
+   "gap_hi": -0.074
+  },
+  {
+   "concept": "開場就打鬥",
+   "year": 2024,
+   "supply": 0.042,
+   "hot": 0.121,
+   "gap": 0.089,
+   "gap_lo": 0.03,
+   "gap_hi": 0.148
+  },
+  {
+   "concept": "女性主角情感",
+   "year": 2024,
+   "supply": -0.019,
+   "hot": -0.079,
+   "gap": -0.068,
+   "gap_lo": -0.124,
+   "gap_hi": -0.011
+  }
+ ],
+ "gap_change_with_2024": {
+  "修仙宗門": 0.16,
+  "喜劇吐槽": 0.011,
+  "地城與怪物": 0.022,
+  "太空科幻": -0.003,
+  "女性主角情感": -0.049,
+  "戀愛關係": -0.159,
+  "戰爭與軍事": 0.064,
+  "文學式描寫": -0.091,
+  "日常溫馨": -0.167,
+  "現代都市奇幻": 0.032,
+  "異世界轉生": 0.174,
+  "神與神話": 0.066,
+  "第一人稱內心獨白": 0.068,
+  "遊戲系統": 0.036,
+  "開場就打鬥": 0.245,
+  "領地經營": -0.006,
+  "魔法學院": 0.031,
+  "黑暗殘酷": 0.1
+ }
+}
