@@ -6,7 +6,7 @@ MIT 15.071 *The AI Edge*, Fall 2026, Project 1 (predictive AI).
 
 **Result.** On 2023 serials (held out in time), a logistic regression on tags, author experience and an embedding of the first three chapters puts **48% of recommendation slots on a future top-10% book**, against 26% for the best editorial rule and 10% at random. Details in [`modeling/README.md`](modeling/README.md).
 
-**Interactive atlas.** `docs/` is a static site (GitHub Pages → *Deploy from branch* → `main` / `docs`): 45,245 books placed by the embedding of their first three chapters, in a PCA view and a UMAP view.
+**Interactive atlas.** <https://godspeedhuang.github.io/royalroad-breakout/> (served by GitHub Pages from `docs/`): 45,245 books placed by the embedding of their first three chapters, in a PCA view and a UMAP view.
 
 ## Data
 
