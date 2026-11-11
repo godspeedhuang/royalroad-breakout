@@ -1,0 +1,22 @@
+.venv/
+.env
+__pycache__/
+.ipynb_checkpoints/
+.DS_Store
+
+# 大檔案不進 git（原始資料、中間檔、向量），改用雲端分享，清單見 README「Large files」
+# 資料夾本身用 .gitkeep 保留，clone 下來結構就在
+/data/**
+!/data/raw/
+!/data/interim/
+!/data/**/.gitkeep
+embedding/out/emb_parts/*
+!embedding/out/emb_parts/.gitkeep
+*.parquet
+
+# 例外：GitHub Pages 上的 Atlas 要讀這兩個檔（公開版，無作者名、節錄 300 字）
+!docs/atlas/*/data/dataset.parquet
+
+# 個人編輯器設定
+.vscode/
+.claude/

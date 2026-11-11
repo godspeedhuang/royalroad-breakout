@@ -1,0 +1,24 @@
+[project]
+name = "royalroad-breakout"
+version = "0.1.0"
+description = "15.071 Project 1: predict which new Royal Road serials reach the top 10% of their release-quarter cohort"
+requires-python = ">=3.12"
+dependencies = [
+    "pandas",
+    "pyarrow",
+    "numpy",
+    "scipy",
+    "scikit-learn",
+    "matplotlib",
+    "seaborn",
+    "tqdm",
+    "ipykernel",
+    "nbconvert",
+    "huggingface-hub",
+    # embedding pipeline
+    "openai",
+    "tiktoken",
+    "python-dotenv",
+    "umap-learn",
+    "torch>=2.15.0",
+]
