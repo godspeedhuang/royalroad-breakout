@@ -1,0 +1,326 @@
+{
+ "n_rows": 1613875,
+ "n_fictions": 86959,
+ "n_authors": 56458,
+ "date_min": "2013-03-30",
+ "date_max": "2025-06-16",
+ "n_chapter_id_dup": 0,
+ "n_chapter_id_null": 1,
+ "const_share": {
+  "total_views": 1.0,
+  "followers": 1.0,
+  "overall_score": 1.0,
+  "favorites": 1.0,
+  "ratings": 1.0,
+  "pages": 1.0
+ },
+ "fi_na": {
+  "overall_score": 1.0,
+  "style_score": 1.0,
+  "story_score": 1.0,
+  "grammar_score": 1.0,
+  "character_score": 1.0,
+  "pages": 1.0,
+  "status": 0.8251,
+  "ratings": 0.1265,
+  "favorites": 0.0739,
+  "fiction_id": 0.0,
+  "is_original": 0.0,
+  "tags": 0.0,
+  "warnings": 0.0,
+  "total_views": 0.0,
+  "average_views": 0.0,
+  "followers": 0.0
+ },
+ "chapters_per_fiction": {
+  "count": 86959.0,
+  "mean": 18.6,
+  "std": 45.1,
+  "min": 1.0,
+  "10%": 1.0,
+  "25%": 2.0,
+  "50%": 5.0,
+  "75%": 18.0,
+  "90%": 45.0,
+  "99%": 192.0,
+  "max": 1793.0
+ },
+ "share_1ch": 0.23646776066882094,
+ "share_ge3": 0.6669464920249772,
+ "by_year": {
+  "2013": {
+   "chapters": 1053,
+   "new_fictions": 111
+  },
+  "2014": {
+   "chapters": 3879,
+   "new_fictions": 508
+  },
+  "2015": {
+   "chapters": 26844,
+   "new_fictions": 2808
+  },
+  "2016": {
+   "chapters": 39057,
+   "new_fictions": 3476
+  },
+  "2017": {
+   "chapters": 45791,
+   "new_fictions": 4052
+  },
+  "2018": {
+   "chapters": 60682,
+   "new_fictions": 4381
+  },
+  "2019": {
+   "chapters": 71327,
+   "new_fictions": 4429
+  },
+  "2020": {
+   "chapters": 103970,
+   "new_fictions": 6373
+  },
+  "2021": {
+   "chapters": 130144,
+   "new_fictions": 7124
+  },
+  "2022": {
+   "chapters": 168975,
+   "new_fictions": 8526
+  },
+  "2023": {
+   "chapters": 249778,
+   "new_fictions": 11786
+  },
+  "2024": {
+   "chapters": 395598,
+   "new_fictions": 17565
+  },
+  "2025": {
+   "chapters": 316777,
+   "new_fictions": 15820
+  }
+ },
+ "status": {
+  "NULL": 0.8251,
+  "ONGOING": 0.1118,
+  "COMPLETED": 0.0631
+ },
+ "is_original": {
+  "1": 0.9148,
+  "0": 0.0852
+ },
+ "followers_q": {
+  "0.5": 3.0,
+  "0.75": 16.0,
+  "0.9": 116.0,
+  "0.95": 406.0,
+  "0.99": 2386.2599999999948,
+  "0.999": 9387.714000000022
+ },
+ "views_q": {
+  "0.5": 1160.0,
+  "0.75": 6269.0,
+  "0.9": 38631.19999999995,
+  "0.95": 125271.29999999945,
+  "0.99": 932190.7799999979,
+  "0.999": 6573860.048000104
+ },
+ "share_zero_followers": 0.26836785151623177,
+ "rho_views_followers": 0.8365487045566629,
+ "score_nonnull": {
+  "overall_score": 0,
+  "style_score": 0,
+  "story_score": 0,
+  "grammar_score": 0,
+  "character_score": 0,
+  "pages": 0
+ },
+ "share_has_score": 0.0,
+ "ratings_na": 0.12650789452500605,
+ "ratings_zero": 0.40083257627157626,
+ "favorites_na": 0.07394289262756011,
+ "favorites_zero": 0.39363378143722905,
+ "rho_ratings_followers": 0.8337917937175694,
+ "rho_favorites_followers": 0.8858976480238301,
+ "ratings_by_followers": {
+  "0": {
+   "n": 23337,
+   "ratings_zero_or_na": 0.9197,
+   "med_ratings": 0.0,
+   "med_favorites": 0.0
+  },
+  "1-9": {
+   "n": 36222,
+   "ratings_zero_or_na": 0.6122,
+   "med_ratings": 0.0,
+   "med_favorites": 1.0
+  },
+  "10-99": {
+   "n": 18040,
+   "ratings_zero_or_na": 0.1034,
+   "med_ratings": 5.0,
+   "med_favorites": 6.0
+  },
+  "100-999": {
+   "n": 7152,
+   "ratings_zero_or_na": 0.0364,
+   "med_ratings": 46.0,
+   "med_favorites": 68.0
+  },
+  "1k-9.9k": {
+   "n": 2127,
+   "ratings_zero_or_na": 0.0451,
+   "med_ratings": 437.0,
+   "med_favorites": 559.5
+  },
+  "10k+": {
+   "n": 81,
+   "ratings_zero_or_na": 0.0,
+   "med_ratings": 3782.0,
+   "med_favorites": 5327.0
+  }
+ },
+ "tags_per_fiction_med": 8.0,
+ "n_distinct_tags": 64,
+ "top_tags": {
+  "Fantasy": 0.6971,
+  "Adventure": 0.6134,
+  "Action": 0.5967,
+  "Male Lead": 0.4521,
+  "Magic": 0.4447,
+  "High Fantasy": 0.2831,
+  "Supernatural": 0.2678,
+  "Strong Lead": 0.2283,
+  "Female Lead": 0.2233,
+  "Progression": 0.2136,
+  "Multiple Lead Characters": 0.1968,
+  "Romance": 0.1965,
+  "Sci-fi": 0.1858,
+  "LitRPG": 0.1838,
+  "Anti-Hero Lead": 0.1799,
+  "Comedy": 0.1735,
+  "Drama": 0.1714,
+  "Portal Fantasy / Isekai": 0.1627,
+  "Reincarnation": 0.155,
+  "Martial Arts": 0.1402,
+  "Slice of Life": 0.1391,
+  "Non-Human Lead": 0.1334,
+  "Psychological": 0.1333,
+  "Mystery": 0.1321,
+  "Strategy": 0.1274
+ },
+ "warnings": {
+  "Graphic Violence": 0.4564,
+  "Profanity": 0.4199,
+  "Sensitive Content": 0.3248,
+  "Sexual Content": 0.1741,
+  "AI-Assisted Content": 0.0708,
+  "AI-Generated Content": 0.0165
+ },
+ "share_no_warning": 0.33774537425683365,
+ "ai_by_year": {
+  "2013": {
+   "n": 111,
+   "ai": 0.0
+  },
+  "2014": {
+   "n": 508,
+   "ai": 0.0
+  },
+  "2015": {
+   "n": 2808,
+   "ai": 0.0
+  },
+  "2016": {
+   "n": 3476,
+   "ai": 0.0
+  },
+  "2017": {
+   "n": 4052,
+   "ai": 0.0
+  },
+  "2018": {
+   "n": 4381,
+   "ai": 0.0
+  },
+  "2019": {
+   "n": 4429,
+   "ai": 0.0009
+  },
+  "2020": {
+   "n": 6373,
+   "ai": 0.0011
+  },
+  "2021": {
+   "n": 7124,
+   "ai": 0.0014
+  },
+  "2022": {
+   "n": 8526,
+   "ai": 0.0028
+  },
+  "2023": {
+   "n": 11786,
+   "ai": 0.0514
+  },
+  "2024": {
+   "n": 17565,
+   "ai": 0.1136
+  },
+  "2025": {
+   "n": 15820,
+   "ai": 0.2217
+  }
+ },
+ "words_q": {
+  "0.01": 139.0,
+  "0.1": 812.0,
+  "0.5": 1866.0,
+  "0.9": 3838.0,
+  "0.99": 8166.0
+ },
+ "share_short_chapter": 0.006030206800402758,
+ "cand_n": 57997,
+ "top10_threshold": 244.0,
+ "first3_words_med": 5082.0,
+ "rho_age_followers": 0.3546847307082815,
+ "rho_nchap_followers": 0.5586399693365346,
+ "age_table": {
+  "<3個月": {
+   "n": 6387,
+   "top10_rate": 0.0272,
+   "med_followers": 2.0
+  },
+  "3-12個月": {
+   "n": 11325,
+   "top10_rate": 0.0692,
+   "med_followers": 3.0
+  },
+  "1-3年": {
+   "n": 16184,
+   "top10_rate": 0.1097,
+   "med_followers": 6.0
+  },
+  ">3年": {
+   "n": 24101,
+   "top10_rate": 0.1275,
+   "med_followers": 15.0
+  }
+ },
+ "dup_title_share": 0.049759081866166815,
+ "dup_desc_share": 0.002817419703538449,
+ "empty_desc_share": 0.0013109626375648294,
+ "no_cover_share": 0.26534343771202523,
+ "author_fictions_q": {
+  "count": 56458.0,
+  "mean": 1.5,
+  "std": 1.5,
+  "min": 1.0,
+  "50%": 1.0,
+  "90%": 3.0,
+  "99%": 7.0,
+  "max": 62.0
+ },
+ "top_author_share": 0.025747766188663625
+}
