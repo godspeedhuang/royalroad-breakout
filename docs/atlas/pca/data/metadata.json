@@ -1,0 +1,1 @@
+{"props": {"data": {"id": "__row_index__", "projection": {"x": "pca_x", "y": "pca_y"}, "text": "chapter1_excerpt", "neighbors": "neighbors"}}, "isStatic": true, "database": {"type": "wasm", "load": true}}

@@ -1,0 +1,1 @@
+{"props": {"data": {"id": "__row_index__", "projection": {"x": "umap_x", "y": "umap_y"}, "text": "chapter1_excerpt", "neighbors": "neighbors"}}, "isStatic": true, "database": {"type": "wasm", "load": true}}

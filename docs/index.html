@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Royal Road Breakout: Embedding Atlas</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 42rem; margin: 4rem auto; padding: 0 1rem; }
+  a.card { display: block; padding: 1rem 1.25rem; margin: 1rem 0; border: 1px solid color-mix(in srgb, currentColor 25%, transparent); border-radius: 8px; text-decoration: none; color: inherit; }
+  a.card:hover { border-color: currentColor; }
+  small { opacity: .7; }
+</style>
+<h1>Royal Road Breakout</h1>
+<p>MIT 15.071 Project 1. Each point is one of 45,245 web serials first released 2016–2024,
+placed by a <code>text-embedding-3-small</code> embedding of its first three chapters.
+Colour by <code>top10</code> to see which books ended up in the top 10% of followers within their release quarter.</p>
+<a class="card" href="atlas/pca/"><b>PCA view</b><br><small>Linear projection (first two components explain 10.4% of variance). Includes the per-quarter centroid of top-10% books, so you can follow how the hits move over time.</small></a>
+<a class="card" href="atlas/umap/"><b>UMAP view</b><br><small>Non-linear projection. Better for seeing clusters of similar stories; distances between clusters are not meaningful.</small></a>
+<p><small>First load downloads about 110 MB (DuckDB-WASM + data). Excerpts are capped at 300 characters and link back to royalroad.com; author names are removed.</small></p>
+</html>
