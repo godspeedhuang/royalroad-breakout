@@ -2808,7 +2808,7 @@
   }
  },
  "concepts": {
-  "戀愛關係": {
+  "romance": {
    "supply_change": -0.008,
    "hot_change": -0.114,
    "gap_early": -0.258,
@@ -2817,7 +2817,7 @@
    "gap_change_lo": -0.201,
    "gap_change_hi": -0.038
   },
-  "喜劇吐槽": {
+  "comedy": {
    "supply_change": -0.163,
    "hot_change": -0.206,
    "gap_early": -0.19,
@@ -2826,7 +2826,7 @@
    "gap_change_lo": -0.118,
    "gap_change_hi": 0.051
   },
-  "女性主角情感": {
+  "female lead emotions": {
    "supply_change": -0.251,
    "hot_change": -0.293,
    "gap_early": -0.021,
@@ -2835,7 +2835,7 @@
    "gap_change_lo": -0.128,
    "gap_change_hi": 0.035
   },
-  "戰爭與軍事": {
+  "war and military": {
    "supply_change": -0.056,
    "hot_change": -0.068,
    "gap_early": 0.097,
@@ -2844,7 +2844,7 @@
    "gap_change_lo": -0.096,
    "gap_change_hi": 0.053
   },
-  "日常溫馨": {
+  "cozy slice of life": {
    "supply_change": 0.072,
    "hot_change": 0.082,
    "gap_early": -0.059,
@@ -2853,7 +2853,7 @@
    "gap_change_lo": -0.08,
    "gap_change_hi": 0.082
   },
-  "太空科幻": {
+  "space sci-fi": {
    "supply_change": -0.121,
    "hot_change": -0.09,
    "gap_early": 0.166,
@@ -2862,7 +2862,7 @@
    "gap_change_lo": -0.057,
    "gap_change_hi": 0.104
   },
-  "黑暗殘酷": {
+  "grimdark": {
    "supply_change": -0.154,
    "hot_change": -0.12,
    "gap_early": -0.023,
@@ -2871,7 +2871,7 @@
    "gap_change_lo": -0.048,
    "gap_change_hi": 0.118
   },
-  "文學式描寫": {
+  "literary prose": {
    "supply_change": -0.048,
    "hot_change": 0.001,
    "gap_early": -0.108,
@@ -2880,7 +2880,7 @@
    "gap_change_lo": -0.046,
    "gap_change_hi": 0.113
   },
-  "開場就打鬥": {
+  "opens with a fight": {
    "supply_change": 0.01,
    "hot_change": 0.059,
    "gap_early": -0.118,
@@ -2889,7 +2889,7 @@
    "gap_change_lo": -0.031,
    "gap_change_hi": 0.145
   },
-  "異世界轉生": {
+  "isekai reincarnation": {
    "supply_change": -0.558,
    "hot_change": -0.503,
    "gap_early": -0.009,
@@ -2898,7 +2898,7 @@
    "gap_change_lo": -0.018,
    "gap_change_hi": 0.132
   },
-  "第一人稱內心獨白": {
+  "first-person inner monologue": {
    "supply_change": -0.083,
    "hot_change": -0.027,
    "gap_early": 0.101,
@@ -2907,7 +2907,7 @@
    "gap_change_lo": -0.024,
    "gap_change_hi": 0.134
   },
-  "神與神話": {
+  "gods and myths": {
    "supply_change": -0.235,
    "hot_change": -0.144,
    "gap_early": 0.125,
@@ -2916,7 +2916,7 @@
    "gap_change_lo": 0.012,
    "gap_change_hi": 0.175
   },
-  "修仙宗門": {
+  "cultivation sect": {
    "supply_change": -0.379,
    "hot_change": -0.275,
    "gap_early": 0.194,
@@ -2925,7 +2925,7 @@
    "gap_change_lo": 0.007,
    "gap_change_hi": 0.179
   },
-  "領地經營": {
+  "kingdom building": {
    "supply_change": -0.331,
    "hot_change": -0.225,
    "gap_early": 0.201,
@@ -2934,7 +2934,7 @@
    "gap_change_lo": 0.033,
    "gap_change_hi": 0.178
   },
-  "遊戲系統": {
+  "game system": {
    "supply_change": -0.423,
    "hot_change": -0.292,
    "gap_early": 0.314,
@@ -2943,7 +2943,7 @@
    "gap_change_lo": 0.063,
    "gap_change_hi": 0.225
   },
-  "地城與怪物": {
+  "dungeons and monsters": {
    "supply_change": -0.279,
    "hot_change": -0.148,
    "gap_early": 0.276,
@@ -2952,7 +2952,7 @@
    "gap_change_lo": 0.059,
    "gap_change_hi": 0.222
   },
-  "現代都市奇幻": {
+  "urban fantasy": {
    "supply_change": -0.165,
    "hot_change": -0.033,
    "gap_early": -0.003,
@@ -2961,7 +2961,7 @@
    "gap_change_lo": 0.064,
    "gap_change_hi": 0.23
   },
-  "魔法學院": {
+  "magic academy": {
    "supply_change": -0.194,
    "hot_change": -0.057,
    "gap_early": 0.045,
@@ -2973,7 +2973,7 @@
  },
  "concept_by_year": [
   {
-   "concept": "遊戲系統",
+   "concept": "game system",
    "year": 2016,
    "supply": 0.544,
    "hot": 0.813,
@@ -2982,7 +2982,7 @@
    "gap_hi": 0.442
   },
   {
-   "concept": "地城與怪物",
+   "concept": "dungeons and monsters",
    "year": 2016,
    "supply": 0.309,
    "hot": 0.502,
@@ -2991,7 +2991,7 @@
    "gap_hi": 0.34
   },
   {
-   "concept": "修仙宗門",
+   "concept": "cultivation sect",
    "year": 2016,
    "supply": 0.472,
    "hot": 0.524,
@@ -3000,7 +3000,7 @@
    "gap_hi": 0.187
   },
   {
-   "concept": "異世界轉生",
+   "concept": "isekai reincarnation",
    "year": 2016,
    "supply": 0.723,
    "hot": 0.687,
@@ -3009,7 +3009,7 @@
    "gap_hi": 0.086
   },
   {
-   "concept": "領地經營",
+   "concept": "kingdom building",
    "year": 2016,
    "supply": 0.435,
    "hot": 0.583,
@@ -3018,7 +3018,7 @@
    "gap_hi": 0.295
   },
   {
-   "concept": "戰爭與軍事",
+   "concept": "war and military",
    "year": 2016,
    "supply": 0.133,
    "hot": 0.159,
@@ -3027,7 +3027,7 @@
    "gap_hi": 0.154
   },
   {
-   "concept": "太空科幻",
+   "concept": "space sci-fi",
    "year": 2016,
    "supply": 0.172,
    "hot": 0.288,
@@ -3036,7 +3036,7 @@
    "gap_hi": 0.25
   },
   {
-   "concept": "現代都市奇幻",
+   "concept": "urban fantasy",
    "year": 2016,
    "supply": 0.262,
    "hot": 0.29,
@@ -3045,7 +3045,7 @@
    "gap_hi": 0.147
   },
   {
-   "concept": "魔法學院",
+   "concept": "magic academy",
    "year": 2016,
    "supply": 0.228,
    "hot": 0.234,
@@ -3054,7 +3054,7 @@
    "gap_hi": 0.113
   },
   {
-   "concept": "戀愛關係",
+   "concept": "romance",
    "year": 2016,
    "supply": 0.106,
    "hot": -0.092,
@@ -3063,7 +3063,7 @@
    "gap_hi": -0.094
   },
   {
-   "concept": "日常溫馨",
+   "concept": "cozy slice of life",
    "year": 2016,
    "supply": 0.118,
    "hot": 0.027,
@@ -3072,7 +3072,7 @@
    "gap_hi": 0.002
   },
   {
-   "concept": "黑暗殘酷",
+   "concept": "grimdark",
    "year": 2016,
    "supply": 0.226,
    "hot": 0.192,
@@ -3081,7 +3081,7 @@
    "gap_hi": 0.095
   },
   {
-   "concept": "喜劇吐槽",
+   "concept": "comedy",
    "year": 2016,
    "supply": 0.256,
    "hot": 0.201,
@@ -3090,7 +3090,7 @@
    "gap_hi": 0.054
   },
   {
-   "concept": "神與神話",
+   "concept": "gods and myths",
    "year": 2016,
    "supply": 0.361,
    "hot": 0.433,
@@ -3099,7 +3099,7 @@
    "gap_hi": 0.199
   },
   {
-   "concept": "第一人稱內心獨白",
+   "concept": "first-person inner monologue",
    "year": 2016,
    "supply": 0.27,
    "hot": 0.333,
@@ -3108,7 +3108,7 @@
    "gap_hi": 0.18
   },
   {
-   "concept": "文學式描寫",
+   "concept": "literary prose",
    "year": 2016,
    "supply": 0.302,
    "hot": 0.143,
@@ -3117,7 +3117,7 @@
    "gap_hi": -0.052
   },
   {
-   "concept": "開場就打鬥",
+   "concept": "opens with a fight",
    "year": 2016,
    "supply": -0.018,
    "hot": -0.082,
@@ -3126,7 +3126,7 @@
    "gap_hi": 0.036
   },
   {
-   "concept": "女性主角情感",
+   "concept": "female lead emotions",
    "year": 2016,
    "supply": 0.288,
    "hot": 0.296,
@@ -3135,7 +3135,7 @@
    "gap_hi": 0.132
   },
   {
-   "concept": "遊戲系統",
+   "concept": "game system",
    "year": 2017,
    "supply": 0.33,
    "hot": 0.657,
@@ -3144,7 +3144,7 @@
    "gap_hi": 0.47
   },
   {
-   "concept": "地城與怪物",
+   "concept": "dungeons and monsters",
    "year": 2017,
    "supply": 0.244,
    "hot": 0.518,
@@ -3153,7 +3153,7 @@
    "gap_hi": 0.446
   },
   {
-   "concept": "修仙宗門",
+   "concept": "cultivation sect",
    "year": 2017,
    "supply": 0.235,
    "hot": 0.422,
@@ -3162,7 +3162,7 @@
    "gap_hi": 0.32
   },
   {
-   "concept": "異世界轉生",
+   "concept": "isekai reincarnation",
    "year": 2017,
    "supply": 0.41,
    "hot": 0.461,
@@ -3171,7 +3171,7 @@
    "gap_hi": 0.175
   },
   {
-   "concept": "領地經營",
+   "concept": "kingdom building",
    "year": 2017,
    "supply": 0.225,
    "hot": 0.441,
@@ -3180,7 +3180,7 @@
    "gap_hi": 0.355
   },
   {
-   "concept": "戰爭與軍事",
+   "concept": "war and military",
    "year": 2017,
    "supply": -0.009,
    "hot": 0.104,
@@ -3189,7 +3189,7 @@
    "gap_hi": 0.239
   },
   {
-   "concept": "太空科幻",
+   "concept": "space sci-fi",
    "year": 2017,
    "supply": 0.095,
    "hot": 0.288,
@@ -3198,7 +3198,7 @@
    "gap_hi": 0.338
   },
   {
-   "concept": "現代都市奇幻",
+   "concept": "urban fantasy",
    "year": 2017,
    "supply": 0.115,
    "hot": 0.143,
@@ -3207,7 +3207,7 @@
    "gap_hi": 0.151
   },
   {
-   "concept": "魔法學院",
+   "concept": "magic academy",
    "year": 2017,
    "supply": 0.16,
    "hot": 0.217,
@@ -3216,7 +3216,7 @@
    "gap_hi": 0.193
   },
   {
-   "concept": "戀愛關係",
+   "concept": "romance",
    "year": 2017,
    "supply": -0.123,
    "hot": -0.285,
@@ -3225,7 +3225,7 @@
    "gap_hi": -0.074
   },
   {
-   "concept": "日常溫馨",
+   "concept": "cozy slice of life",
    "year": 2017,
    "supply": -0.196,
    "hot": -0.185,
@@ -3234,7 +3234,7 @@
    "gap_hi": 0.134
   },
   {
-   "concept": "黑暗殘酷",
+   "concept": "grimdark",
    "year": 2017,
    "supply": 0.09,
    "hot": 0.113,
@@ -3243,7 +3243,7 @@
    "gap_hi": 0.151
   },
   {
-   "concept": "喜劇吐槽",
+   "concept": "comedy",
    "year": 2017,
    "supply": 0.17,
    "hot": 0.006,
@@ -3252,7 +3252,7 @@
    "gap_hi": -0.058
   },
   {
-   "concept": "神與神話",
+   "concept": "gods and myths",
    "year": 2017,
    "supply": 0.157,
    "hot": 0.276,
@@ -3261,7 +3261,7 @@
    "gap_hi": 0.244
   },
   {
-   "concept": "第一人稱內心獨白",
+   "concept": "first-person inner monologue",
    "year": 2017,
    "supply": -0.014,
    "hot": 0.133,
@@ -3270,7 +3270,7 @@
    "gap_hi": 0.275
   },
   {
-   "concept": "文學式描寫",
+   "concept": "literary prose",
    "year": 2017,
    "supply": -0.129,
    "hot": -0.159,
@@ -3279,7 +3279,7 @@
    "gap_hi": 0.083
   },
   {
-   "concept": "開場就打鬥",
+   "concept": "opens with a fight",
    "year": 2017,
    "supply": -0.025,
    "hot": -0.171,
@@ -3288,7 +3288,7 @@
    "gap_hi": -0.041
   },
   {
-   "concept": "女性主角情感",
+   "concept": "female lead emotions",
    "year": 2017,
    "supply": 0.157,
    "hot": 0.192,
@@ -3297,7 +3297,7 @@
    "gap_hi": 0.161
   },
   {
-   "concept": "遊戲系統",
+   "concept": "game system",
    "year": 2018,
    "supply": 0.216,
    "hot": 0.469,
@@ -3306,7 +3306,7 @@
    "gap_hi": 0.398
   },
   {
-   "concept": "地城與怪物",
+   "concept": "dungeons and monsters",
    "year": 2018,
    "supply": 0.138,
    "hot": 0.416,
@@ -3315,7 +3315,7 @@
    "gap_hi": 0.428
   },
   {
-   "concept": "修仙宗門",
+   "concept": "cultivation sect",
    "year": 2018,
    "supply": 0.194,
    "hot": 0.478,
@@ -3324,7 +3324,7 @@
    "gap_hi": 0.45
   },
   {
-   "concept": "異世界轉生",
+   "concept": "isekai reincarnation",
    "year": 2018,
    "supply": 0.283,
    "hot": 0.244,
@@ -3333,7 +3333,7 @@
    "gap_hi": 0.075
   },
   {
-   "concept": "領地經營",
+   "concept": "kingdom building",
    "year": 2018,
    "supply": 0.17,
    "hot": 0.348,
@@ -3342,7 +3342,7 @@
    "gap_hi": 0.312
   },
   {
-   "concept": "戰爭與軍事",
+   "concept": "war and military",
    "year": 2018,
    "supply": 0.009,
    "hot": 0.132,
@@ -3351,7 +3351,7 @@
    "gap_hi": 0.229
   },
   {
-   "concept": "太空科幻",
+   "concept": "space sci-fi",
    "year": 2018,
    "supply": 0.097,
    "hot": 0.236,
@@ -3360,7 +3360,7 @@
    "gap_hi": 0.28
   },
   {
-   "concept": "現代都市奇幻",
+   "concept": "urban fantasy",
    "year": 2018,
    "supply": 0.012,
    "hot": -0.052,
@@ -3369,7 +3369,7 @@
    "gap_hi": 0.036
   },
   {
-   "concept": "魔法學院",
+   "concept": "magic academy",
    "year": 2018,
    "supply": 0.074,
    "hot": 0.134,
@@ -3378,7 +3378,7 @@
    "gap_hi": 0.184
   },
   {
-   "concept": "戀愛關係",
+   "concept": "romance",
    "year": 2018,
    "supply": -0.085,
    "hot": -0.421,
@@ -3387,7 +3387,7 @@
    "gap_hi": -0.26
   },
   {
-   "concept": "日常溫馨",
+   "concept": "cozy slice of life",
    "year": 2018,
    "supply": -0.169,
    "hot": -0.249,
@@ -3396,7 +3396,7 @@
    "gap_hi": 0.022
   },
   {
-   "concept": "黑暗殘酷",
+   "concept": "grimdark",
    "year": 2018,
    "supply": 0.023,
    "hot": -0.028,
@@ -3405,7 +3405,7 @@
    "gap_hi": 0.045
   },
   {
-   "concept": "喜劇吐槽",
+   "concept": "comedy",
    "year": 2018,
    "supply": 0.083,
    "hot": -0.212,
@@ -3414,7 +3414,7 @@
    "gap_hi": -0.205
   },
   {
-   "concept": "神與神話",
+   "concept": "gods and myths",
    "year": 2018,
    "supply": 0.055,
    "hot": 0.201,
@@ -3423,7 +3423,7 @@
    "gap_hi": 0.275
   },
   {
-   "concept": "第一人稱內心獨白",
+   "concept": "first-person inner monologue",
    "year": 2018,
    "supply": -0.04,
    "hot": 0.024,
@@ -3432,7 +3432,7 @@
    "gap_hi": 0.17
   },
   {
-   "concept": "文學式描寫",
+   "concept": "literary prose",
    "year": 2018,
    "supply": -0.134,
    "hot": -0.236,
@@ -3441,7 +3441,7 @@
    "gap_hi": 0.003
   },
   {
-   "concept": "開場就打鬥",
+   "concept": "opens with a fight",
    "year": 2018,
    "supply": -0.024,
    "hot": -0.132,
@@ -3450,7 +3450,7 @@
    "gap_hi": 0.02
   },
   {
-   "concept": "女性主角情感",
+   "concept": "female lead emotions",
    "year": 2018,
    "supply": 0.119,
    "hot": 0.021,
@@ -3459,7 +3459,7 @@
    "gap_hi": -0.001
   },
   {
-   "concept": "遊戲系統",
+   "concept": "game system",
    "year": 2019,
    "supply": 0.11,
    "hot": 0.53,
@@ -3468,7 +3468,7 @@
    "gap_hi": 0.584
   },
   {
-   "concept": "地城與怪物",
+   "concept": "dungeons and monsters",
    "year": 2019,
    "supply": 0.053,
    "hot": 0.392,
@@ -3477,7 +3477,7 @@
    "gap_hi": 0.494
   },
   {
-   "concept": "修仙宗門",
+   "concept": "cultivation sect",
    "year": 2019,
    "supply": 0.038,
    "hot": 0.235,
@@ -3486,7 +3486,7 @@
    "gap_hi": 0.307
   },
   {
-   "concept": "異世界轉生",
+   "concept": "isekai reincarnation",
    "year": 2019,
    "supply": 0.058,
    "hot": 0.101,
@@ -3495,7 +3495,7 @@
    "gap_hi": 0.154
   },
   {
-   "concept": "領地經營",
+   "concept": "kingdom building",
    "year": 2019,
    "supply": 0.061,
    "hot": 0.367,
@@ -3504,7 +3504,7 @@
    "gap_hi": 0.454
   },
   {
-   "concept": "戰爭與軍事",
+   "concept": "war and military",
    "year": 2019,
    "supply": -0.028,
    "hot": 0.106,
@@ -3513,7 +3513,7 @@
    "gap_hi": 0.249
   },
   {
-   "concept": "太空科幻",
+   "concept": "space sci-fi",
    "year": 2019,
    "supply": 0.046,
    "hot": 0.231,
@@ -3522,7 +3522,7 @@
    "gap_hi": 0.321
   },
   {
-   "concept": "現代都市奇幻",
+   "concept": "urban fantasy",
    "year": 2019,
    "supply": -0.023,
    "hot": 0.059,
@@ -3531,7 +3531,7 @@
    "gap_hi": 0.201
   },
   {
-   "concept": "魔法學院",
+   "concept": "magic academy",
    "year": 2019,
    "supply": -0.007,
    "hot": 0.034,
@@ -3540,7 +3540,7 @@
    "gap_hi": 0.174
   },
   {
-   "concept": "戀愛關係",
+   "concept": "romance",
    "year": 2019,
    "supply": -0.07,
    "hot": -0.414,
@@ -3549,7 +3549,7 @@
    "gap_hi": -0.275
   },
   {
-   "concept": "日常溫馨",
+   "concept": "cozy slice of life",
    "year": 2019,
    "supply": -0.095,
    "hot": -0.12,
@@ -3558,7 +3558,7 @@
    "gap_hi": 0.078
   },
   {
-   "concept": "黑暗殘酷",
+   "concept": "grimdark",
    "year": 2019,
    "supply": -0.037,
    "hot": 0.08,
@@ -3567,7 +3567,7 @@
    "gap_hi": 0.232
   },
   {
-   "concept": "喜劇吐槽",
+   "concept": "comedy",
    "year": 2019,
    "supply": 0.057,
    "hot": -0.095,
@@ -3576,7 +3576,7 @@
    "gap_hi": -0.056
   },
   {
-   "concept": "神與神話",
+   "concept": "gods and myths",
    "year": 2019,
    "supply": -0.052,
    "hot": 0.149,
@@ -3585,7 +3585,7 @@
    "gap_hi": 0.333
   },
   {
-   "concept": "第一人稱內心獨白",
+   "concept": "first-person inner monologue",
    "year": 2019,
    "supply": -0.029,
    "hot": 0.189,
@@ -3594,7 +3594,7 @@
    "gap_hi": 0.347
   },
   {
-   "concept": "文學式描寫",
+   "concept": "literary prose",
    "year": 2019,
    "supply": -0.137,
    "hot": -0.193,
@@ -3603,7 +3603,7 @@
    "gap_hi": 0.041
   },
   {
-   "concept": "開場就打鬥",
+   "concept": "opens with a fight",
    "year": 2019,
    "supply": -0.025,
    "hot": -0.091,
@@ -3612,7 +3612,7 @@
    "gap_hi": 0.046
   },
   {
-   "concept": "女性主角情感",
+   "concept": "female lead emotions",
    "year": 2019,
    "supply": 0.039,
    "hot": -0.021,
@@ -3621,7 +3621,7 @@
    "gap_hi": 0.057
   },
   {
-   "concept": "遊戲系統",
+   "concept": "game system",
    "year": 2020,
    "supply": 0.002,
    "hot": 0.393,
@@ -3630,7 +3630,7 @@
    "gap_hi": 0.546
   },
   {
-   "concept": "地城與怪物",
+   "concept": "dungeons and monsters",
    "year": 2020,
    "supply": -0.019,
    "hot": 0.321,
@@ -3639,7 +3639,7 @@
    "gap_hi": 0.481
   },
   {
-   "concept": "修仙宗門",
+   "concept": "cultivation sect",
    "year": 2020,
    "supply": -0.044,
    "hot": 0.238,
@@ -3648,7 +3648,7 @@
    "gap_hi": 0.416
   },
   {
-   "concept": "異世界轉生",
+   "concept": "isekai reincarnation",
    "year": 2020,
    "supply": -0.011,
    "hot": -0.016,
@@ -3657,7 +3657,7 @@
    "gap_hi": 0.077
   },
   {
-   "concept": "領地經營",
+   "concept": "kingdom building",
    "year": 2020,
    "supply": -0.022,
    "hot": 0.262,
@@ -3666,7 +3666,7 @@
    "gap_hi": 0.404
   },
   {
-   "concept": "戰爭與軍事",
+   "concept": "war and military",
    "year": 2020,
    "supply": -0.044,
    "hot": 0.093,
@@ -3675,7 +3675,7 @@
    "gap_hi": 0.252
   },
   {
-   "concept": "太空科幻",
+   "concept": "space sci-fi",
    "year": 2020,
    "supply": -0.01,
    "hot": 0.178,
@@ -3684,7 +3684,7 @@
    "gap_hi": 0.304
   },
   {
-   "concept": "現代都市奇幻",
+   "concept": "urban fantasy",
    "year": 2020,
    "supply": -0.047,
    "hot": -0.005,
@@ -3693,7 +3693,7 @@
    "gap_hi": 0.145
   },
   {
-   "concept": "魔法學院",
+   "concept": "magic academy",
    "year": 2020,
    "supply": -0.003,
    "hot": 0.037,
@@ -3702,7 +3702,7 @@
    "gap_hi": 0.137
   },
   {
-   "concept": "戀愛關係",
+   "concept": "romance",
    "year": 2020,
    "supply": -0.039,
    "hot": -0.393,
@@ -3711,7 +3711,7 @@
    "gap_hi": -0.3
   },
   {
-   "concept": "日常溫馨",
+   "concept": "cozy slice of life",
    "year": 2020,
    "supply": -0.03,
    "hot": -0.037,
@@ -3720,7 +3720,7 @@
    "gap_hi": 0.084
   },
   {
-   "concept": "黑暗殘酷",
+   "concept": "grimdark",
    "year": 2020,
    "supply": -0.055,
    "hot": -0.059,
@@ -3729,7 +3729,7 @@
    "gap_hi": 0.087
   },
   {
-   "concept": "喜劇吐槽",
+   "concept": "comedy",
    "year": 2020,
    "supply": 0.072,
    "hot": -0.165,
@@ -3738,7 +3738,7 @@
    "gap_hi": -0.169
   },
   {
-   "concept": "神與神話",
+   "concept": "gods and myths",
    "year": 2020,
    "supply": -0.074,
    "hot": 0.085,
@@ -3747,7 +3747,7 @@
    "gap_hi": 0.272
   },
   {
-   "concept": "第一人稱內心獨白",
+   "concept": "first-person inner monologue",
    "year": 2020,
    "supply": -0.037,
    "hot": 0.128,
@@ -3756,7 +3756,7 @@
    "gap_hi": 0.276
   },
   {
-   "concept": "文學式描寫",
+   "concept": "literary prose",
    "year": 2020,
    "supply": -0.087,
    "hot": -0.125,
@@ -3765,7 +3765,7 @@
    "gap_hi": 0.047
   },
   {
-   "concept": "開場就打鬥",
+   "concept": "opens with a fight",
    "year": 2020,
    "supply": -0.015,
    "hot": -0.114,
@@ -3774,7 +3774,7 @@
    "gap_hi": -0.024
   },
   {
-   "concept": "女性主角情感",
+   "concept": "female lead emotions",
    "year": 2020,
    "supply": 0.024,
    "hot": -0.04,
@@ -3783,7 +3783,7 @@
    "gap_hi": 0.042
   },
   {
-   "concept": "遊戲系統",
+   "concept": "game system",
    "year": 2021,
    "supply": -0.036,
    "hot": 0.339,
@@ -3792,7 +3792,7 @@
    "gap_hi": 0.517
   },
   {
-   "concept": "地城與怪物",
+   "concept": "dungeons and monsters",
    "year": 2021,
    "supply": -0.062,
    "hot": 0.331,
@@ -3801,7 +3801,7 @@
    "gap_hi": 0.52
   },
   {
-   "concept": "修仙宗門",
+   "concept": "cultivation sect",
    "year": 2021,
    "supply": -0.056,
    "hot": 0.255,
@@ -3810,7 +3810,7 @@
    "gap_hi": 0.438
   },
   {
-   "concept": "異世界轉生",
+   "concept": "isekai reincarnation",
    "year": 2021,
    "supply": -0.05,
    "hot": -0.061,
@@ -3819,7 +3819,7 @@
    "gap_hi": 0.068
   },
   {
-   "concept": "領地經營",
+   "concept": "kingdom building",
    "year": 2021,
    "supply": -0.055,
    "hot": 0.24,
@@ -3828,7 +3828,7 @@
    "gap_hi": 0.41
   },
   {
-   "concept": "戰爭與軍事",
+   "concept": "war and military",
    "year": 2021,
    "supply": -0.046,
    "hot": 0.042,
@@ -3837,7 +3837,7 @@
    "gap_hi": 0.17
   },
   {
-   "concept": "太空科幻",
+   "concept": "space sci-fi",
    "year": 2021,
    "supply": -0.008,
    "hot": 0.175,
@@ -3846,7 +3846,7 @@
    "gap_hi": 0.274
   },
   {
-   "concept": "現代都市奇幻",
+   "concept": "urban fantasy",
    "year": 2021,
    "supply": -0.061,
    "hot": -0.018,
@@ -3855,7 +3855,7 @@
    "gap_hi": 0.122
   },
   {
-   "concept": "魔法學院",
+   "concept": "magic academy",
    "year": 2021,
    "supply": -0.035,
    "hot": 0.127,
@@ -3864,7 +3864,7 @@
    "gap_hi": 0.282
   },
   {
-   "concept": "戀愛關係",
+   "concept": "romance",
    "year": 2021,
    "supply": -0.045,
    "hot": -0.418,
@@ -3873,7 +3873,7 @@
    "gap_hi": -0.317
   },
   {
-   "concept": "日常溫馨",
+   "concept": "cozy slice of life",
    "year": 2021,
    "supply": -0.009,
    "hot": 0.003,
@@ -3882,7 +3882,7 @@
    "gap_hi": 0.092
   },
   {
-   "concept": "黑暗殘酷",
+   "concept": "grimdark",
    "year": 2021,
    "supply": -0.059,
    "hot": -0.102,
@@ -3891,7 +3891,7 @@
    "gap_hi": 0.028
   },
   {
-   "concept": "喜劇吐槽",
+   "concept": "comedy",
    "year": 2021,
    "supply": 0.045,
    "hot": -0.216,
@@ -3900,7 +3900,7 @@
    "gap_hi": -0.2
   },
   {
-   "concept": "神與神話",
+   "concept": "gods and myths",
    "year": 2021,
    "supply": -0.077,
    "hot": 0.119,
@@ -3909,7 +3909,7 @@
    "gap_hi": 0.3
   },
   {
-   "concept": "第一人稱內心獨白",
+   "concept": "first-person inner monologue",
    "year": 2021,
    "supply": -0.019,
    "hot": 0.143,
@@ -3918,7 +3918,7 @@
    "gap_hi": 0.269
   },
   {
-   "concept": "文學式描寫",
+   "concept": "literary prose",
    "year": 2021,
    "supply": -0.064,
    "hot": -0.057,
@@ -3927,7 +3927,7 @@
    "gap_hi": 0.094
   },
   {
-   "concept": "開場就打鬥",
+   "concept": "opens with a fight",
    "year": 2021,
    "supply": -0.035,
    "hot": -0.186,
@@ -3936,7 +3936,7 @@
    "gap_hi": -0.082
   },
   {
-   "concept": "女性主角情感",
+   "concept": "female lead emotions",
    "year": 2021,
    "supply": -0.026,
    "hot": -0.133,
@@ -3945,7 +3945,7 @@
    "gap_hi": -0.043
   },
   {
-   "concept": "遊戲系統",
+   "concept": "game system",
    "year": 2022,
    "supply": -0.082,
    "hot": 0.405,
@@ -3954,7 +3954,7 @@
    "gap_hi": 0.627
   },
   {
-   "concept": "地城與怪物",
+   "concept": "dungeons and monsters",
    "year": 2022,
    "supply": -0.07,
    "hot": 0.331,
@@ -3963,7 +3963,7 @@
    "gap_hi": 0.519
   },
   {
-   "concept": "修仙宗門",
+   "concept": "cultivation sect",
    "year": 2022,
    "supply": -0.129,
    "hot": 0.166,
@@ -3972,7 +3972,7 @@
    "gap_hi": 0.399
   },
   {
-   "concept": "異世界轉生",
+   "concept": "isekai reincarnation",
    "year": 2022,
    "supply": -0.111,
    "hot": 0.005,
@@ -3981,7 +3981,7 @@
    "gap_hi": 0.203
   },
   {
-   "concept": "領地經營",
+   "concept": "kingdom building",
    "year": 2022,
    "supply": -0.08,
    "hot": 0.237,
@@ -3990,7 +3990,7 @@
    "gap_hi": 0.422
   },
   {
-   "concept": "戰爭與軍事",
+   "concept": "war and military",
    "year": 2022,
    "supply": -0.004,
    "hot": 0.097,
@@ -3999,7 +3999,7 @@
    "gap_hi": 0.185
   },
   {
-   "concept": "太空科幻",
+   "concept": "space sci-fi",
    "year": 2022,
    "supply": -0.009,
    "hot": 0.199,
@@ -4008,7 +4008,7 @@
    "gap_hi": 0.302
   },
   {
-   "concept": "現代都市奇幻",
+   "concept": "urban fantasy",
    "year": 2022,
    "supply": -0.052,
    "hot": 0.193,
@@ -4017,7 +4017,7 @@
    "gap_hi": 0.354
   },
   {
-   "concept": "魔法學院",
+   "concept": "magic academy",
    "year": 2022,
    "supply": -0.044,
    "hot": 0.202,
@@ -4026,7 +4026,7 @@
    "gap_hi": 0.352
   },
   {
-   "concept": "戀愛關係",
+   "concept": "romance",
    "year": 2022,
    "supply": -0.075,
    "hot": -0.348,
@@ -4035,7 +4035,7 @@
    "gap_hi": -0.232
   },
   {
-   "concept": "日常溫馨",
+   "concept": "cozy slice of life",
    "year": 2022,
    "supply": -0.051,
    "hot": -0.074,
@@ -4044,7 +4044,7 @@
    "gap_hi": 0.052
   },
   {
-   "concept": "黑暗殘酷",
+   "concept": "grimdark",
    "year": 2022,
    "supply": -0.059,
    "hot": 0.039,
@@ -4053,7 +4053,7 @@
    "gap_hi": 0.172
   },
   {
-   "concept": "喜劇吐槽",
+   "concept": "comedy",
    "year": 2022,
    "supply": 0.015,
    "hot": -0.153,
@@ -4062,7 +4062,7 @@
    "gap_hi": -0.107
   },
   {
-   "concept": "神與神話",
+   "concept": "gods and myths",
    "year": 2022,
    "supply": -0.065,
    "hot": 0.17,
@@ -4071,7 +4071,7 @@
    "gap_hi": 0.327
   },
   {
-   "concept": "第一人稱內心獨白",
+   "concept": "first-person inner monologue",
    "year": 2022,
    "supply": -0.053,
    "hot": 0.163,
@@ -4080,7 +4080,7 @@
    "gap_hi": 0.311
   },
   {
-   "concept": "文學式描寫",
+   "concept": "literary prose",
    "year": 2022,
    "supply": -0.079,
    "hot": -0.08,
@@ -4089,7 +4089,7 @@
    "gap_hi": 0.07
   },
   {
-   "concept": "開場就打鬥",
+   "concept": "opens with a fight",
    "year": 2022,
    "supply": -0.009,
    "hot": 0.029,
@@ -4098,7 +4098,7 @@
    "gap_hi": 0.118
   },
   {
-   "concept": "女性主角情感",
+   "concept": "female lead emotions",
    "year": 2022,
    "supply": -0.113,
    "hot": -0.112,
@@ -4107,7 +4107,7 @@
    "gap_hi": 0.082
   },
   {
-   "concept": "遊戲系統",
+   "concept": "game system",
    "year": 2023,
    "supply": -0.059,
    "hot": 0.318,
@@ -4116,7 +4116,7 @@
    "gap_hi": 0.489
   },
   {
-   "concept": "地城與怪物",
+   "concept": "dungeons and monsters",
    "year": 2023,
    "supply": -0.012,
    "hot": 0.33,
@@ -4125,7 +4125,7 @@
    "gap_hi": 0.443
   },
   {
-   "concept": "修仙宗門",
+   "concept": "cultivation sect",
    "year": 2023,
    "supply": -0.05,
    "hot": 0.178,
@@ -4134,7 +4134,7 @@
    "gap_hi": 0.328
   },
   {
-   "concept": "異世界轉生",
+   "concept": "isekai reincarnation",
    "year": 2023,
    "supply": -0.096,
    "hot": -0.062,
@@ -4143,7 +4143,7 @@
    "gap_hi": 0.104
   },
   {
-   "concept": "領地經營",
+   "concept": "kingdom building",
    "year": 2023,
    "supply": -0.028,
    "hot": 0.22,
@@ -4152,7 +4152,7 @@
    "gap_hi": 0.34
   },
   {
-   "concept": "戰爭與軍事",
+   "concept": "war and military",
    "year": 2023,
    "supply": 0.015,
    "hot": 0.052,
@@ -4161,7 +4161,7 @@
    "gap_hi": 0.1
   },
   {
-   "concept": "太空科幻",
+   "concept": "space sci-fi",
    "year": 2023,
    "supply": 0.018,
    "hot": 0.166,
@@ -4170,7 +4170,7 @@
    "gap_hi": 0.227
   },
   {
-   "concept": "現代都市奇幻",
+   "concept": "urban fantasy",
    "year": 2023,
    "supply": 0.006,
    "hot": 0.107,
@@ -4179,7 +4179,7 @@
    "gap_hi": 0.173
   },
   {
-   "concept": "魔法學院",
+   "concept": "magic academy",
    "year": 2023,
    "supply": -0.041,
    "hot": 0.085,
@@ -4188,7 +4188,7 @@
    "gap_hi": 0.21
   },
   {
-   "concept": "戀愛關係",
+   "concept": "romance",
    "year": 2023,
    "supply": -0.004,
    "hot": -0.372,
@@ -4197,7 +4197,7 @@
    "gap_hi": -0.345
   },
   {
-   "concept": "日常溫馨",
+   "concept": "cozy slice of life",
    "year": 2023,
    "supply": 0.031,
    "hot": -0.089,
@@ -4206,7 +4206,7 @@
    "gap_hi": -0.074
   },
   {
-   "concept": "黑暗殘酷",
+   "concept": "grimdark",
    "year": 2023,
    "supply": -0.005,
    "hot": -0.022,
@@ -4215,7 +4215,7 @@
    "gap_hi": 0.042
   },
   {
-   "concept": "喜劇吐槽",
+   "concept": "comedy",
    "year": 2023,
    "supply": -0.039,
    "hot": -0.254,
@@ -4224,7 +4224,7 @@
    "gap_hi": -0.168
   },
   {
-   "concept": "神與神話",
+   "concept": "gods and myths",
    "year": 2023,
    "supply": 0.011,
    "hot": 0.188,
@@ -4233,7 +4233,7 @@
    "gap_hi": 0.26
   },
   {
-   "concept": "第一人稱內心獨白",
+   "concept": "first-person inner monologue",
    "year": 2023,
    "supply": 0.038,
    "hot": 0.103,
@@ -4242,7 +4242,7 @@
    "gap_hi": 0.136
   },
   {
-   "concept": "文學式描寫",
+   "concept": "literary prose",
    "year": 2023,
    "supply": 0.037,
    "hot": -0.112,
@@ -4251,7 +4251,7 @@
    "gap_hi": -0.099
   },
   {
-   "concept": "開場就打鬥",
+   "concept": "opens with a fight",
    "year": 2023,
    "supply": 0.006,
    "hot": -0.049,
@@ -4260,7 +4260,7 @@
    "gap_hi": 0.007
   },
   {
-   "concept": "女性主角情感",
+   "concept": "female lead emotions",
    "year": 2023,
    "supply": -0.05,
    "hot": -0.127,
@@ -4269,7 +4269,7 @@
    "gap_hi": -0.019
   },
   {
-   "concept": "遊戲系統",
+   "concept": "game system",
    "year": 2024,
    "supply": -0.153,
    "hot": 0.23,
@@ -4278,7 +4278,7 @@
    "gap_hi": 0.47
   },
   {
-   "concept": "地城與怪物",
+   "concept": "dungeons and monsters",
    "year": 2024,
    "supply": -0.081,
    "hot": 0.233,
@@ -4287,7 +4287,7 @@
    "gap_hi": 0.404
   },
   {
-   "concept": "修仙宗門",
+   "concept": "cultivation sect",
    "year": 2024,
    "supply": -0.059,
    "hot": 0.232,
@@ -4296,7 +4296,7 @@
    "gap_hi": 0.385
   },
   {
-   "concept": "異世界轉生",
+   "concept": "isekai reincarnation",
    "year": 2024,
    "supply": -0.157,
    "hot": -0.039,
@@ -4305,7 +4305,7 @@
    "gap_hi": 0.184
   },
   {
-   "concept": "領地經營",
+   "concept": "kingdom building",
    "year": 2024,
    "supply": -0.095,
    "hot": 0.119,
@@ -4314,7 +4314,7 @@
    "gap_hi": 0.291
   },
   {
-   "concept": "戰爭與軍事",
+   "concept": "war and military",
    "year": 2024,
    "supply": 0.007,
    "hot": 0.152,
@@ -4323,7 +4323,7 @@
    "gap_hi": 0.215
   },
   {
-   "concept": "太空科幻",
+   "concept": "space sci-fi",
    "year": 2024,
    "supply": -0.086,
    "hot": 0.058,
@@ -4332,7 +4332,7 @@
    "gap_hi": 0.216
   },
   {
-   "concept": "現代都市奇幻",
+   "concept": "urban fantasy",
    "year": 2024,
    "supply": -0.009,
    "hot": 0.035,
@@ -4341,7 +4341,7 @@
    "gap_hi": 0.101
   },
   {
-   "concept": "魔法學院",
+   "concept": "magic academy",
    "year": 2024,
    "supply": -0.027,
    "hot": 0.036,
@@ -4350,7 +4350,7 @@
    "gap_hi": 0.124
   },
   {
-   "concept": "戀愛關係",
+   "concept": "romance",
    "year": 2024,
    "supply": 0.111,
    "hot": -0.262,
@@ -4359,7 +4359,7 @@
    "gap_hi": -0.362
   },
   {
-   "concept": "日常溫馨",
+   "concept": "cozy slice of life",
    "year": 2024,
    "supply": 0.099,
    "hot": -0.036,
@@ -4368,7 +4368,7 @@
    "gap_hi": -0.087
   },
   {
-   "concept": "黑暗殘酷",
+   "concept": "grimdark",
    "year": 2024,
    "supply": 0.017,
    "hot": 0.101,
@@ -4377,7 +4377,7 @@
    "gap_hi": 0.156
   },
   {
-   "concept": "喜劇吐槽",
+   "concept": "comedy",
    "year": 2024,
    "supply": -0.137,
    "hot": -0.265,
@@ -4386,7 +4386,7 @@
    "gap_hi": -0.091
   },
   {
-   "concept": "神與神話",
+   "concept": "gods and myths",
    "year": 2024,
    "supply": -0.02,
    "hot": 0.134,
@@ -4395,7 +4395,7 @@
    "gap_hi": 0.221
   },
   {
-   "concept": "第一人稱內心獨白",
+   "concept": "first-person inner monologue",
    "year": 2024,
    "supply": -0.01,
    "hot": 0.175,
@@ -4404,7 +4404,7 @@
    "gap_hi": 0.26
   },
   {
-   "concept": "文學式描寫",
+   "concept": "literary prose",
    "year": 2024,
    "supply": 0.103,
    "hot": -0.03,
@@ -4413,7 +4413,7 @@
    "gap_hi": -0.097
   },
   {
-   "concept": "開場就打鬥",
+   "concept": "opens with a fight",
    "year": 2024,
    "supply": 0.039,
    "hot": 0.112,
@@ -4422,7 +4422,7 @@
    "gap_hi": 0.135
   },
   {
-   "concept": "女性主角情感",
+   "concept": "female lead emotions",
    "year": 2024,
    "supply": -0.034,
    "hot": -0.116,
@@ -4432,23 +4432,23 @@
   }
  ],
  "gap_change_with_2024": {
-  "修仙宗門": 0.129,
-  "喜劇吐槽": 0.048,
-  "地城與怪物": 0.073,
-  "太空科幻": -0.006,
-  "女性主角情感": -0.071,
-  "戀愛關係": -0.157,
-  "戰爭與軍事": 0.063,
-  "文學式描寫": -0.04,
-  "日常溫馨": -0.091,
-  "現代都市奇幻": 0.052,
-  "異世界轉生": 0.14,
-  "神與神話": 0.046,
-  "第一人稱內心獨白": 0.104,
-  "遊戲系統": 0.111,
-  "開場就打鬥": 0.199,
-  "領地經營": 0.036,
-  "魔法學院": 0.025,
-  "黑暗殘酷": 0.117
+  "cultivation sect": 0.129,
+  "comedy": 0.048,
+  "dungeons and monsters": 0.073,
+  "space sci-fi": -0.006,
+  "female lead emotions": -0.071,
+  "romance": -0.157,
+  "war and military": 0.063,
+  "literary prose": -0.04,
+  "cozy slice of life": -0.091,
+  "urban fantasy": 0.052,
+  "isekai reincarnation": 0.14,
+  "gods and myths": 0.046,
+  "first-person inner monologue": 0.104,
+  "game system": 0.111,
+  "opens with a fight": 0.199,
+  "kingdom building": 0.036,
+  "magic academy": 0.025,
+  "grimdark": 0.117
  }
 }

@@ -1,9 +1,9 @@
-<title>RoyalRoad 研究流程</title>
+<title>RoyalRoad research workflow</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap">
 <style>
-/* layout：單欄閱讀寬度，流程圖放在最前面；顏色沿用同專案的 EDA 報告 */
+/* layout: single-column reading width, flowchart first; colors follow the EDA report of the same project */
 :root { --bg:#f4f6f6; --surface:#ffffff; --tint:#e6efef; --fg:#1b2829; --muted:#566667; --line:#d6dedf; --accent:#2a6a6e; --todo:#b84a32; --plate:#ffffff;
   --sans:"Noto Sans TC","PingFang TC","Heiti TC",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#0e1516; --surface:#162022; --tint:#1d2e30; --fg:#e3ebeb; --muted:#92a4a5; --line:#2a3b3d; --accent:#62b4b9; --todo:#e88b73; color-scheme:dark; } }
@@ -38,19 +38,19 @@ footer { font-size:13px; color:var(--muted); border-top:1px solid var(--line); p
 <main>
 <header>
   <div class="eyebrow">15.071 Project 1 · royalroad/embedding/</div>
-  <h1>RoyalRoad 研究流程</h1>
-  <p class="lede">這條流程把 161 萬章小說變成 45,245 本書的向量，用來看熱門口味有沒有隨時間移動。資料與趨勢分析已經跑完；主模型、AUC 漂移測試和方向解釋還沒做。</p>
+  <h1>RoyalRoad research workflow</h1>
+  <p class="lede">This pipeline turns 1.61 million chapters into vectors for 45,245 books, to see whether hit tastes shift over time. Data and trend analysis are done; the main model, the AUC drift test and the direction explanation are not yet done.</p>
 </header>
 
 <section>
-  <h2>流程全貌</h2>
+  <h2>Workflow overview</h2>
   <div class="legend">
-    <span><i class="sw proc"></i>已完成的步驟</span>
-    <span><i class="sw data"></i>已產出的資料</span>
-    <span><i class="sw todo"></i>還沒做</span>
+    <span><i class="sw proc"></i>Completed steps</span>
+    <span><i class="sw data"></i>Data produced</span>
+    <span><i class="sw todo"></i>Not done yet</span>
   </div>
   <figure><div class="dia">
-  <svg viewBox="0 0 920 1000" role="img" aria-label="流程圖：原始資料經挑書切塊、Parley embedding、合併向量後，分成降維探索、向量趨勢與 tags 趨勢三條線，再接到尚未完成的方向解釋、主模型與 AUC 漂移測試，最後匯入 Project 1 報告。">
+  <svg viewBox="0 0 920 1000" role="img" aria-label="Flowchart: raw data goes through book selection and chunking, Parley embedding and vector pooling, then splits into three lines (dimension reduction, vector trends, tags trends), which lead to the unfinished direction explanation, main model and AUC drift test, and finally feed into the Project 1 report.">
     <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--muted)"/></marker>
     <marker id="t" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--todo)"/></marker></defs>
     <g fill="none" stroke-width="1.5" style="stroke:var(--muted)">
@@ -76,13 +76,13 @@ footer { font-size:13px; color:var(--muted); border-top:1px solid var(--line); p
       <path d="M760,842 V896" marker-end="url(#t)"/>
     </g>
 
-    <!-- 已產出的資料 -->
+    <!-- Data produced -->
     <g style="fill:var(--tint);stroke:var(--line)">
       <rect x="40" y="30" width="240" height="72" rx="6"/>
       <rect x="640" y="30" width="240" height="72" rx="6"/>
       <rect x="340" y="150" width="240" height="72" rx="6"/>
     </g>
-    <!-- 已完成的步驟 -->
+    <!-- Completed steps -->
     <g stroke-width="2" style="fill:var(--surface);stroke:var(--accent)">
       <rect x="340" y="30" width="240" height="72" rx="6"/>
       <rect x="340" y="270" width="240" height="72" rx="6"/>
@@ -93,7 +93,7 @@ footer { font-size:13px; color:var(--muted); border-top:1px solid var(--line); p
       <rect x="340" y="510" width="240" height="72" rx="6"/>
       <rect x="640" y="390" width="200" height="72" rx="6"/>
     </g>
-    <!-- 還沒做 -->
+    <!-- Not done yet -->
     <g stroke-width="2" stroke-dasharray="6 4" style="fill:var(--surface);stroke:var(--todo)">
       <rect x="340" y="650" width="240" height="72" rx="6"/>
       <rect x="640" y="650" width="240" height="72" rx="6"/>
@@ -102,99 +102,99 @@ footer { font-size:13px; color:var(--muted); border-top:1px solid var(--line); p
     </g>
 
     <g text-anchor="middle" style="font-family:var(--sans);font-size:14px;font-weight:700;fill:currentColor">
-      <text x="160" y="60">原始資料</text><text x="460" y="60">挑書與切塊</text><text x="760" y="60">books_meta</text>
-      <text x="460" y="180">chunks_input</text><text x="460" y="300">Parley embedding</text><text x="460" y="420">合併成書向量</text>
-      <text x="160" y="420">PCA 與 UMAP</text><text x="160" y="540">Embedding Atlas</text><text x="160" y="660">季度軌跡圖</text>
-      <text x="460" y="540">向量趨勢</text><text x="740" y="420">Tags 趨勢</text>
-      <text x="460" y="680">解釋移動方向</text><text x="760" y="680">主模型 ML + DL</text><text x="760" y="800">AUC 漂移測試</text>
-      <text x="460" y="930">Project 1 報告：問題 → 解法 → 上線建議</text>
+      <text x="160" y="60">Raw data</text><text x="460" y="60">Pick books and chunk</text><text x="760" y="60">books_meta</text>
+      <text x="460" y="180">chunks_input</text><text x="460" y="300">Parley embedding</text><text x="460" y="420">Pool into book vectors</text>
+      <text x="160" y="420">PCA and UMAP</text><text x="160" y="540">Embedding Atlas</text><text x="160" y="660">Quarterly trajectory</text>
+      <text x="460" y="540">Vector trends</text><text x="740" y="420">Tags trends</text>
+      <text x="460" y="680">Explain the shift</text><text x="760" y="680">Main model ML + DL</text><text x="760" y="800">AUC drift test</text>
+      <text x="460" y="930">Project 1 report: problem → solution → deployment advice</text>
     </g>
     <g text-anchor="middle" style="font-family:var(--sans);font-size:12px;fill:var(--muted)">
-      <text x="160" y="82">1,613,875 章 · 12 GB</text><text x="460" y="82">01_prepare.py</text><text x="760" y="82">45,245 本 · Y 與 tags</text>
-      <text x="460" y="202">183,020 塊 · 3.55 億 token</text><text x="460" y="322">02_embed.py · 39 分鐘 · 0 失敗</text><text x="460" y="442">03_pool_project.py · 1,536 維</text>
-      <text x="160" y="442">同一個座標系 · 所有年份一起擬合</text><text x="160" y="562">UMAP :5055 · PCA :5057</text><text x="160" y="682">09_pca_trajectory.py</text>
-      <text x="460" y="562">05_drift.ipynb · 含雜訊下限</text><text x="740" y="442">04_tags_trend.ipynb</text>
-      <text x="460" y="702">兩端的書、用字、概念探針</text><text x="760" y="702">預測同季前 10%</text><text x="760" y="822">固定測試年，換訓練年代</text>
-      <text x="460" y="952">主模型回答要不要用，漂移測試回答能用多久，方向解釋回答口味往哪變</text>
+      <text x="160" y="82">1,613,875 chapters · 12 GB</text><text x="460" y="82">01_prepare.py</text><text x="760" y="82">45,245 books · Y and tags</text>
+      <text x="460" y="202">183,020 chunks · 355M tokens</text><text x="460" y="322">02_embed.py · 39 min · 0 failures</text><text x="460" y="442">03_pool_project.py · 1,536 dims</text>
+      <text x="160" y="442">One coordinate system · all years fit together</text><text x="160" y="562">UMAP :5055 · PCA :5057</text><text x="160" y="682">09_pca_trajectory.py</text>
+      <text x="460" y="562">05_drift.ipynb · with noise floor</text><text x="740" y="442">04_tags_trend.ipynb</text>
+      <text x="460" y="702">Books at both ends, wording, concept probes</text><text x="760" y="702">Predict same-quarter top 10%</text><text x="760" y="822">Fixed test year, vary training era</text>
+      <text x="460" y="952">Main model: use it or not? Drift test: for how long? Direction: where is taste heading?</text>
     </g>
     <g style="font-family:var(--sans);font-size:11px;fill:var(--muted)">
-      <text x="750" y="244">不需要 embedding</text>
-      <text x="858" y="380" text-anchor="end" style="fill:var(--todo)">Y 與特徵</text>
-      <text x="616" y="640" style="fill:var(--todo)">向量特徵</text>
+      <text x="750" y="244">No embedding needed</text>
+      <text x="858" y="380" text-anchor="end" style="fill:var(--todo)">Y and features</text>
+      <text x="616" y="640" style="fill:var(--todo)">Vector features</text>
     </g>
   </svg></div>
-  <figcaption>實線是已經跑通的路徑，虛線是接下來要接上的路徑。Embedding Atlas 的兩個網址只在你自己的電腦上開得到。</figcaption></figure>
+  <figcaption>Solid lines are paths already working; dashed lines are paths to connect next. The two Embedding Atlas URLs only open on your own computer.</figcaption></figure>
 </section>
 
 <section>
-  <h2>每一步做了什麼</h2>
+  <h2>What each step does</h2>
   <div class="tbl"><table>
-    <tr><th>步驟</th><th>程式</th><th>做法</th><th>狀態</th></tr>
-    <tr><td>挑書與切塊</td><td><code>01_prepare.py</code></td><td>2016–2024 年開始連載、至少 3 章的書。每本取前三章，合計上限 2 萬 token（1,592 本被截斷）。每章一個向量，超過 8,000 token 才平均切開（2,397 章）。</td><td class="done">完成</td></tr>
-    <tr><td>Y 的定義</td><td><code>01_prepare.py</code></td><td>同季 <code>followers</code> 排名前 10% = 1。只在同季內比，避免老書占便宜。</td><td class="done">完成</td></tr>
-    <tr><td>Embedding</td><td><code>02_embed.py</code></td><td><code>text-embedding-3-small</code>，1,536 維。Parley 沒有 Batch API，所以每次請求塞多塊並同時送多個，可中斷續跑。</td><td class="done">完成</td></tr>
-    <tr><td>合併與降維</td><td><code>03_pool_project.py</code></td><td>依 token 數加權平均後重新正規化，得到章與書的向量。PCA 看方向，UMAP 看分群。</td><td class="done">完成</td></tr>
-    <tr><td>Tags 趨勢</td><td><code>04_tags_trend.ipynb</code><br><code>10_tags_compare.py</code></td><td>每年的供給占比、熱門占比和 lift。排除 2016 年與後來才出現的標籤再算一次。另畫一張 43 個 tag 的兩時期比較圖。</td><td class="done">完成</td></tr>
-    <tr><td>向量趨勢</td><td><code>05_drift.ipynb</code></td><td>在原始 1,536 維算中心點距離與偏好方向，和同年拆兩半的雜訊比較，並校正早期樣本少的問題。</td><td class="done">完成</td></tr>
-    <tr><td>互動探索</td><td><code>06</code> 到 <code>09</code></td><td>Embedding Atlas 的 UMAP 版與 PCA 版，加上每季前 10% 中心點的軌跡圖。</td><td class="done">完成</td></tr>
-    <tr><td>解釋移動方向</td><td>尚未建立</td><td>讀方向兩端的書、比較兩時期用字、用概念句子做探針，把向量變化翻成看得懂的話。</td><td class="todo">待做</td></tr>
-    <tr><td>主模型</td><td>尚未建立</td><td>tags、作者歷史、更新節奏、前三章向量，預測同季前 10%，和 baseline 比較。</td><td class="todo">待做</td></tr>
-    <tr><td>AUC 漂移測試</td><td>尚未建立</td><td>固定測試年，換不同年代的訓練資料，看 AUC 掉多少，決定多久重新訓練一次。</td><td class="todo">待做</td></tr>
+    <tr><th>Step</th><th>Script</th><th>Method</th><th>Status</th></tr>
+    <tr><td>Pick books and chunk</td><td><code>01_prepare.py</code></td><td>Books that started serialization in 2016–2024 with at least 3 chapters. Take each book's first three chapters, capped at 20,000 tokens in total (1,592 books truncated). One vector per chapter; only chapters over 8,000 tokens are split evenly (2,397 chapters).</td><td class="done">Done</td></tr>
+    <tr><td>Y definition</td><td><code>01_prepare.py</code></td><td>Same-quarter <code>followers</code> in the top 10% = 1. Ranked only within a quarter, so older books get no head start.</td><td class="done">Done</td></tr>
+    <tr><td>Embedding</td><td><code>02_embed.py</code></td><td><code>text-embedding-3-small</code>, 1,536 dims. Parley has no Batch API, so each request packs several chunks and several requests run concurrently; runs can resume after interruption.</td><td class="done">Done</td></tr>
+    <tr><td>Pooling and dimension reduction</td><td><code>03_pool_project.py</code></td><td>Token-weighted average, then re-normalized, giving chapter and book vectors. PCA for direction, UMAP for clusters.</td><td class="done">Done</td></tr>
+    <tr><td>Tags trends</td><td><code>04_tags_trend.ipynb</code><br><code>10_tags_compare.py</code></td><td>Yearly supply share, hit share and lift. Recomputed excluding 2016 and tags that appeared later. Plus a two-period comparison chart of 43 tags.</td><td class="done">Done</td></tr>
+    <tr><td>Vector trends</td><td><code>05_drift.ipynb</code></td><td>In the original 1,536 dimensions, compute centroid distances and the preference direction, compare them with split-half noise within the same year, and correct for small early samples.</td><td class="done">Done</td></tr>
+    <tr><td>Interactive exploration</td><td><code>06</code> to <code>09</code></td><td>Embedding Atlas in UMAP and PCA versions, plus a trajectory chart of each quarter's top 10% centroid.</td><td class="done">Done</td></tr>
+    <tr><td>Explain the shift</td><td>Not built yet</td><td>Read books at both ends of the direction, compare wording across two periods, and probe with concept sentences, turning vector changes into plain language.</td><td class="todo">To do</td></tr>
+    <tr><td>Main model</td><td>Not built yet</td><td>Tags, author history, update pace and first-three-chapter vectors predict same-quarter top 10%, compared with the baseline.</td><td class="todo">To do</td></tr>
+    <tr><td>AUC drift test</td><td>Not built yet</td><td>Fix the test year, train on data from different eras, see how much AUC drops, and decide how often to retrain.</td><td class="todo">To do</td></tr>
   </table></div>
 </section>
 
 <section>
-  <h2>目前看到的結果</h2>
-  <figure><div class="plate"><img src="__IMG__" alt="每季前 10% 的中心點在 PCA 平面上的軌跡"></div>
-  <figcaption>左圖是全部書與兩條中心點軌跡。右圖放大每季前 10% 的中心點，顏色由深到淺代表 2016Q1 到 2024Q4。這兩軸只解釋約 10% 的變異，軌跡用來說明方向，證據看下面的 1,536 維數字。</figcaption></figure>
+  <h2>Results so far</h2>
+  <figure><div class="plate"><img src="__IMG__" alt="Trajectory of each quarter's top 10% centroid on the PCA plane"></div>
+  <figcaption>Left: all books and two centroid trajectories. Right: zoom on each quarter's top 10% centroid, colored from dark to light for 2016Q1 to 2024Q4. These two axes explain only about 10% of the variance; the trajectory illustrates direction, and the evidence is in the 1,536-dimension numbers below.</figcaption></figure>
   <ul style="margin-top:16px">
-    <li><b>供給在穩定移動。</b>全部書的中心點離 2016 年的 cosine 距離，從 0.017 增加到 0.035，雜訊約 0.0003。</li>
-    <li><b>偏好慢慢漂移。</b>校正雜訊後，「前 10% 減其他」的方向相隔 1 年相似度 0.98，相隔 8 年 0.85。只看 2019–2024 也一樣，5 年內從 0.95 降到 0.88。</li>
-    <li><b>漂移不只是 tags。</b>tags 只解釋向量變異的 10%。扣掉 tags 之後，相似度從 0.97 降到 0.74。</li>
-    <li><b>2016 年的 tag 資料不可靠。</b>每本書中位數 6 個 tag，之後是 8 到 9 個，Progression 這類標籤 2018 到 2021 年才被大量使用。這比較像平台或標記習慣改變，不是口味改變。</li>
-    <li><b>近年的前 10% 意義不同。</b>2023、2024 年的書觀察時間短，前 10% 比較接近早期就衝起來的書，這也可能造成部分漂移，目前沒有排除。</li>
+    <li><b>Supply is moving steadily.</b>The cosine distance of the all-books centroid from 2016 grows from 0.017 to 0.035; noise is about 0.0003.</li>
+    <li><b>Preference drifts slowly.</b>After noise correction, the "top 10% minus the rest" direction has similarity, 1 year apart, of 0.98, and 8 years apart, of 0.85. Using only 2019–2024 gives the same picture: within 5 years it falls from 0.95 to 0.88.</li>
+    <li><b>Drift is not just tags.</b>Tags explain only 10% of the vector variance. After removing tags, similarity drops from 0.97 to 0.74.</li>
+    <li><b>2016 tag data is unreliable.</b>The median is 6 tags per book, versus 8 to 9 later, and tags like Progression only came into wide use in 2018 to 2021. This looks more like a change in platform or tagging habits than in taste.</li>
+    <li><b>The recent top 10% means something different.</b>Books from 2023 and 2024 have short observation windows, so their top 10% is closer to books that took off early. This may also cause part of the drift and has not been ruled out yet.</li>
   </ul>
 </section>
 
 <section>
-  <h2>各 tag 的偏好比較</h2>
-  <p>每個 tag 一列，比較 2017–2019 和 2022–2024 兩個時期。x 軸是 lift，也就是前 10% 裡的占比除以全部書裡的占比，大於 1 表示這類書比較容易紅。y 軸是 tag，依 2022–2024 的 lift 排序。右欄是兩個時期的供給占比。</p>
-  <figure><div class="plate"><img src="__IMG2__" alt="43 個 tag 在兩個時期的 lift 比較，LitRPG 最高且上升，Romance 下降"></div>
-  <figcaption>空心點是 2017–2019，實心點是 2022–2024。紅線表示 lift 上升，藍線表示下降。不含 2016 年，因為標籤資料和之後不一致。只列兩個時期前 10% 都至少 30 本的 tag。</figcaption></figure>
+  <h2>Preference by tag</h2>
+  <p>One row per tag, comparing 2017–2019 with 2022–2024. The x axis is lift: share within the top 10% divided by share among all books; above 1 means such books are more likely to become hits. The y axis is tag, sorted by 2022–2024 lift. The right column shows supply share in the two periods.</p>
+  <figure><div class="plate"><img src="__IMG2__" alt="Lift of 43 tags in two periods: LitRPG highest and rising, Romance falling"></div>
+  <figcaption>Hollow dots are 2017–2019, filled dots 2022–2024. Red lines mean lift rose, blue lines mean it fell. 2016 is excluded because its tag data is inconsistent with later years. Only tags whose top 10% has at least 30 books in both periods are shown.</figcaption></figure>
   <ul style="margin-top:16px">
-    <li><b>LitRPG 最容易紅，而且還在上升。</b>lift 從 1.6 升到 2.5，供給反而從 31% 降到 22%。</li>
-    <li><b>Xianxia 上升很多。</b>lift 從 1.3 升到 2.2，供給維持 5% 到 6%。</li>
-    <li><b>Romance 明顯下降。</b>lift 從 0.95 降到 0.66，供給維持 19%。</li>
-    <li><b>Drama 和 Psychological 回到平均。</b>lift 從約 0.7 升到約 1。</li>
-    <li><b>High Fantasy 變多但沒那麼突出。</b>供給從 15% 增加到 38%，lift 下降。</li>
-    <li><b>Progression 的下降不能照字面解讀。</b>早期供給只有 1%，後來 35%，比較可能是標籤普及。</li>
+    <li><b>LitRPG is the most likely to hit, and still rising.</b>Lift rose from 1.6 to 2.5, while supply fell from 31% to 22%.</li>
+    <li><b>Xianxia rose a lot.</b>Lift rose from 1.3 to 2.2; supply stayed at 5% to 6%.</li>
+    <li><b>Romance fell clearly.</b>Lift fell from 0.95 to 0.66; supply stayed at 19%.</li>
+    <li><b>Drama and Psychological returned to average.</b>Lift rose from about 0.7 to about 1.</li>
+    <li><b>High Fantasy grew but stands out less.</b>Supply rose from 15% to 38%, while lift fell.</li>
+    <li><b>Progression's decline should not be read literally.</b>Early supply was only 1%, later 35%, more likely because the tag caught on.</li>
   </ul>
-  <p style="margin-top:12px">這些都是個別 tag 的相關，沒有控制 tag 之間的重疊，例如 LitRPG 和 GameLit 常一起出現。圖上也沒有信賴區間，供給只有幾 % 的 tag 誤差比較大。</p>
+  <p style="margin-top:12px">These are correlations for individual tags, without controlling for overlap between tags (for example, LitRPG and GameLit often appear together). The chart also has no confidence intervals; tags with supply of only a few % have larger errors.</p>
 </section>
 
 <section>
-  <h2>已經定下來的設計</h2>
+  <h2>Design decisions made</h2>
   <div class="tbl"><table>
-    <tr><th>決定</th><th>選擇</th><th>原因</th></tr>
-    <tr><td>研究定位</td><td>主模型是主角，口味研究是第三幕的配角</td><td>課程評分看預測、benchmark 和換算價值</td></tr>
-    <tr><td>比較對象</td><td>同時看供給、熱門、偏好</td><td>熱門書變了，可能只是市場上的書變了</td></tr>
-    <tr><td>輸入文字</td><td>前三章</td><td>每本都有，而且是紅之前就寫好的內容，整本書會偷看結果</td></tr>
-    <tr><td>涵蓋範圍</td><td>全部 45,245 本</td><td>成本可接受，不用處理抽樣</td></tr>
-    <tr><td>存放方式</td><td>parquet</td><td>主要是整批讀出來計算，用不到向量資料庫的搜尋</td></tr>
-    <tr><td>判斷趨勢</td><td>1,536 維的數字為主，2D 圖為輔</td><td>降維會扭曲距離，PCA 平面只保留約 10% 的變異</td></tr>
-    <tr><td>互動工具</td><td>Embedding Atlas</td><td>篩選、搜尋、看原文都內建，把時間留給主模型</td></tr>
+    <tr><th>Decision</th><th>Choice</th><th>Reason</th></tr>
+    <tr><td>Research focus</td><td>The main model is the lead; the taste study plays a supporting role in act three</td><td>Course grading looks at prediction, benchmarks and translating results into value</td></tr>
+    <tr><td>Comparison</td><td>Look at supply, hits and preference together</td><td>Hits may change only because the books on the market changed</td></tr>
+    <tr><td>Input text</td><td>First three chapters</td><td>Every book has them, and they were written before it took off; the whole book would peek at the outcome</td></tr>
+    <tr><td>Coverage</td><td>All 45,245 books</td><td>Cost is acceptable, and no sampling to deal with</td></tr>
+    <tr><td>Storage</td><td>parquet</td><td>Mostly batch reads for computation; vector database search is not needed</td></tr>
+    <tr><td>Judging trends</td><td>1,536-dim numbers first, 2D plots as support</td><td>Dimension reduction distorts distances; the PCA plane keeps only about 10% of the variance</td></tr>
+    <tr><td>Interactive tool</td><td>Embedding Atlas</td><td>Filtering, search and raw text views are built in, leaving time for the main model</td></tr>
   </table></div>
 </section>
 
 <section>
-  <h2>重新開啟互動圖</h2>
+  <h2>Reopen the interactive charts</h2>
   <pre>cd "final project 1/royalroad/embedding"
-./06_atlas.sh        # UMAP 版，http://localhost:5055
-./08_atlas_pca.sh    # PCA 版，http://localhost:5057</pre>
+./06_atlas.sh        # UMAP version, http://localhost:5055
+./08_atlas_pca.sh    # PCA version, http://localhost:5057</pre>
 </section>
 
 <footer>
-  資料：Hugging Face <code>OmniAICreator/RoyalRoad-1.61M</code>，資料截止約 2025-06-16。Y 是爬取當下的累積 followers，資料裡沒有當年的值。
-  數字來自 <code>out/drift_summary.json</code> 與 <code>out/tags_summary.json</code>。
+  Data: Hugging Face <code>OmniAICreator/RoyalRoad-1.61M</code>, data cutoff around 2025-06-16. Y is cumulative followers at scrape time; the data has no values from earlier points in time.
+  Numbers from <code>out/drift_summary.json</code> and <code>out/tags_summary.json</code>。
 </footer>
 </main>

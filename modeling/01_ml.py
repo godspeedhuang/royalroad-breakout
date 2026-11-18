@@ -1,12 +1,12 @@
-"""規則 baseline、logistic regression、gradient boosting。
+"""Rule baselines, logistic regression, gradient boosting.
 
-選模流程（每個模型都一樣）：
-  1. 用 2017–2021 訓練，在 2022 上選超參數（看 AUC）
-  2. 選好後用 2017–2022 重新訓練
-  3. 在 2023（測試）和 2024（補充）打分數，測試年完全不參與選模
+Model selection (the same for every model):
+  1. train on 2017–2021, pick hyperparameters on 2022 (by AUC)
+  2. refit on 2017–2022
+  3. score 2023 (test) and 2024 (supplementary); the test year plays no part in model selection
 
-輸出：out/preds_ml.parquet（每本書、每個模型的分數）、out/selection_ml.json（選到的超參數與驗證分數）
-比較與信賴區間在 03_compare.py。
+Outputs: out/preds_ml.parquet (every model's score for every book), out/selection_ml.json (chosen hyperparameters and validation scores)
+Comparison and confidence intervals are in 03_compare.py.
 """
 import itertools
 import json
@@ -29,21 +29,21 @@ preds = b.loc[ev, ["fiction_id", "year", "quarter", "top10", "followers", "first
 sel = {}
 col = lambda blk, name: X[blk][:, b.attrs["cols"][blk].index(name)]
 
-# ---- 規則 baseline：不用模型，編輯憑直覺也做得到的排法 ----
+# ---- Rule baselines: rankings an editor could use without a model ----
 tag_cols = [i for i, c in enumerate(b.attrs["cols"]["S"]) if c.startswith("tag_")]
 T = X["S"][:, tag_cols]
-tag_rate = (T[trva] * y[trva, None]).sum(0) / np.maximum(T[trva].sum(0), 1)  # 每個 tag 過去進前 10% 的比例
+tag_rate = (T[trva] * y[trva, None]).sum(0) / np.maximum(T[trva].sum(0), 1)  # past share of each tag's books that reached the top 10%
 rules = {
-    "rule_fast_update": -b.first3_span_days.values,          # 更新越快越優先
-    "rule_hot_genre": (T @ tag_rate) / np.maximum(T.sum(1), 1),  # 熱門類型優先
-    "rule_known_author": col("A", "log_prior_n"),            # 老作者優先：以前寫過越多本越優先
+    "rule_fast_update": -b.first3_span_days.values,          # faster updates first
+    "rule_hot_genre": (T @ tag_rate) / np.maximum(T.sum(1), 1),  # popular genres first
+    "rule_known_author": col("A", "log_prior_n"),            # experienced authors first: more earlier books ranks higher
 }
 for name, s in rules.items():
     preds[name] = s[ev]
     sel[name] = {"val": metrics(y[va], s[va], q[va])}
 
-# ---- logistic regression：一次加一個特徵區塊，看每一塊多帶來多少 ----
-# 主模型是 SAT。P（前作表現）和 D（簡介）有 leak 疑慮，加上去只當上限參考（見 features.py）。
+# ---- Logistic regression: add one feature block at a time to see what each adds ----
+# The main model is SAT. P (earlier books' success) and D (blurb) are leak-prone and serve only as an upper bound (see features.py).
 CS = [1e-4, 1e-3, 1e-2, 1e-1]
 lr = lambda C: make_pipeline(StandardScaler(), LogisticRegression(C=C, max_iter=3000))
 for names in ["S", "SA", "SAT", "SATP", "SATPD", "T", "D"]:
@@ -54,7 +54,7 @@ for names in ["S", "SA", "SAT", "SATP", "SATPD", "T", "D"]:
     sel[f"lr_{names}"] = {"C": C, "val": val[C], "val_auc_by_C": {str(c): round(v["auc"], 4) for c, v in val.items()}}
     print(f"lr_{names:5s} C={C:<7g} val AUC {val[C]['auc']:.3f}  recall {val[C]['recall_at_slots']:.3f}", flush=True)
 
-# ---- gradient boosting：結構化 + 作者 + 前三章向量先用 PCA 降到 32 維，避免 1,536 維淹沒少量但強的特徵 ----
+# ---- Gradient boosting: structured + author + first-three-chapter vector reduced to 32 dims with PCA, so 1,536 dims do not drown a few strong features ----
 def gb_matrix(fit):
     return np.hstack([X["S"], X["A"], PCA(32, random_state=0).fit(X["T"][fit]).transform(X["T"])])
 

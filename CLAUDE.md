@@ -1,90 +1,100 @@
-# Royal Road Breakout：給 Claude 的專案脈絡
+# Royal Road Breakout: project context for Claude
 
-MIT 15.071 The AI Edge（Fall 2026）Project 1，三人小組。**截止 2026-11-20。**
-課程要求見 `docs/project-brief.md`，建模設計見 `modeling/README.md`，對外說明見 `README.md`。
+MIT 15.071 The AI Edge (Fall 2026) Project 1, team of three. **Due 2026-11-20.**
+Course requirements: `docs/project-brief.md`. Modeling design: `modeling/README.md`. Public overview: `README.md`.
 
-## 一句話
+## In one sentence
 
-Stakeholder 是 Royal Road 的推薦團隊：新連載很多、推薦位有限。用第 3 章發布當下拿得到的資訊（前三章文字、tags、作者是不是第一次寫書），預測一本書最後會不會進「同一季開始連載的書裡 followers 前 10%」。成績最重要的是**第一次寫書的作者**那一組，因為他們沒有前作可以參考。
+The stakeholder is Royal Road's recommendation team: many new serials, few recommendation slots. Using only what is available when chapter 3 is published (text of the first three chapters, tags, whether the author is writing a first book), predict whether a book ends up in the top 10% of followers among books first released in the same quarter. The result that matters most is for **first-time authors**, who have no earlier books to go on.
 
-簡報的三幕：(1) 新作者被淹沒 → (2) 模型比 baseline 多挑中幾本熱門書 → (3) 口味會不會漂移、模型多久要重訓。**主模型是主角，口味研究是配角。**
+The deck's three acts: (1) new authors get buried → (2) how many more future hits the model picks than a baseline → (3) does taste drift, and how often must the model be retrained. **The main model is the lead; the taste study is supporting.**
 
-## 現在的狀態
+## Status
 
-| 部分 | 狀態 |
+| Part | Status |
 |---|---|
-| EDA（`eda/`） | 完成 |
-| Embedding 與口味漂移分析（`embedding/`） | 完成 |
-| 公開版 Atlas（`docs/atlas/`） | 已上線：https://godspeedhuang.github.io/royalroad-breakout/（main 分支 /docs，push 後自動重新部署） |
-| 主預測模型（`modeling/`） | 完成第一版：規則、LR、gradient boosting、MLP。主模型 `lr_SAT`，2023 測試年 AUC 0.887、Recall@名額 0.482（最好的規則 0.261） |
-| AUC 漂移測試（固定測試年、換訓練年代） | 完成：訓練資料每舊一年，tags 模型 AUC 掉 0.026，文字模型掉 0.008 |
-| 簡報、影片 | 還沒做 |
+| EDA (`eda/`) | Done |
+| Embeddings and taste-drift analysis (`embedding/`) | Done |
+| Public Atlas (`docs/atlas/`) | Live: https://godspeedhuang.github.io/royalroad-breakout/ (main branch /docs, redeploys on push) |
+| Main prediction model (`modeling/`) | First version done: rules, LR, gradient boosting, MLP. Main model `lr_SAT`, 2023 test year AUC 0.887, Recall@slots 0.482 (best rule 0.261) |
+| AUC drift test (fixed test year, training data of different ages) | Done: each extra year of training-data age costs 0.026 AUC for tags, 0.008 for text |
+| Covers (`cover/01`, `02`, teammate Yinqi Yu on Colab) | Cover status, embeddings from 4 frozen image models, ablation done: on valid-cover books only, adding CLIP ViT-L/14 to S+A+T takes Recall@slots from 0.289 to 0.360. Results in `cover/out/`; cover embeddings on the teammate's Google Drive |
+| Covers merged into the main model (`cover/03_cover_merge.ipynb`) | Done. Plan 1: on the same valid-cover test books, the main model trained on all books already scores 0.348, so covers must be compared against 0.348, not 0.289. Plan 2 (two-stage merge): covers add 4.0 points among valid-cover books in 2023 (significant) and 0 in 2024; merged into the ranking of all books there is no gain (0.482 vs 0.481 in 2023, −2.1 in 2024) because the cover adjustment drifts upward on newer books. Recommendation (team has not decided): no covers in the main model; report covers as exploratory |
+| Walkthrough (`walkthrough/01–06`) and experiment log (`EXPERIMENTS.md`) | 01–05 done; 06 waits for SyuanBo's code for 50 slots, day-30 re-rank and revenue |
+| Deck, video | Draft deck exists (10 slides); its numbers for 50 slots, day 30 and revenue have no code in the repo yet. Video not started |
 
-## 資料的關鍵事實
+## Key facts about the data
 
-- 來源：HF `OmniAICreator/RoyalRoad-1.61M`，一章一列，86,959 本書，至少 3 章的 57,997 本。
-- `followers`、`total_views`、`average_views` 是約 2025-06-16 的**單一快照**，同一本書每一章的值都一樣，沒有成長曲線。
-- 五個 score 欄位和 `pages` 全空；`status` 82.5% 是空的。
-- 連載越久 followers 越多（連載不到 3 個月的書進前 10% 的比例 2.7%，超過 3 年的 12.8%），所以 Y 一定要用**同季排名**。
-- 本專案樣本：2016–2024 年開始連載、至少 3 章 → 45,245 本，135,735 章。
+- Source: HF `OmniAICreator/RoyalRoad-1.61M`, one row per chapter, 86,959 books, 57,997 with at least 3 chapters.
+- `followers`, `total_views`, `average_views` are a **single snapshot** from about 2025-06-16, identical on every chapter of a book; there is no growth curve.
+- The five score columns and `pages` are entirely empty; `status` is 82.5% empty.
+- Older books have more followers (books out for under 3 months reach the top 10% 2.7% of the time, over 3 years 12.8%), so Y must be a **within-quarter rank**.
+- Project sample: first released 2016–2024 with at least 3 chapters → 45,245 books, 135,735 chapters.
 
-## 已經做過的決定（不要重新討論）
+## Decisions already made (do not reopen)
 
-- 資料集用 RoyalRoad，不用 AniList、Bangumi。
-- Y = 同季 followers 前 10%（`top10`）。
-- 只看前三章：後面的章節是紅了之後才寫的，會倒果為因。
-- 每章一個向量；超過 8,000 token 的章平均切塊再依 token 數加權合併；每本書前三章上限 20,000 token。
-- 書的向量 = 三章依 token 數加權平均後 L2 正規化。簡介另外一個向量，不混進書的向量。
-- 模型 `text-embedding-3-small`（1,536 維），經 MIT Parley 的 OpenAI 相容 API。Parley 沒有 Batch API，用並行請求。
-- 向量存 parquet，不用向量資料庫。
-- 趨勢的結論以 1,536 維算出的數字為準，2D 圖只用來說明。PCA 看軌跡，UMAP 看分群，不用 t-SNE。
-- 視覺化工具用 Apple Embedding Atlas（`uvx embedding-atlas`），不用 SQLRooms。
-- 作者歷史用資料裡的 `author_url` 自己算，不去爬作者頁。
-- 作者特徵只放「以前寫過幾本書」「是不是第一次寫書」（只算更早開始連載的書）。前作的 followers 是 2025 年快照，這本書紅了會回頭拉高前作，所以「前作是不是前 10%」要標注有回推問題，前作的 followers 原始數字不用。「老作者優先」當 business-rule baseline，成績分成第一次寫書和有前作兩組報。
+- Dataset: Royal Road, not AniList or Bangumi.
+- Y = top 10% of followers within the release quarter (`top10`).
+- Only the first three chapters: later chapters are written after a book takes off, which would reverse cause and effect.
+- One vector per chapter; chapters over 8,000 tokens are split evenly and recombined by token-weighted mean; at most 20,000 tokens for a book's first three chapters.
+- Book vector = token-weighted mean of the three chapters, L2-normalized. The blurb gets its own vector and is not mixed into the book vector.
+- Model `text-embedding-3-small` (1,536-d) through MIT Parley's OpenAI-compatible API. Parley has no Batch API, so requests run in parallel.
+- Vectors are stored as parquet, no vector database.
+- Trend conclusions use numbers computed in 1,536 dimensions; 2D plots are for illustration only. PCA for trajectories, UMAP for clusters, no t-SNE.
+- Visualization tool: Apple Embedding Atlas (`uvx embedding-atlas`), not SQLRooms.
+- Author history is computed from `author_url` in the data; author pages are not scraped.
+- Author features are only "number of earlier books" and "first book or not" (counting only books first released earlier). Earlier books' followers are a 2025 snapshot and a new hit pulls readers back to them, so "earlier book reached the top 10%" is flagged as leak-prone and raw follower counts of earlier books are not used. "Experienced authors first" is a business-rule baseline, and results are reported separately for first-time and returning authors.
 
-## 已知的坑
+## Known pitfalls
 
-- **浮水印**：約 6,507 本書的章節含防盜句子（提到 Amazon、Royal Road），2016 年 75% 的書有，其他年 10–15%。之前看到的「2016→2017 大跳動」幾乎全是它造成的。建模時檢查過：模型從 2017 年起訓練，測試年拿掉含浮水印的書後主模型 AUC 不變（0.889 對 0.887），所以不用為了建模重做 embedding。比對用子字串，可能誤標正常提到這些字的書。
-- **引用漂移數字要用去浮水印版**：偏好方向相隔 8 年的相似度是 0.935（`watermark_check.json`），不是舊的 0.85。`drift_summary.json`、`direction_summary.json` 和 `reports/artifacts/workflow*.html` 裡的數字都是去浮水印前的。
-- **簡介有 leak**：簡介是 2025 年的版本。測試年 7.8% 的書簡介裡有 Amazon、Kindle、Patreon、Audible、"Book 2" 這類字，其中 45.5% 是熱門書。所以簡介向量（D）和前作表現（P）不放進主模型，只當上限參考（加上去 Recall 到 0.573）。tags 和章節內容也可能被事後改過，這個資料集無法還原。
-- 供給和熱門的移動方向在 1,536 維幾乎平行（cosine 0.90）。「市場往一邊走、熱門書沒跟著走」是 PCA 圖造成的錯覺，不要這樣講。
-- PCA 2D 只解釋 10.4% 的變異。
-- 2024 年觀察時間最短（0.5–1.5 年），只當補充；2023 年（1.5–2.5 年）是測試年。2016–2017 年每季前 10% 只有 52–60 本。
-- Progression 這個 tag 的 lift 下降，是標籤後來才普及，不是讀者變心。
-- `12_explain_direction.py` 只產生去浮水印版（`*_clean`）；概念探針的點估計和信賴區間用的估計式不同（各年等權平均 vs. 合併後 bootstrap）。
-- `--labels` 傳給 Embedding Atlas 會報錯，`atlas_pca_labels.parquet` 沒在用。
+- **Watermarks**: about 6,507 books contain anti-piracy sentences in chapter text (mentioning Amazon or Royal Road); 75% of 2016 books, 10–15% in other years. The apparent "2016 → 2017 jump" was almost entirely caused by them. Checked for modeling: models train from 2017, and dropping watermarked books from the test year leaves the main model's AUC unchanged (0.889 vs 0.887), so the embeddings do not need to be redone for modeling. Matching is by substring and may flag books that mention these words normally.
+- **Cite the watermark-free drift numbers**: the preference direction eight years apart has similarity 0.935 (`watermark_check.json`), not the old 0.85. Numbers in `drift_summary.json`, `direction_summary.json` and `reports/artifacts/workflow*.html` are from before watermarks were removed.
+- **Blurbs leak**: blurbs are the 2025 version. 7.8% of test-year blurbs mention Amazon, Kindle, Patreon, Audible, "Book 2" and the like, and 45.5% of those books are hits. So the blurb vector (D) and earlier books' success (P) stay out of the main model and serve only as an upper bound (recall 0.573 with them). Tags and chapter text may also have been edited later; this dataset cannot recover earlier versions.
+- **Covers leak**: `time=` in the cover URL is the upload time of the current cover. Books whose cover appeared or changed after chapter 3 have a 21% hit rate in 2017–2022, against 7% for valid covers (uploaded before chapter 3 and never changed). So a cover model can only be trained on valid covers; filling zeros for books without a valid cover and adding covers to the main model would leak this status. Valid covers are almost all from 2020 onward (earlier URLs have no `time=`).
+- Supply and hits move in almost the same direction in 1,536 dimensions (cosine 0.90). "The market moves one way and hits do not follow" is an artifact of the PCA plot; do not say it.
+- PCA 2D explains only 10.4% of the variance.
+- 2024 has the shortest observation time (0.5–1.5 years) and is only supplementary; 2023 (1.5–2.5 years) is the test year. 2016–2017 have only 52–60 top-10% books per quarter.
+- The falling lift of the Progression tag reflects the tag spreading later, not readers changing their minds.
+- `12_explain_direction.py` only produces the watermark-free version (`*_clean`); the concept probes' point estimates and confidence intervals use different estimators (equal-weight mean across years vs. pooled bootstrap). `--plot-only` redraws its figure from the saved JSON without the data or the API.
+- Passing `--labels` to Embedding Atlas errors out; `atlas_pca_labels.parquet` is unused.
 
-## 隊友已有的結果
+## A teammate's earlier results
 
-一位隊友先前用同一個資料集做過一版（不在這個 repo）：2021–2023 年、至少 5 章的 13,998 本；指標是 314 個推薦位的 Recall@10%；logistic regression（結構化 + 標題簡介 + 內文）約 50%，規則 baseline 16–38%；標題簡介的增量顯著（+6.1 pp），內文和封面不顯著。這個 repo 的模型是從零寫的，沒有接這一版；差異寫在 `modeling/README.md` 的「已知限制」。
+A teammate built an earlier version on the same dataset (not in this repo): 13,998 books from 2021–2023 with at least 5 chapters; metric Recall@10% with 314 slots; logistic regression (structured + title and blurb + body text) about 50%, rule baselines 16–38%; title and blurb added a significant 6.1 points, body text and covers were not significant. This repo's models were written from scratch and do not build on that version; differences are in "Known limitations" in `modeling/README.md`.
 
-## 檔案與資料
+## Files and data
 
-- `embedding/out/` 裡只有 JSON、CSV、圖進 git。`data/` 和所有 `.parquet` 都被 gitignore，資料夾用 `.gitkeep` 保留；例外是 `docs/atlas/*/data/dataset.parquet`（Pages 要用）。大檔透過雲端私下傳給隊友，清單在 README 的「Large files」。
-- 資料都在這個資料夾裡（2026-11-11 從舊資料夾 `../final project 1/royalroad/` 搬過來，不是 symlink）：`data/raw`（12 GB 原始資料）、`data/interim`、`embedding/out/*.parquet`、`embedding/out/emb_parts`（3,129 個請求的原始向量），合計約 17 GB。舊資料夾只剩程式碼的舊副本。
-- `books.parquet`（826 MB）是建模的輸入。它和 `books_meta`、`atlas*.parquet` 放在公開的 HF dataset 分享（`embedding/14_publish_hf.sh`），作者名一起公開，使用者決定的：上游資料集本來就公開。`chapters*.parquet` 有章節全文，不上傳，要用就跑 `01_prepare.py` 重建。
-- `embedding/.env` 放 Parley 金鑰，不進 git。不要讀它、不要印出來。
-- `docs/` 是 GitHub Pages 的內容。`docs/atlas/` 由 `embedding/13_export_atlas.sh` 產生，不要手改。公開版拿掉了作者名，節錄限 300 字。
+- In `embedding/out/` only JSON, CSV and figures are in git. `data/` and all `.parquet` files are gitignored; folders are kept with `.gitkeep`. Exception: `docs/atlas/*/data/dataset.parquet` (needed by Pages). Large files are shared privately with teammates through the cloud; the list is under "Large files" in the README.
+- On the original author's machine all data lives in this folder (moved on 2026-11-11 from the old folder `../final project 1/royalroad/`, not a symlink): `data/raw` (12 GB raw data), `data/interim`, `embedding/out/*.parquet`, `embedding/out/emb_parts` (raw vectors from 3,129 requests), about 17 GB in total. The old folder only holds old copies of the code. Other machines only have what was downloaded from HF.
+- `books.parquet` (826 MB) is the modeling input. It is shared with `books_meta` and `atlas*.parquet` on the public HF dataset (`embedding/14_publish_hf.sh`), author names included, by the user's decision: the upstream dataset is public anyway. `chapters*.parquet` contain full chapter text and are not uploaded; rebuild them with `01_prepare.py`.
+- Cover files from the teammate (`cover_status.parquet`, `cover_emb_*.parquet`) go in `data/cover/`, not in git. Without `cover_status.parquet`, `cover/03_cover_merge.ipynb` uses the book list in `cover/out/clusters/cover_clusters.parquet` as the valid-cover list (clustering used valid covers only). Cover images belong to their authors and must not go into the repo; `cover/out/clusters/cluster_*.png` are thumbnail sheets and are gitignored.
+- `walkthrough/` notebooks only read JSON, CSV and figures from the `out/` folders and `reports/eda/`; they do not recompute and run in seconds. Rerun them when upstream results change: `cd walkthrough && for f in 0*.ipynb; do uv run jupyter nbconvert --to notebook --execute --inplace "$f"; done`.
+- `embedding/.env` holds the Parley key and is not in git. Do not read it or print it.
+- `docs/` is the GitHub Pages content. `docs/atlas/` is produced by `embedding/13_export_atlas.sh`; do not edit it by hand. The public version drops author names and limits excerpts to 300 characters. Exception made on 2026-11-17: the Chinese labels in `docs/atlas/*/data/dataset.parquet` (`kind`, `top10`, centroid titles) were relabeled in place to the English labels the current code produces; nothing else changed.
 
-## 慣例
+## Conventions
 
-- 用 uv：`uv sync`、`uv run python ...`、`uv add <pkg>`。不要用 pip。
-- 腳本用兩位數編號表示執行順序；路徑一律從 `Path(__file__).parent` 算。
-- 跟 SyuanBo 對話用繁體中文，專有名詞保留英文。README 用英文（課程交付物）。
-- 新的數字要能從 `embedding/out/*.json` 或程式重現，不要只寫在對話裡。
-- 文件不用破折號（— 或 ——），改用括號、逗號、冒號或拆句。數字區間的 – 照用。
+- Use uv: `uv sync`, `uv run python ...`, `uv add <pkg>`. Do not use pip.
+- Scripts are numbered with two digits in run order; paths are always built from `Path(__file__).parent`.
+- Talk to SyuanBo in Traditional Chinese, keeping technical terms in English. Everything in the repo is in English: all READMEs, `EXPERIMENTS.md`, this file, code, comments, notebook text and outputs, and figure labels. Notebooks use short one- or two-sentence notes instead of large headings.
+- Chinese that intentionally remains: the teammate's Google Drive folder name `封面向量_V区块_交接`; the legacy-label mappings (written as `\u` escapes) in `07_atlas_pca.py`, `09_pca_trajectory.py` and `13_export_atlas.sh`, because the `atlas*.parquet` files on HF still store the old Chinese labels; book titles, blurbs and chapter text in the data (authors' original content). Figures from `eda/01_eda.ipynb` (`reports/eda/figs/`, also embedded in that notebook and in `walkthrough/01`) still have Chinese labels because rerunning the EDA needs the 12 GB raw data. The text outputs of `eda/01` and `cover/01–02` were translated in place (numbers unchanged) because those notebooks cannot be rerun here.
+- New numbers must be reproducible from `embedding/out/*.json` or code, not only stated in conversation.
+- Documents do not use em dashes (— or ——); use parentheses, commas, colons or separate sentences. En dashes in number ranges (–) are fine.
 
-## 改完程式碼之後：檢查文件
+## After changing code: check the documents
 
-每次改完程式碼（新增、改名或刪除腳本，改參數，產生新結果），回報完成之前先把下面每份文件看過一次，過時的地方一起改。回報時列出改了哪些文件、哪些看過但不用改。
+Every time code changes (scripts added, renamed or deleted, parameters changed, new results), read each document below before reporting done and update anything out of date. When reporting, list which documents changed and which were read and needed no change.
 
-| 文件 | 什麼情況要改 |
+| Document | Update when |
 |---|---|
-| `README.md` | 指令、檔案位置、樣本數、重現步驟、主要結果變了 |
-| `CLAUDE.md` | 狀態表、已做的決定、已知的坑、檔案與資料的說明變了 |
-| `modeling/README.md` | 特徵、切分、指標、baseline 的設計或結果變了 |
-| `docs/index.html` | Atlas 的版本、樣本數、頁面上的說明變了 |
-| `docs/project-brief.md` | 只有課程要求變了才改 |
+| `README.md` | Commands, file locations, sample sizes, reproduction steps or headline results change |
+| `CLAUDE.md` | Status table, decisions, known pitfalls, or file and data notes change |
+| `modeling/README.md` | Feature, split, metric or baseline design or results change |
+| `cover/README.md` | The cover pipeline, file locations or results change |
+| `EXPERIMENTS.md` | An experiment is added or finished, or a decision changes |
+| `walkthrough/*.ipynb` | Rerun when upstream JSON, CSV or figures change; check numbers written into the text (e.g. takeaways) |
+| `docs/index.html` | The Atlas version, sample size or page text changes |
+| `docs/project-brief.md` | Only when the course requirements change |
 
-- 文件裡的數字以程式輸出為準，不要憑記憶改。
-- 新增 `.md` 檔或子資料夾的 README 時，把它加進這張表。
+- Numbers in documents follow program output, not memory.
+- When adding a `.md` file or a README for a subfolder, add it to this table.

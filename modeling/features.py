@@ -1,20 +1,20 @@
-"""modeling/ 共用：讀資料、做特徵、時間切分、指標。
+"""Shared code for modeling/: load data, build features, time split, metrics.
 
-輸入：embedding/out/books.parquet（一本一列）、embedding/out/watermark_books.csv
-Y   ：top10 = 同一季開始連載的書裡，followers 是否 ≥ 90 百分位
+Inputs: embedding/out/books.parquet (one row per book), embedding/out/watermark_books.csv
+Y     : top10 = whether followers are at or above the 90th percentile among books first released in the same quarter
 
-特徵區塊（都只用第 3 章發布時拿得到的資訊）：
-  S 結構化：tags、warnings、is_original、前三章長度與發布間隔
-  A 作者經驗：是不是第一次寫書、以前寫過幾本（只算更早開始連載的書）
-  T 前三章向量 book_vec（1,536 維）
-  C 第一章向量 chap1_vec（1,536 維）
+Feature blocks (all use only information available when chapter 3 is published):
+  S structured: tags, warnings, is_original, length of chapters 1–3 and days between them
+  A author experience: first book or not, number of earlier books (only books first released earlier)
+  T first-three-chapter vector book_vec (1,536-d)
+  C chapter-1 vector chap1_vec (1,536-d)
 
-有 leak 疑慮、只當上限參考的區塊：
-  P 前作表現：前作有沒有進同季前 10%。前作的 followers 是 2025 年快照，這本書紅了會回頭拉高前作。
-  D 簡介向量 desc_vec（1,536 維）+ 簡介長度。簡介是 2025 年的版本，作者紅了之後會改
-    （加上 Amazon、Kindle、Patreon、Audible、"Book 2" 之類的字）。b["desc_marker"] 標出這些書。
+Leak-prone blocks, used only as an upper bound:
+  P earlier books' success: whether an earlier book reached its quarter's top 10%. Earlier books' followers are a 2025 snapshot, and a new hit pulls readers back to them.
+  D blurb vector desc_vec (1,536-d) + blurb length. The blurb is the 2025 version; authors edit it after a book takes off
+    (adding words like Amazon, Kindle, Patreon, Audible, "Book 2"). b["desc_marker"] flags these books.
 
-不能當特徵（事後才有）：followers、total_views、average_views、favorites、ratings、
+Not usable as features (only known afterwards): followers, total_views, average_views, favorites, ratings,
 n_chapters、pct_in_quarter、log_followers、status、cover_url、pca_*、umap_*
 """
 import json
@@ -30,16 +30,16 @@ EMB = HERE.parent / "embedding" / "out"
 OUT = HERE / "out"
 OUT.mkdir(exist_ok=True)
 
-# 時間切分。2016 年不用：75% 的書含防盜浮水印（見 embedding/11_watermark_check.py）。
-# 2024 年觀察時間太短，「前 10%」還不穩，只當補充。
+# Time split. 2016 is not used: 75% of its books carry anti-piracy watermarks (see embedding/11_watermark_check.py).
+# 2024 has been observed too briefly for its top 10% to settle; supplementary only.
 TRAIN_YEARS, VAL_YEAR, TEST_YEAR, RECENT_YEAR = (2017, 2021), 2022, 2023, 2024
 VECS = {"D": "desc_vec", "T": "book_vec", "C": "chap1_vec"}
-# 簡介裡「紅了之後才會出現」的字（不完整，只用來做敏感度檢查）
+# Words in blurbs that only appear after a book takes off (incomplete; used only for a sensitivity check)
 DESC_MARKERS = ["amazon", "kindle", "patreon", "audible", "audiobook", "stubbed", "book 2", "book two", "volume 2", "discord"]
 
 
 def load():
-    """回傳 (books DataFrame, {區塊名: 2D float32 array})，列順序一致。"""
+    """Returns (books DataFrame, {block name: 2D float32 array}) with matching row order."""
     t = pq.read_table(EMB / "books.parquet")
     b = t.drop(list(VECS.values())).to_pandas()
     X = {k: np.nan_to_num(t.column(c).combine_chunks().flatten().to_numpy().reshape(len(b), -1).astype(np.float32))
@@ -73,10 +73,10 @@ def _multihot(lists, prefix):
 
 
 def _author_history(b):
-    """同一作者更早開始連載的書。
+    """Earlier books by the same author (first released earlier).
 
-    ponytail: 只算樣本內的書（2016–2024、至少 3 章），更早的或不到 3 章的前作沒算進來；
-    要補的話從 data/interim/fictions_47.parquet 算。
+    ponytail: only books in the sample count (2016–2024, at least 3 chapters); earlier books, or books with fewer than 3 chapters, are not counted;
+    to include them, compute from data/interim/fictions_47.parquet.
     """
     o = b.sort_values(["first_release", "fiction_id"])
     g = o.groupby("author_id", sort=False)
@@ -93,14 +93,14 @@ def splits(b):
 
 
 def block(X, names):
-    """把幾個特徵區塊接起來，例如 block(X, "SAD")。"""
+    """Concatenate feature blocks, e.g. block(X, "SAD")."""
     return np.hstack([X[k] for k in names])
 
 
 def recall_at_slots(y, score, quarter):
-    """每一季的推薦名額 = 該季真正的熱門書數量（約 10%）；回傳所有名額裡挑中熱門書的比例。
+    """Each quarter gets as many slots as it has true hits (about 10%); returns the share of all slots that go to a hit.
 
-    名額數等於熱門書數，所以這個數字同時是 recall 和 precision。隨機挑大約是 0.10。
+    The number of slots equals the number of hits, so this is both recall and precision. Random picks score about 0.10.
     """
     d = pd.DataFrame({"y": np.asarray(y, bool), "s": score, "q": quarter})
     hits = sum(g.nlargest(int(g.y.sum()), "s").y.sum() for _, g in d.groupby("q"))
@@ -112,25 +112,25 @@ def metrics(y, score, quarter):
             "recall_at_slots": float(recall_at_slots(y, score, quarter))}
 
 
-if __name__ == "__main__":  # 自我檢查：python modeling/features.py
+if __name__ == "__main__":  # self-check: python modeling/features.py
     b, X = load()
     sp = splits(b)
     for k, m in sp.items():
-        print(f"{k:6s} {m.sum():6,d} 本  top10 {b.top10[m].mean():.3f}  含浮水印 {b.wm[m].mean():.3f}  "
-              f"簡介有事後字眼 {b.desc_marker[m].mean():.3f}  第一次寫書 {b.first_time_author[m].mean():.3f}")
+        print(f"{k:6s} {m.sum():6,d} books  top10 {b.top10[m].mean():.3f}  watermark {b.wm[m].mean():.3f}  "
+              f"blurb with after-success words {b.desc_marker[m].mean():.3f}  first-time author {b.first_time_author[m].mean():.3f}")
     print({k: v.shape for k, v in X.items()})
-    # 作者歷史不能偷看：每位作者最早的那本書一定沒有前作
+    # Author history must not peek ahead: each author's first book has no earlier books
     first = b.sort_values(["first_release", "fiction_id"]).groupby("author_id").head(1).index
     assert (X["A"][b.index.get_indexer(first)] == 0).all() and (X["P"][b.index.get_indexer(first)] == 0).all()
-    # 寫最多本的作者：前作本數要是 0, 1, 2, ...；前作表現要等於手算的值
+    # The most prolific author: earlier-book counts must be 0, 1, 2, ...; earlier-book success must match a hand computation
     a = b.author_id.value_counts().index[0]
     o = b[b.author_id == a].sort_values(["first_release", "fiction_id"])
     i = b.index.get_indexer(o.index)
     assert np.allclose(np.expm1(X["A"][i, 1]), np.arange(len(o)), atol=1e-3)
     assert np.allclose(X["P"][i, 0], o.top10.astype(float).shift().cummax().fillna(0).values)
-    # 指標：完美排序 = 1，反向排序 = 0
+    # Metric: perfect ranking = 1, reversed ranking = 0
     y = b.top10.values[sp["test"]]; q = b.quarter.values[sp["test"]]
     assert recall_at_slots(y, y.astype(float), q) == 1 and recall_at_slots(y, -y.astype(float), q) == 0
     r = np.random.default_rng(0).random(len(y))
-    print("隨機分數：", {k: round(v, 3) for k, v in metrics(y, r, q).items()})
+    print("random scores:", {k: round(v, 3) for k, v in metrics(y, r, q).items()})
     print("ok")

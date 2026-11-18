@@ -1,13 +1,13 @@
-"""Deep learning：在預訓練文字向量上訓練 MLP（PyTorch）。
+"""Deep learning: an MLP (PyTorch) on pretrained text vectors.
 
-文字編碼器（text-embedding-3-small）是凍結的，這裡訓練的是接在向量後面的分類網路。
-選模流程和 01_ml.py 一樣：2017–2021 訓練、2022 選超參數與 epoch 數，
-選好後用 2017–2022 重新訓練同樣的 epoch 數，在 2023 與 2024 打分數（3 個 seed 平均）。
+The text encoder (text-embedding-3-small) is frozen; what is trained here is the classifier on top of the vectors.
+Model selection as in 01_ml.py: train 2017–2021, pick hyperparameters and the number of epochs on 2022,
+then refit on 2017–2022 for the same number of epochs and score 2023 and 2024 (average of 3 seeds).
 
-輸出：out/preds_dl.parquet、out/selection_dl.json
+Outputs: out/preds_dl.parquet, out/selection_dl.json
 
-ponytail: 編碼器沒有 fine-tune。要再往上，下一步是在前三章原文上 fine-tune 小型文字模型
-（chapters.parquet 有原文），成本與時間都高一個量級，先確認文字有訊號再做。
+ponytail: the encoder is not fine-tuned. Going further would mean fine-tuning a small text model on the first three chapters
+(chapters.parquet has the text), an order of magnitude more cost and time; first confirm the text has signal.
 """
 import itertools
 import json
@@ -25,7 +25,7 @@ GRID = list(itertools.product([0.2, 0.5], [1e-4, 1e-2]))  # (dropout, weight_dec
 
 
 def train(Z, y, drop, wd, epochs, seed=0, Zva=None, yva=None):
-    """有驗證集：每個 epoch 算驗證 AUC，早停，回傳 (最佳 AUC, 最佳 epoch)。沒有驗證集：跑滿 epochs，回傳模型。"""
+    """With a validation set: compute validation AUC every epoch, stop early, return (best AUC, best epoch). Without: run all epochs and return the model."""
     torch.manual_seed(seed)
     net = nn.Sequential(nn.Linear(Z.shape[1], 256), nn.ReLU(), nn.Dropout(drop),
                         nn.Linear(256, 64), nn.ReLU(), nn.Dropout(drop), nn.Linear(64, 1))

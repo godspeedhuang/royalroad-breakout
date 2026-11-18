@@ -4,8 +4,8 @@ __pycache__/
 .ipynb_checkpoints/
 .DS_Store
 
-# 大檔案不進 git（原始資料、中間檔、向量），改用雲端分享，清單見 README「Large files」
-# 資料夾本身用 .gitkeep 保留，clone 下來結構就在
+# Large files stay out of git (raw data, intermediate files, vectors) and are shared through the cloud; see "Large files" in the README
+# Folders are kept with .gitkeep so the structure exists after cloning
 /data/**
 !/data/raw/
 !/data/interim/
@@ -14,9 +14,12 @@ embedding/out/emb_parts/*
 !embedding/out/emb_parts/.gitkeep
 *.parquet
 
-# 例外：GitHub Pages 上的 Atlas 要讀這兩個檔（公開版，無作者名、節錄 300 字）
+# Exception: the Atlas on GitHub Pages reads these two files (public version, no author names, 300-character excerpts)
 !docs/atlas/*/data/dataset.parquet
 
-# 個人編輯器設定
+# Personal editor settings
 .vscode/
 .claude/
+
+# Cover thumbnail sheets (cover art belongs to the authors; not public)
+cover/out/clusters/cluster_*.png

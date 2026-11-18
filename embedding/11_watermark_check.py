@@ -1,10 +1,10 @@
-"""檢查 Royal Road 防盜浮水印對趨勢結果的影響。
+"""How Royal Road's anti-piracy watermarks affect the trend results.
 
-Royal Road 會在章節裡插入防盜句子（例如 "Report any appearances on Amazon."）。
-2016 年的章節有一半含這種句子，其他年份約 5–7%，可能造成假的「2016 年很不一樣」。
-這裡把前三章含浮水印的書排除，重算主要數字，和全部書比較。
+Royal Road inserts anti-piracy sentences into chapters (for example "Report any appearances on Amazon.").
+Half of 2016 chapters contain them, other years about 5–7%, which can fake a "2016 is very different" result.
+Here books whose first three chapters contain a watermark are dropped, the main numbers recomputed, and compared with all books.
 
-輸出：out/watermark_check.json、out/watermark_books.csv（含浮水印的書的 fiction_id）
+Outputs: out/watermark_check.json, out/watermark_books.csv (fiction_id of books with watermarks)
 """
 import json
 from pathlib import Path
@@ -25,7 +25,7 @@ c = pd.read_parquet(OUT / "chapters_meta.parquet", columns=["fiction_id", "text"
 low = c.text.str.lower()
 c["wm"] = np.logical_or.reduce([low.str.contains(t, regex=False).values for t in TERMS])
 flag = c.groupby("fiction_id").wm.any()
-pd.DataFrame({"fiction_id": flag.index[flag.values]}).to_csv(OUT / "watermark_books.csv", index=False)  # 給 modeling/ 用
+pd.DataFrame({"fiction_id": flag.index[flag.values]}).to_csv(OUT / "watermark_books.csv", index=False)  # used by modeling/
 
 t = pq.read_table(OUT / "books.parquet")
 b = t.drop(["book_vec", "chap1_vec", "desc_vec"]).to_pandas()

@@ -8,6 +8,8 @@ MIT 15.071 *The AI Edge*, Fall 2026, Project 1 (predictive AI).
 
 **Interactive atlas.** <https://godspeedhuang.github.io/royalroad-breakout/> (served by GitHub Pages from `docs/`): 45,245 books placed by the embedding of their first three chapters, in a PCA view and a UMAP view.
 
+**Start here.** [`walkthrough/`](walkthrough/) tells the story in six short notebooks that only read saved results (no data download needed): 01 problem and target, 02 main model, 03 leakage checks, 04 drift and retraining, 05 cover experiment, 06 business value. [`EXPERIMENTS.md`](EXPERIMENTS.md) lists everything we tried, the result, and the decision.
+
 ## Data
 
 [OmniAICreator/RoyalRoad-1.61M](https://huggingface.co/datasets/OmniAICreator/RoyalRoad-1.61M) on Hugging Face: 1.61M chapters from 86,959 serials on royalroad.com, one row per chapter, 12 GB.
@@ -30,6 +32,9 @@ Things that shaped the design:
 | `embedding/06, 08, 13` | Launch the atlas locally; export the public static atlas to `docs/atlas/` |
 | `embedding/out/` | Small results (JSON, CSV, figures) are tracked; parquet files are not |
 | `modeling/` | Rule baselines, logistic regression, gradient boosting, PyTorch MLP, drift test; results in `modeling/out/` |
+| `cover/` | Cover images: which covers predate chapter 3, frozen image embeddings (01–02 run on Colab), and a two-stage merge into the main model (03); results in `cover/out/` |
+| `walkthrough/` | Six narrative notebooks, in slide order, that read the saved results |
+| `EXPERIMENTS.md` | What we tried, what happened, what we decided |
 | `reports/` | EDA figures and HTML report sources |
 
 ## Reproduce
@@ -56,6 +61,7 @@ uv run python embedding/09_pca_trajectory.py
 uv run python embedding/10_tags_compare.py
 uv run python embedding/11_watermark_check.py
 uv run python embedding/12_explain_direction.py   # calls the embedding endpoint for 18 probe sentences
+uv run python embedding/12_explain_direction.py --plot-only   # redraw its figure from the saved JSON only
 
 # Atlas
 ./embedding/06_atlas.sh          # UMAP view, http://localhost:5055
@@ -69,6 +75,13 @@ uv run python 01_ml.py        # rules, logistic regression, gradient boosting
 uv run python 02_dl.py        # MLP on the frozen embeddings
 uv run python 03_compare.py   # → out/results.json, results.md, figs/model_comparison.png
 uv run python 04_drift.py     # → out/drift_auc.json, figs/drift_auc.png
+cd ..
+
+# Covers: 01–02 run on Colab (see cover/README.md); 03 needs their outputs in data/cover/
+cd cover && uv run jupyter nbconvert --to notebook --execute --inplace 03_cover_merge.ipynb && cd ..
+
+# Walkthrough (reads saved results only, a few seconds)
+cd walkthrough && for f in 0*.ipynb; do uv run jupyter nbconvert --to notebook --execute --inplace "$f"; done
 ```
 
 ## Large files
@@ -116,6 +129,7 @@ Train 2017–2021, tune on 2022, test once on 2023 (8,075 books, 811 positives).
 - **First-time authors** (two thirds of books) are harder: recall 0.43, still well above the rule's 0.25.
 - **Blurbs are excluded on purpose.** The blurb is the 2025 version, and 7.8% of test books have blurbs mentioning Amazon, Kindle, Patreon, Audible or a second volume; 46% of those are hits. Adding the blurb lifts recall to 0.57, but that is an upper bound contaminated by edits made after success.
 - **Retraining.** Holding the test year fixed, each extra year of age in the training window costs 0.026 AUC for a tags-only model and 0.008 for a text-only model. Retrain at least yearly.
+- **Covers are not used.** Covers uploaded after chapter 3 come with three times the hit rate (21% vs 7%), so only covers that predate chapter 3 are usable (42% of books). On those books a frozen CLIP embedding adds 4.0 points in 2023 (CI +1.2 to +8.4) but nothing in 2024, and merged into the ranking of all books it does not help (0.482 vs 0.481). Details in [`cover/README.md`](cover/README.md).
 
 ## Exploratory findings
 

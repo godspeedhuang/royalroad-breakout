@@ -1,12 +1,12 @@
-"""步驟 4：把 chunks_input.parquet 送去 Parley 做 embedding。
+"""Step 4: send chunks_input.parquet to Parley for embedding.
 
-- 每次請求塞多塊文字，同時送多個請求（Parley 沒有 OpenAI 的 Batch API）
-- 每個請求的結果寫成 out/emb_parts/ 底下一個 parquet，中斷後重跑會跳過已完成的塊
-- 失敗自動重試；金鑰錯誤直接停止
+- Several chunks per request, several requests at once (Parley has no OpenAI Batch API)
+- Each request's result is written as one parquet under out/emb_parts/; a rerun after an interruption skips finished chunks
+- Failures are retried automatically; a key error stops immediately
 
-用法：
-  python 02_embed.py --limit-books 100   # 試跑
-  python 02_embed.py                      # 全部
+Usage:
+  python 02_embed.py --limit-books 100   # trial run
+  python 02_embed.py                      # everything
 """
 import argparse
 import asyncio
@@ -55,12 +55,12 @@ async def embed_one(client, model, batch, sem, stats):
             break
         except (AuthenticationError, PermissionDeniedError):
             raise
-        except Exception as e:  # 429、5xx、逾時都重試
+        except Exception as e:  # retry on 429, 5xx and timeouts
             stats["retries"] += 1
             wait = min(60, 2 ** attempt) + random.random()
             if attempt == 7:
                 stats["failed"] += len(batch)
-                print(f"  放棄一批（{len(batch)} 塊）：{type(e).__name__}: {str(e)[:120]}")
+                print(f"  giving up on a batch ({len(batch)} chunks): {type(e).__name__}: {str(e)[:120]}")
                 return
             await asyncio.sleep(wait)
     vecs = np.asarray([d.embedding for d in sorted(resp.data, key=lambda d: d.index)], dtype=np.float32)
@@ -92,7 +92,7 @@ async def main():
         df = df[df.fiction_id.isin(keep)]
     done = load_done()
     todo = df[~df.chunk_uid.isin(done)].sort_values(["fiction_id", "chunk_uid"])
-    print(f"model={model}  待做 {len(todo):,} 塊（已完成 {len(df) - len(todo):,}），約 {todo.n_tokens.sum() / 1e6:.1f}M token")
+    print(f"model={model}  to do {len(todo):,} chunks ({len(df) - len(todo):,} already done), about {todo.n_tokens.sum() / 1e6:.1f}M tokens")
     if todo.empty:
         return
 
@@ -105,9 +105,9 @@ async def main():
         await fut
         if i % 50 == 0 or i == len(tasks):
             el = time.time() - t0
-            print(f"  {i}/{len(tasks)} 請求｜{stats['done']:,} 塊｜{stats['tokens'] / 1e6:.1f}M token｜"
-                  f"{el / 60:.1f} 分｜重試 {stats['retries']}｜失敗 {stats['failed']}", flush=True)
-    print("完成", stats)
+            print(f"  {i}/{len(tasks)} requests | {stats['done']:,} chunks | {stats['tokens'] / 1e6:.1f}M tokens | "
+                  f"{el / 60:.1f} min | retries {stats['retries']} | failed {stats['failed']}", flush=True)
+    print("done", stats)
 
 
 if __name__ == "__main__":

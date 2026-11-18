@@ -1,14 +1,14 @@
-"""比較所有模型在測試年（2023）的表現。
+"""Compare all models on the test year (2023).
 
-  1. 每個模型的 AUC、AP、Recall@名額，Recall 附 bootstrap 95% 信賴區間
-  2. 每加一個特徵區塊多了多少（成對 bootstrap）
-  3. 分組：全部／第一次寫書的作者／有前作的作者
-  4. leak 檢查：拿掉含浮水印的書、拿掉簡介有事後字眼的書，分數掉多少
-  5. 影響換算：每季固定名額下，模型比規則多挑中幾本熱門書
+  1. AUC, AP and Recall@slots for every model, with a bootstrap 95% interval for recall
+  2. what each added feature block contributes (paired bootstrap)
+  3. groups: all / first-time authors / returning authors
+  4. leak checks: how scores change without watermarked books and without blurbs that contain after-success words
+  5. impact: with a fixed number of slots per quarter, how many more hits the model picks than the rule
 
-主模型不是看測試分數選的：從沒有 leak 疑慮的候選（lr_SAT、gb_SAT、mlp_SAT）裡挑驗證年 AUC 最高的。
+The main model is not chosen on test scores: among leak-free candidates (lr_SAT, gb_SAT, mlp_SAT) the one with the highest validation AUC wins.
 
-輸出：out/results.json、out/results.md、out/figs/model_comparison.png
+Outputs: out/results.json, out/results.md, out/figs/model_comparison.png
 """
 import json
 
@@ -29,8 +29,8 @@ LABEL = {
     "lr_SATP": "LR: + prior-book success", "lr_SATPD": "LR: + blurb", "lr_D": "LR: blurb only",
 }
 KIND = {m: "Rule" if m.startswith("rule") else "Deep learning" if m.startswith("mlp") else "Machine learning" for m in LABEL}
-LEAKY = {"lr_SATP", "lr_SATPD", "lr_D"}  # 用到 P 或 D，只當上限參考
-COLOR = {"Machine learning": "#2a78d6", "Deep learning": "#eb6834", "Rule": "#1baf7a"}  # dataviz 預設色盤 1–3
+LEAKY = {"lr_SATP", "lr_SATPD", "lr_D"}  # use P or D; upper bound only
+COLOR = {"Machine learning": "#2a78d6", "Deep learning": "#eb6834", "Rule": "#1baf7a"}  # dataviz default palette 1–3
 
 p = pd.read_parquet(OUT / "preds_ml.parquet").merge(pd.read_parquet(OUT / "preds_dl.parquet"), on="fiction_id")
 models = list(LABEL)
@@ -43,7 +43,7 @@ rule = max([m for m in models if m.startswith("rule")], key=lambda m: sel[m]["va
 table = lambda d, ms=models: {m: metrics(d.top10.values, d[m].values, d.quarter.values) for m in ms}
 r3 = lambda x: round(float(x), 3)
 
-# ---- 1. bootstrap：在每一季裡重抽書，保留「每季名額」的結構 ----
+# ---- 1. bootstrap: resample books within each quarter, keeping the slots-per-quarter structure ----
 by_q = [np.flatnonzero(test.quarter.values == q) for q in test.quarter.unique()]
 boot = {m: np.empty(B) for m in models}
 for i in range(B):
@@ -56,19 +56,19 @@ res = {"test_year": TEST_YEAR, "n_test": len(test), "n_positive": int(test.top10
        "test": {m: {**{k: r3(v) for k, v in t.items()}, "recall_ci95": ci(boot[m]), "leak_prone": m in LEAKY} for m, t in table(test).items()},
        "recent_2024": {m: {k: r3(v) for k, v in t.items()} for m, t in table(recent).items()}}
 
-# ---- 2. 每一步多了多少（百分點） ----
+# ---- 2. what each step adds (percentage points) ----
 steps = [("model vs best rule", main, rule), ("author experience", "lr_SA", "lr_S"), ("chapter text", "lr_SAT", "lr_SA"),
          ("boosting vs LR", "gb_SAT", "lr_SAT"), ("MLP vs LR", "mlp_SAT", "lr_SAT"),
          ("prior-book success (leak-prone)", "lr_SATP", "lr_SAT"), ("blurb (leak-prone)", "lr_SATPD", "lr_SATP")]
 res["increments_pp"] = {name: {"a": a, "b": c, "diff": round(100 * (res["test"][a]["recall_at_slots"] - res["test"][c]["recall_at_slots"]), 1),
                                "ci95": [round(100 * x, 1) for x in np.percentile(boot[a] - boot[c], [2.5, 97.5])]} for name, a, c in steps}
 
-# ---- 3. 分組 ----
+# ---- 3. groups ----
 groups = {"all": np.ones(len(test), bool), "first_time_author": test.first_time_author.values, "returning_author": ~test.first_time_author.values}
 res["by_group"] = {g: {"n": int(m.sum()), "n_positive": int(test.top10[m].sum()),
                        **{k: {a: r3(b) for a, b in v.items()} for k, v in table(test[m], [rule, "lr_S", "lr_SA", main]).items()}} for g, m in groups.items()}
 
-# ---- 4. leak 檢查 ----
+# ---- 4. leak checks ----
 flag_auc = lambda f: r3(metrics(test.top10.values, test[f].values.astype(float), test.quarter.values)["auc"])
 res["leak_checks"] = {
     "watermark": {"share_of_test": r3(test.wm.mean()), "top10_rate_if_flagged": r3(test.top10[test.wm].mean()), "auc_of_flag_alone": flag_auc("wm"),
@@ -77,7 +77,7 @@ res["leak_checks"] = {
                      "without_flagged_books": {m: {k: r3(v) for k, v in t.items()} for m, t in table(test[~test.desc_marker], ["lr_SAT", "lr_D", "lr_SATPD"]).items()}},
 }
 
-# ---- 5. 影響換算：每季名額 = 該季熱門書數 ----
+# ---- 5. impact: slots per quarter = hits in that quarter ----
 def picks(m):
     return pd.concat([g.nlargest(int(g.top10.sum()), m) for _, g in test.groupby("quarter")])
 nq = test.quarter.nunique()
@@ -85,13 +85,13 @@ pm, pr = picks(main), picks(rule)
 res["impact"] = {
     "quarters": nq, "books_per_quarter": round(len(test) / nq), "slots_per_quarter": round(test.top10.sum() / nq),
     "hits_per_quarter": {"random": round(0.1 * test.top10.sum() / nq, 1), rule: round(pr.top10.sum() / nq, 1), main: round(pm.top10.sum() / nq, 1)},
-    # 被推薦的書最後累積的 followers 總和（事後數字，只用來表達「推薦位有沒有給對書」）
+    # total eventual followers of the recommended books (an after-the-fact number, only to show whether slots went to the right books)
     "eventual_followers_of_picks_per_quarter": {"random": round(test.followers.mean() * test.top10.sum() / nq), rule: round(pr.followers.sum() / nq),
                                                  main: round(pm.followers.sum() / nq), "oracle": round(test.followers[test.top10].sum() / nq)},
 }
 (OUT / "results.json").write_text(json.dumps(res, indent=1))
 
-# ---- 表 ----
+# ---- table ----
 rows = ["| Model | AUC | AP | Recall@slots (95% CI) | 2024 recall |", "|---|---|---|---|---|"]
 for m in models:
     t = res["test"][m]
@@ -99,7 +99,7 @@ for m in models:
                 f"{t['recall_at_slots']:.3f} ({t['recall_ci95'][0]:.3f}–{t['recall_ci95'][1]:.3f}) | {res['recent_2024'][m]['recall_at_slots']:.3f} |")
 (OUT / "results.md").write_text("\n".join(rows) + "\n\n† uses information that may postdate chapter 3 (see README); upper bound only. Random = 0.10.\n")
 
-# ---- 圖：一個量（recall）、三類模型；leak 疑慮的用斜線填 ----
+# ---- figure: one measure (recall), three kinds of model; leak-prone ones hatched ----
 order = sorted(models, key=lambda m: res["test"][m]["recall_at_slots"])
 fig, ax = plt.subplots(figsize=(8.5, 5.2))
 for i, m in enumerate(order):

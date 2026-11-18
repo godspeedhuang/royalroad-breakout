@@ -325,7 +325,7 @@
  ],
  "axis_tags": {
   "PC1": {
-   "高的一端": {
+   "high end": {
     "LitRPG": 0.49,
     "Adventure": 0.328,
     "Action": 0.306,
@@ -333,7 +333,7 @@
     "Fantasy": 0.26,
     "Martial Arts": 0.185
    },
-   "低的一端": {
+   "low end": {
     "Female Lead": -0.428,
     "Drama": -0.294,
     "Multiple Lead Characters": -0.272,
@@ -343,7 +343,7 @@
    }
   },
   "PC2": {
-   "高的一端": {
+   "high end": {
     "Romance": 0.389,
     "School Life": 0.219,
     "Martial Arts": 0.194,
@@ -351,7 +351,7 @@
     "Reincarnation": 0.142,
     "Slice of Life": 0.135
    },
-   "低的一端": {
+   "low end": {
     "LitRPG": -0.363,
     "Sci-fi": -0.296,
     "Adventure": -0.223,
