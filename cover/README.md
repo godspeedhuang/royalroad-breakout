@@ -18,6 +18,7 @@ Can the cover image help predict which serials take off? Notebooks 01 and 02 wer
 | `out/clusters/` | CLIP ViT-L/14 clustering: silhouette, lift per cluster, a 24-cover sample sheet per cluster |
 | `out/ablation/` | Results of 02 and paired bootstrap differences |
 | `out/cover_merge.json` | All numbers from 03 |
+| `out/preds_cover.parquet` | Per-serial two-stage scores (main + cover adjustment) for 2023 and 2024, written by 03; read by `modeling/05_demo_data.py` for the demo's "S+A+T+Cover" bar. Parquet, not in git |
 
 **Inputs for 03** (not in git; put them in `data/cover/`): `cover_status.parquet` and `cover_emb_clip_l14.parquet`, from the teammate's Google Drive folder `RR_project1/cover_v2/封面向量_V区块_交接/` (subfolders `01_status/` and `03_embeddings/`). It also needs `embedding/out/books.parquet` (HF dataset).
 

@@ -13,6 +13,7 @@ uv run python 01_ml.py        # rules, logistic regression, gradient boosting
 uv run python 02_dl.py        # PyTorch MLP
 uv run python 03_compare.py   # comparison, confidence intervals, groups, leak checks, impact
 uv run python 04_drift.py     # fixed test year, training data of different ages
+uv run python 05_demo_data.py # data for the demo page (docs/demo/data.js)
 ```
 
 | File | Output |
@@ -21,6 +22,7 @@ uv run python 04_drift.py     # fixed test year, training data of different ages
 | `01_ml.py`, `02_dl.py` | `out/preds_*.parquet` (every model's score for every book, not in git), `out/selection_*.json` (chosen hyperparameters and validation scores) |
 | `03_compare.py` | `out/results.json`, `out/results.md`, `out/figs/model_comparison.png` |
 | `04_drift.py` | `out/drift_auc.json`, `out/figs/drift_auc.png` |
+| `05_demo_data.py` | `../docs/demo/data.js`: every 2023 and 2024 book's score under each model, with title, tags, cover URL, genre tint and outcome; 20 serials per 2016 quarter and each quarter's hit threshold for the target animation; tag and warning lists; the hyperparameter grids from `selection_*.json`; two example first-three-chapter vectors and the hit direction (2017–2022, no watermarks); a 4,000-serial PCA/UMAP sample with yearly paths and the 1,536-d 2017→2024 shift cosine; screen 0's numbers (including the hits' share of 2023 views and followers) and cover wall; the top pick's first lines (≤ 200 characters, from `atlas.parquet`) with their cl100k_base tokens and its chapter-1 vector; two standardized raw dimensions of the map sample; the cover model's scores from `cover/out/preds_cover.parquet` when present (checked against `cover_merge.json`); the drift, tag-lift and cover-experiment numbers the page charts. Prints the 50-slot numbers used in the deck |
 
 ## Design
 
@@ -130,6 +132,8 @@ Rules built on tags go stale fast; the text signal lasts longer. Part of the tag
 - Author experience counts only books in the sample (2016–2024, at least 3 chapters); earlier books, or books with fewer than 3 chapters, are not counted.
 - A teammate's earlier version (2021–2023, at least 5 chapters, 13,998 books) reported Recall@10% of about 50% using titles and blurbs. Here it is 48% without blurbs and 57% with them, the same order of magnitude, but the samples and splits differ, so the numbers are not directly comparable.
 - 2016–2017 have only 52–60 top-10% books per quarter; books with 0 followers tie in the within-quarter ranking.
+- Gradient boosting is not exactly reproducible across machines: tiny floating-point differences in the PCA step change which of four near-tied settings wins on 2022. Rerun on another machine (Apple M5 Pro, scikit-learn 1.9.1) it picked learning rate 0.03 with 31 leaves and scored 0.465 instead of 0.476; still not better than LR. The rules, all LR models and the MLP reproduce exactly.
+- The editors' rule has many tied scores (books with the same tags score the same), so its hit count can move by one book with the tie-break. The demo breaks ties by book id.
 
 ## Covers
 

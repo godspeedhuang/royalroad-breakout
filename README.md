@@ -8,7 +8,7 @@ MIT 15.071 *The AI Edge*, Fall 2026, Project 1 (predictive AI).
 
 **Interactive atlas.** <https://godspeedhuang.github.io/royalroad-breakout/> (served by GitHub Pages from `docs/`): 45,245 books placed by the embedding of their first three chapters, in a PCA view and a UMAP view.
 
-**Start here.** [`walkthrough/`](walkthrough/) tells the story in six short notebooks that only read saved results (no data download needed): 01 problem and target, 02 main model, 03 leakage checks, 04 drift and retraining, 05 cover experiment, 06 business value. [`EXPERIMENTS.md`](EXPERIMENTS.md) lists everything we tried, the result, and the decision.
+**Start here.** [`walkthrough/`](walkthrough/) tells the story in six short notebooks that only read saved results (no data download needed): 01 problem and target, 02 main model, 03 leakage checks, 04 drift and retraining, 05 cover experiment, 06 business value. [`EXPERIMENTS.md`](EXPERIMENTS.md) lists everything we tried, the result, and the decision. The demo page [`docs/demo/`](docs/demo/) shows which serials each model would recommend in a given quarter and whether they became hits (open `docs/demo/index.html` directly in a browser; it also works on GitHub Pages).
 
 ## Data
 
@@ -35,6 +35,7 @@ Things that shaped the design:
 | `cover/` | Cover images: which covers predate chapter 3, frozen image embeddings (01–02 run on Colab), and a two-stage merge into the main model (03); results in `cover/out/` |
 | `walkthrough/` | Six narrative notebooks, in slide order, that read the saved results |
 | `EXPERIMENTS.md` | What we tried, what happened, what we decided |
+| `docs/demo/` | Demo page in five screens (why, target, model choice, the model's picks, checks; ↓/↑ to move, space to play or pause): pick a quarter, number of slots, model and author group, and see which serials each model recommends and whether they became hits; data from `modeling/05_demo_data.py` |
 | `reports/` | EDA figures and HTML report sources |
 
 ## Reproduce
@@ -75,6 +76,7 @@ uv run python 01_ml.py        # rules, logistic regression, gradient boosting
 uv run python 02_dl.py        # MLP on the frozen embeddings
 uv run python 03_compare.py   # → out/results.json, results.md, figs/model_comparison.png
 uv run python 04_drift.py     # → out/drift_auc.json, figs/drift_auc.png
+uv run python 05_demo_data.py # → ../docs/demo/data.js (needs out/preds_*.parquet from 01 and 02)
 cd ..
 
 # Covers: 01–02 run on Colab (see cover/README.md); 03 needs their outputs in data/cover/

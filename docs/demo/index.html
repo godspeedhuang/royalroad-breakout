@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer"><!-- covers are loaded from royalroad.com -->
+<title>Royal Road Breakout demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400..700&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- Keys: ↓ / ↑ move between screens, space plays or pauses the current screen. -->
+
+<!-- Cover: title, MIT, team, course, over a tilted wall of real covers -->
+<section class="screen full hero" id="title">
+  <div class="hero-wall" id="hero-wall"></div>
+  <div class="hero-shade"></div>
+  <div class="hero-text">
+    <h1>Royal Road Breakout</h1>
+    <p class="hero-sub">Spotting tomorrow's web-fiction hits at chapter 3</p>
+    <img class="hero-mit" src="https://upload.wikimedia.org/wikipedia/commons/b/b8/MIT_2023_red_logo.svg" alt="MIT" onerror="this.replaceWith(Object.assign(document.createElement('b'), { className: 'hero-mit-text', textContent: 'MIT' }))">
+    <p class="hero-course hero-course-line">MIT 15.071 · The AI Edge · Fall 2026</p>
+    <p class="hero-team" id="hero-team"></p>
+    <div class="hero-projects">
+      <button class="proj primary" data-go="why"><small>Project One</small><b>Data exploration and model</b><span>→</span></button>
+      <button class="proj" data-go="p2"><small>Project Two</small><b>Agentic solution</b><span>in progress</span></button>
+    </div>
+  </div>
+  <div class="hero-arc"></div>
+  <p class="hero-hint">Press ↓ to begin</p>
+</section>
+
+<!-- 0: why we built this -->
+<section class="screen full" id="why">
+  <header>
+    <div class="titles">
+      <h2><span class="n">0</span>Why we built this</h2>
+      <p class="lede">Royal Road's recommendation team: about two thousand new serials every quarter, a few dozen slots. Which new stories deserve them?</p>
+    </div>
+    <div class="steps"><button class="primary" data-play="why">▶ Play</button></div>
+  </header>
+  <div class="cols">
+    <div class="card">
+      <h3>New serials get buried</h3>
+      <div id="wall"></div>
+      <div id="funnel"></div>
+      <p class="bigcap" id="why-cap"></p>
+    </div>
+    <div class="card">
+      <h3>What we built</h3>
+      <div id="flow"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 1: the target (Y) -->
+<section class="screen full" id="hit">
+  <header>
+    <div class="titles">
+      <h2><span class="n">1</span>What counts as a hit</h2>
+      <p class="lede">Followers are counted once, in June 2025. So a serial is only compared with serials that started in the same quarter.</p>
+    </div>
+    <div class="steps">
+      <button class="primary" data-play="hit">▶ Play</button>
+      <button data-step-of="hit" data-step="0">1 Serials start</button>
+      <button data-step-of="hit" data-step="1">2 Counted in June 2025</button>
+      <button data-step-of="hit" data-step="2">3 Top 10% of each quarter</button>
+    </div>
+  </header>
+  <div class="card grow1">
+    <div id="anim"></div>
+    <div class="cap-row"><p class="bigcap" id="anim-cap"></p><div class="formula" id="fx-target"></div></div>
+  </div>
+</section>
+
+<!-- The filter bar sticks only over screens 2 and 3, the two it drives -->
+<div class="filtered">
+<div id="filters"><div class="inner">
+  <span class="brand">Royal Road Breakout</span>
+  <label>Quarter <select id="f-quarter"></select></label>
+  <label class="slider">Slots per quarter <input id="f-k" type="range" min="10" max="250" step="5"><b id="f-k-val"></b></label>
+  <label>Authors <select id="f-authors"><option value="all">All</option><option value="first">First-time only</option></select></label>
+  <label>Model <select id="f-model"></select></label>
+  <span class="story">Story
+    <button data-story="1">1 Rule</button>
+    <button data-story="2">2 Tags</button>
+    <button data-story="3" class="on">3 + Chapters</button>
+    <button data-story="4">4 First-time</button>
+  </span>
+</div></div>
+
+<!-- 2: inputs (X) and model choice -->
+<section class="screen" id="model">
+  <header>
+    <div class="titles">
+      <h2><span class="n">2</span>How we chose the model</h2>
+      <p class="lede">Inputs added one block at a time, then three algorithms on the same inputs. Click any item to look inside.</p>
+    </div>
+    <div class="steps" id="model-steps"><button class="primary" data-play="model">▶ Play</button></div>
+  </header>
+  <div class="timeline">
+    <div><b>Train</b>2017–2021</div>
+    <div><b>Tune</b>2022</div>
+    <div class="test"><b>Test</b>2023, never seen</div>
+    <div class="na"><b>2024</b>not settled yet</div>
+  </div>
+  <div class="cols" id="model-cols">
+    <div class="card builder">
+      <h3>Inputs</h3>
+      <div class="opts" id="blocks"></div>
+      <h3>Algorithm</h3>
+      <div class="opts" id="methods"></div>
+    </div>
+    <div class="card" id="detail-card">
+      <h3 id="detail-title"></h3>
+      <p class="sub" id="detail-sub"></p>
+      <div class="detail" id="detail"></div>
+    </div>
+    <div class="stack">
+      <div class="card grow1" id="chart-card">
+        <h3>Share of slots that went to future hits</h3>
+        <p class="sub" id="models-cap"></p>
+        <div class="formula small" id="fx-share"></div>
+        <div class="chart-box" id="models-chart"></div>
+      </div>
+      <div class="card">
+        <h3>First-time authors</h3>
+        <div class="kpi-inline"><div class="big accent" id="ft-mult"></div><p class="cap" id="ft-cap"></p></div>
+      </div>
+    </div>
+  </div>
+  <p class="bigcap" id="model-cap"></p>
+</section>
+
+<!-- 3: the model's picks on the test year -->
+<section class="screen" id="picks">
+  <header>
+    <div class="titles">
+      <h2><span class="n">3</span>The model's picks</h2>
+      <p class="lede" id="picks-cap"></p>
+    </div>
+    <div class="steps"><button class="primary" data-play="picks">▶ Play</button></div>
+  </header>
+  <div class="cols">
+    <div class="card">
+      <div class="kpis">
+        <div class="k"><div class="big rule" id="kpi-rule"></div><p class="cap" id="kpi-rule-cap"></p></div>
+        <div class="k"><div class="big accent" id="kpi-model"></div><p class="cap" id="kpi-model-cap"></p></div>
+        <div class="k"><div class="big" id="kpi-mult"></div><p class="cap">more hits than the rule</p></div>
+      </div>
+      <div class="layers">
+        <button data-layer="picks">Picked</button>
+        <button data-layer="hits">Actual hits</button>
+        <button data-layer="both" class="on">Both</button>
+        <div class="legend" id="mosaic-legend"></div>
+      </div>
+      <div id="mosaic"></div>
+      <div id="hover">Every square is one test serial. Hover to see it, click to open it on Royal Road.</div>
+    </div>
+    <div class="card">
+      <h3>The picks, highest score first</h3>
+      <div class="layers">
+        <button id="dim">Gray out the misses</button>
+        <button id="covers-all"></button>
+        <span class="hit-share" id="hit-share"></span>
+      </div>
+      <div id="covers"></div>
+      <p class="cap">Current covers from royalroad.com; serials without one show their title. Click to open.</p>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- 4: checks -->
+<section class="screen full" id="checks">
+  <header>
+    <div class="titles">
+      <h2><span class="n">4</span>What else we checked</h2>
+      <p class="lede">The model only uses what existed at chapter 3, and taste drifts, so it has to be retrained. Point at a chart to play it; double-click to play and light all.</p>
+    </div>
+    <div class="steps"><button class="primary" data-play="checks">▶ Play</button></div>
+  </header>
+  <div class="cols spot" id="check-cols">
+    <div class="card" id="leak-card">
+      <h3>Left out: anything edited after the fact</h3>
+      <p class="sub" id="leak-sub"></p>
+      <div class="legend"><span><i style="background:var(--other)"></i>the rest</span><span><i style="background:var(--accent)"></i>blurb names Patreon, "Book 2"…, or cover added after chapter 3</span></div>
+      <div class="chart-box" id="leak-chart"></div>
+      <p class="cap">Authors add "Book 2", Patreon links or a new cover once a serial takes off. Using them would be reading the answer.</p>
+    </div>
+    <div class="card" id="drift-card">
+      <h3>Retrain every year</h3>
+      <p class="sub">Test year 2023, training data of different ages. AUC, higher is better.</p>
+      <div class="chart-box" id="drift-chart"></div>
+      <p class="cap">A tags model loses 0.026 AUC per year of age; the story signal only 0.008.</p>
+    </div>
+    <div class="card" id="taste-card">
+      <h3>Taste over time</h3>
+      <div class="layers">
+        <button data-taste="pca" class="on">Story map: PCA</button>
+        <button data-taste="tags">Tag lift</button>
+        <button data-taste="umap">Story map: UMAP</button>
+      </div>
+      <p class="sub" id="taste-sub"></p>
+      <div class="formula small" id="fx-lift"></div>
+      <div class="legend" id="taste-legend"></div>
+      <div class="chart-box" id="taste-chart"></div>
+      <p class="cap" id="taste-cap"></p>
+    </div>
+  </div>
+  <p class="next"><b>Next step:</b> score every new serial at chapter 3, pilot one quarter with half the slots chosen by the model, retrain once a year.</p>
+  <p class="cap">Data: Hugging Face OmniAICreator/RoyalRoad-1.61M (snapshot June 2025). Page data: modeling/05_demo_data.py. No author names. <a href="../atlas/umap/">Explore all serials in the Embedding Atlas</a>.</p>
+</section>
+
+<div id="peek"></div><!-- cover card that follows the mouse over the mosaic -->
+
+<!-- Project Two: placeholder -->
+<section class="screen full p2" id="p2">
+  <div class="p2-box">
+    <p class="hero-course">Project Two</p>
+    <h2>Agentic solution</h2>
+    <p class="lede">We are still working on it.</p>
+    <span class="p2-dots"><i></i><i></i><i></i></span>
+    <button data-go="title">← Back to the cover</button>
+  </div>
+</section>
+
+<div id="veil"></div><!-- black fade used when the cover buttons jump between distant screens -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

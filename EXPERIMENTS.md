@@ -45,7 +45,7 @@ Known limit we cannot fix with this dataset: tags, chapter text and followers ar
 
 | # | Analysis | Status |
 |---|---|---|
-| 16 | Hits per slot with a fixed 50 slots per quarter (53% → 68%, 34 vs 14 per quarter) | Waiting for code |
+| 16 | Hits per slot with a fixed 50 slots per quarter (53% → 68%, 34 vs 14 per quarter) | Reproduced by `modeling/05_demo_data.py` (2023): rule 28.5% (57/200), S+A 52.5%, S+A+T 68.0% (136/200, 34 per quarter), gradient boosting 70.5%, MLP 72.5% (the deck says 74%) |
 | 17 | Day-30 re-rank with the first month's posting rhythm (68% → 76%) | Waiting for code |
 | 18 | Ad revenue and editor time (about $39k and $36k a year) | Waiting for code |
 
