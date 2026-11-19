@@ -14,7 +14,6 @@ Three ways to explain them:
 Only books without watermark sentences are used (see 11_watermark_check.py).
 Outputs: out/direction_summary_clean.json, out/figs/concept_change_clean.png
 To redraw only the figure from the saved JSON (no data or API needed): python 12_explain_direction.py --plot-only
-(out/direction_summary.json is the older result from before watermarks were removed; this script no longer writes it.)
 """
 import json
 from pathlib import Path

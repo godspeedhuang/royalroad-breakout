@@ -36,7 +36,7 @@ Things that shaped the design:
 | `walkthrough/` | Six narrative notebooks, in slide order, that read the saved results |
 | `EXPERIMENTS.md` | What we tried, what happened, what we decided |
 | `docs/demo/` | Demo page (cover, why, target, model choice, the model's picks, checks, business value; ↓/↑ to move, space to play or pause): pick a quarter, number of slots, model and author group, and see which serials each model recommends and whether they became hits; data from `modeling/05_demo_data.py` |
-| `reports/` | EDA figures, HTML report sources, and the draft slide deck and video script (`reports/slides/`) |
+| `reports/` | EDA figures (`reports/eda/`), and the draft slide deck and video script (`reports/slides/`) |
 
 ## Reproduce
 
