@@ -41,17 +41,29 @@ Known limit we cannot fix with this dataset: tags, chapter text and followers ar
 | 14 | How fast does a model go stale? | Fix the test year, train on 2-year windows of increasing age (5,000 serials each) | Each extra year of age: −0.026 AUC for tags, −0.008 for text. The tags drop is mostly a step when the training window predates 2020–21 (tag usage changed) | Retrain at least yearly; rely on text | `modeling/04_drift.py` |
 | 15 | Do reader preferences drift? | Direction "top 10% minus others" in the 1,536-d embedding, compared across years, corrected for sampling noise, watermarks removed | Cosine similarity 0.935 eight years apart; market supply and hits move together (cosine 0.90) | Describe as "what wins within a cohort is stable"; snapshot overlap may overstate it | `embedding/05_drift.ipynb`, `11_watermark_check.py` |
 
-## Pending (in the slides, code not yet in this repo)
+## Business numbers in the slides
 
-| # | Analysis | Status |
-|---|---|---|
-| 16 | Hits per slot with a fixed 50 slots per quarter (53% → 68%, 34 vs 14 per quarter) | Reproduced by `modeling/05_demo_data.py` (2023): rule 28.5% (57/200), S+A 52.5%, S+A+T 68.0% (136/200, 34 per quarter), gradient boosting 70.5%, MLP 72.5% (the deck says 74%) |
-| 17 | Day-30 re-rank with the first month's posting rhythm (68% → 76%) | Waiting for code |
-| 18 | Ad revenue and editor time (about $39k and $36k a year) | Ad revenue reproduced by `modeling/05_demo_data.py` (2023, model minus rule views × 10% × $3 / 1,000): $25,766 / $38,671 / $46,498 at 25 / 50 / 100 slots a quarter (the deck's $38,856 at 50 differs by rule ties). The deck's editor-time formula is not in the repo; the demo's business screen uses its own definition (extra serials read down the rule's list to match the model's hits × minutes × hourly cost), with all assumptions on sliders |
+| # | Analysis | Result | Where |
+|---|---|---|---|
+| 16 | Hits per slot with a fixed 50 slots per quarter | Rule 28%, S+A 53%, S+A+T 68% (34 vs 14 hits per quarter), boosting 71%, MLP 74% (2023). `modeling/05_demo_data.py` reproduces them with a newer boosting/MLP run (70.5%, 72.5%) | `modeling/08_impact.py`, `05_demo_data.py` |
+| 17 | Day-30 re-rank with the first month's posting rhythm | 50 slots: 68% → 76% (+8.0 pp, CI +0.5 to +14.0). Recall@slots: +5.2 pp on 2022 validation but +0.7 pp on 2023 (CI −2.0 to +3.1), first-time authors +2.4 pp (CI −1.1 to +6.4), neither significant. Decision: a confirmation pass to A/B test, not a replacement | `modeling/07_day30.py` |
+| 18 | Ad revenue and editor time | Base case (lift 10%, CPM $3, 50 slots): about $39k a year, range $13k to $130k. Editor time: reading only the model's top 200 per quarter instead of every new serial saves about 1,200 hours (about $36k at $30 an hour). The demo's business screen uses its own editor-time definition (see `CLAUDE.md`) | `modeling/08_impact.py` |
+
+## Validation-year attempts to improve the main model
+
+All on the 2022 validation year only (trained on 2017–2021); the test year was not touched. Baseline `lr_SAT`: validation AUC 0.8775, Recall@slots 0.454; the standard error of Recall@slots is about 0.02. Details in `modeling/README.md`, numbers in `modeling/out/experiments_val.json`.
+
+| # | Question | What we tried | Result (validation AUC, Recall@slots) | Decision | Where |
+|---|---|---|---|---|---|
+| 19 | Would a larger embedding help? | Truncate `book_vec` to its first k dimensions to measure the marginal value of dimensions | Text only: 512-d 0.839, 1,024-d 0.846, 1,536-d 0.849 | `text-embedding-3-large` would add an estimated 0.005–0.015 AUC at 6.5x the price; not done | `modeling/06_experiments.py` |
+| 20 | How should the three chapters be combined? | Side by side (4,608 columns), chapter 1 only, chapter 1 next to the mean, equal-weight mean | 0.869 / 0.427, 0.867 / 0.431, 0.875 / 0.450, **0.881 / 0.461** | Equal-weight mean is the only small win; not yet applied | same |
+| 21 | Do similar earlier books predict success? | Share of hits among the 50 nearest earlier books (at least 365 days earlier, different author) | 0.878 / 0.457; alone AUC 0.756 | No gain over T | same |
+| 22 | Does writing style add anything? | 17 stylometric statistics from the raw text | 0.877 / 0.452; alone AUC 0.660 | No gain over T | same |
+| 23 | A different target or loss? | Ridge on 0/1, Ridge on quarter rank, pairwise ranking (hit vs non-hit; by rank) | 0.875 / 0.457, 0.861 / 0.431, 0.875 / 0.467 (0.457–0.475 across 3 pairings), 0.854 / 0.410 | Keep logistic regression on 0/1 | same |
+| 24 | Full author history? | Author experience recomputed from all books, including earlier books abandoned before chapter 3 and books before 2016 | Recall@slots 0.454 → 0.462; 5.3% of "first-time" authors had written before | Small effect; not adopted | `modeling/07_day30.py` |
 
 ## Ideas not tried yet
 
 - Gradient boosting on the full 1,536-d embedding instead of 32 PCA components (the early-fusion setup in Lecture 15), and a late-fusion model that stacks separate tags and text scores.
-- The chapter-1 vector (`chap1_vec`) alone or alongside the 3-chapter vector: it is already built but unused.
 - Interpretable cover features from CLIP text prompts (for example "a professional book cover with title text").
 - Choosing the number of slots from a cost-benefit rule (keep adding a slot while the next serial's hit probability times the value of a hit exceeds the cost of a slot).

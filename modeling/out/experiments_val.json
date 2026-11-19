@@ -1,0 +1,199 @@
+{
+ "dims": {
+  "T first 128": {
+   "auc": 0.8109,
+   "recall": 0.3398,
+   "C": 0.01
+  },
+  "T first 256": {
+   "auc": 0.8274,
+   "recall": 0.3433,
+   "C": 0.003
+  },
+  "T first 512": {
+   "auc": 0.8392,
+   "recall": 0.3643,
+   "C": 0.003
+  },
+  "T first 1024": {
+   "auc": 0.8457,
+   "recall": 0.3905,
+   "C": 0.001
+  },
+  "T first 1536": {
+   "auc": 0.8489,
+   "recall": 0.3975,
+   "C": 0.001
+  }
+ },
+ "chapters_note": {
+  "books_missing_a_chapter_vector": 449
+ },
+ "chapters": {
+  "text only: token-weighted mean (T)": {
+   "auc": 0.8489,
+   "recall": 0.3975,
+   "C": 0.001
+  },
+  "text only: equal mean": {
+   "auc": 0.853,
+   "recall": 0.3888,
+   "C": 0.001
+  },
+  "text only: concat 3x1536": {
+   "auc": 0.8477,
+   "recall": 0.38,
+   "C": 0.0003
+  },
+  "text only: chapter 1 only": {
+   "auc": 0.8207,
+   "recall": 0.3678,
+   "C": 0.001
+  },
+  "text only: chapter 2 only": {
+   "auc": 0.8247,
+   "recall": 0.3818,
+   "C": 0.001
+  },
+  "text only: chapter 3 only": {
+   "auc": 0.8262,
+   "recall": 0.352,
+   "C": 0.001
+  },
+  "S+A (no text)": {
+   "auc": 0.8183,
+   "recall": 0.3888,
+   "C": 0.003
+  },
+  "S+A+T (main)": {
+   "auc": 0.8775,
+   "recall": 0.4536,
+   "C": 0.001
+  },
+  "S+A+equal mean": {
+   "auc": 0.8806,
+   "recall": 0.4606,
+   "C": 0.001
+  },
+  "S+A+concat": {
+   "auc": 0.8692,
+   "recall": 0.4273,
+   "C": 0.0003
+  },
+  "S+A+chapter 1": {
+   "auc": 0.8667,
+   "recall": 0.4308,
+   "C": 0.001
+  },
+  "S+A+T+chapter 1": {
+   "auc": 0.8752,
+   "recall": 0.4501,
+   "C": 0.001
+  }
+ },
+ "knn": {
+  "neighbour top10 share alone": {
+   "auc": 0.7564,
+   "recall": 0.3275
+  },
+  "S+A+knn": {
+   "auc": 0.8429,
+   "recall": 0.4291,
+   "C": 0.01
+  },
+  "S+A+T+knn": {
+   "auc": 0.878,
+   "recall": 0.4571,
+   "C": 0.001
+  }
+ },
+ "style_univariate_auc": {
+  "dash_pk": 0.605,
+  "ly_pk": 0.586,
+  "bracket_pk": 0.581,
+  "word_len": 0.547,
+  "ttr": 0.538,
+  "lower_i_pk": 0.468,
+  "semi_pk": 0.531,
+  "dialog_share": 0.469,
+  "sent_len": 0.475,
+  "ellip_pk": 0.519,
+  "third_pk": 0.481,
+  "excl_pk": 0.482,
+  "ques_pk": 0.517,
+  "para_len": 0.484,
+  "caps_pk": 0.513,
+  "ttr_missing": 0.491,
+  "first_i_pk": 0.505,
+  "has_author_note": 0.497
+ },
+ "style": {
+  "style alone": {
+   "auc": 0.6596,
+   "recall": 0.1856,
+   "C": 0.01
+  },
+  "S+A+style": {
+   "auc": 0.8262,
+   "recall": 0.4063,
+   "C": 0.003
+  },
+  "S+A+T+style": {
+   "auc": 0.8774,
+   "recall": 0.4518,
+   "C": 0.001
+  }
+ },
+ "target_loss": {
+  "LR on 0/1 (main)": {
+   "auc": 0.8775,
+   "recall": 0.4536,
+   "C": 0.001
+  },
+  "Ridge on 0/1": {
+   "auc": 0.8748,
+   "recall": 0.4571,
+   "lambda": 10000.0
+  },
+  "Ridge on quarter rank": {
+   "auc": 0.8614,
+   "recall": 0.4308,
+   "lambda": 1000.0
+  },
+  "pairwise rank (binary)": {
+   "auc": 0.8746,
+   "recall": 0.467,
+   "recall_by_seed": [
+    0.4694,
+    0.4571,
+    0.4746
+   ],
+   "C": 0.0001
+  },
+  "pairwise rank (graded)": {
+   "auc": 0.8543,
+   "recall": 0.4098,
+   "recall_by_seed": [
+    0.4116,
+    0.4098,
+    0.4081
+   ],
+   "C": 0.0003
+  }
+ },
+ "test_slot_quality": {
+  "rule_hot_genre": {
+   "slots": 811,
+   "hit_top10": 0.261,
+   "in_top20": 0.425,
+   "misses_median_pct": 0.649
+  },
+  "lr_SAT": {
+   "slots": 811,
+   "hit_top10": 0.482,
+   "in_top20": 0.674,
+   "misses_median_pct": 0.757
+  }
+ },
+ "val_positives": 571
+}

@@ -21,5 +21,8 @@ embedding/out/emb_parts/*
 .vscode/
 .claude/
 
+# Office lock files created while a document is open
+~$*
+
 # Cover thumbnail sheets (cover art belongs to the authors; not public)
 cover/out/clusters/cluster_*.png

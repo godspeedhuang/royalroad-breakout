@@ -14,6 +14,9 @@ uv run python 02_dl.py        # PyTorch MLP
 uv run python 03_compare.py   # comparison, confidence intervals, groups, leak checks, impact
 uv run python 04_drift.py     # fixed test year, training data of different ages
 uv run python 05_demo_data.py # data for the demo page (docs/demo/data.js)
+uv run python 06_experiments.py   # validation-year attempts to improve the main model (about 6 minutes; needs chapters.parquet)
+uv run python 07_day30.py     # day-30 version: main model + first-30-day posting rhythm (needs data/interim/chapters_47.parquet and data/raw)
+uv run python 08_impact.py    # business impact: hit rate and money at a fixed number of slots (needs predictions from 01, 02 and 07)
 ```
 
 | File | Output |
@@ -23,6 +26,9 @@ uv run python 05_demo_data.py # data for the demo page (docs/demo/data.js)
 | `03_compare.py` | `out/results.json`, `out/results.md`, `out/figs/model_comparison.png` |
 | `04_drift.py` | `out/drift_auc.json`, `out/figs/drift_auc.png` |
 | `05_demo_data.py` | `../docs/demo/data.js`: every 2023 and 2024 book's score under each model, with title, tags, cover URL, genre tint and outcome; 20 serials per 2016 quarter and each quarter's hit threshold for the target animation; tag and warning lists; the hyperparameter grids from `selection_*.json`; two example first-three-chapter vectors and the hit direction (2017–2022, no watermarks); a 4,000-serial PCA/UMAP sample with yearly paths and the 1,536-d 2017→2024 shift cosine; screen 0's numbers (including the hits' share of 2023 views and followers) and cover wall; the top pick's first lines (≤ 200 characters, from `atlas.parquet`) with their cl100k_base tokens and its chapter-1 vector; two standardized raw dimensions of the map sample; the cover model's scores from `cover/out/preds_cover.parquet` when present (checked against `cover_merge.json`); views per serial for the business screen; the drift, tag-lift and cover-experiment numbers the page charts. Prints the 50-slot numbers and the ad revenue used in the deck |
+| `06_experiments.py` | `out/experiments_val.json` (stylometric features cached in `out/style_trainval.parquet`, not in git) |
+| `07_day30.py` | `out/day30.json`, `out/preds_day30.parquet` (not in git) |
+| `08_impact.py` | `out/impact.json` (the deck and video read their numbers from here) |
 
 ## Design
 
@@ -109,6 +115,51 @@ First-time authors are harder to call, but the model still beats the rule by a w
 
 Followers are an after-the-fact number, used only to show whether slots went to the right books; they are not an effect caused by recommending.
 
+**Who got the slots the model missed** (`06_experiments.py` part 6; descriptive only, not used to choose a model): 48.2% of the main model's slots go to books in their quarter's top 10% and 67.4% to the top 20%; the misses have a median rank at the quarter's 76th percentile. For the popular-genres rule the numbers are 26.1%, 42.5% and the 65th percentile; for random picks, 10%, 20% and the 50th percentile.
+
+## Day-30 version (`07_day30.py`)
+
+A second pass for the recommendation team: recommend a first batch at chapter 3, then re-rank on day 30 after chapter 1 using posting rhythm. Features are the main model's S+A+T plus V: chapters posted on day 1, in the first 7 days and in the first 30 days, days with an update in the first 30 days, the longest gap, days since the last update at day 30, and total characters in the first 30 days. V only uses chapters released in the first 30 days (source `data/interim/chapters_47.parquet`), all visible on day 30.
+
+In the training and validation years, future hits post a median of 15 chapters in their first 30 days; other books post 6.
+
+| | Chapter 3 (`lr_SAT`) | Day 30 (S+A+T+V) | Difference (pp, paired bootstrap 95% CI) |
+|---|---|---|---|
+| Validation 2022, Recall@slots | 0.454 | 0.506 | |
+| Test 2023, all | 0.482 | 0.490 | +0.7 (−2.0 to +3.1), not significant |
+| Test 2023, first-time authors | 0.430 | 0.455 | +2.4 (−1.1 to +6.4), not significant |
+| 2024, all | 0.453 | 0.516 | |
+| 2024, first-time authors | 0.383 | 0.464 | |
+
+It looks useful on the validation year (+5.2) but only +0.7 remains on the 2023 test year. 2024 gains another 6.3, but 2024 books have the shortest observation time (0.5–1.5 years): their followers still mostly reflect the first few months, which posting rhythm naturally tracks, so the 2024 gain is probably overstated. Conclusion: use it as a confirmation pass, A/B test before launch, and do not replace the chapter-3 main model.
+
+A full author history (F: recomputed from all books, including earlier books abandoned before chapter 3 and books before 2016) was compared on the validation year only: Recall@slots 0.454 → 0.462, no change for first-time authors. Of the authors labelled first-time, 5.3% had in fact written before (earlier books with fewer than 3 chapters or before 2016). The effect is small; not adopted.
+
+Known risks: books that get stubbed after succeeding usually keep their first few dozen chapters, so the first 30 days are mostly intact and the effect is conservative; authors of unsuccessful books who delete chapters would make their rhythm look worse than it was, which this dataset cannot detect. In production, authors could split chapters to inflate counts, which is why character count is a feature.
+
+## Business impact (`08_impact.py`)
+
+The deck's version: a fixed 50 recommendation slots per quarter (Rising Stars shows at most 50 serials per genre), filled with the 50 highest scores each quarter. This differs from Recall@slots above, where slots = the quarter's number of hits (about 203 per quarter in 2023). All assumptions sit at the top of `08_impact.py`; after changing them, rerun 08 and `reports/slides/build_deck.js`.
+
+2023 test year, 50 slots per quarter:
+
+| Ranking | Share of slots that are hits (95% CI) | Hits per quarter |
+|---|---|---|
+| Random | 10% | 5 |
+| Rule: popular genres first | 28% (22%–35%) | 14 |
+| LR: S+A | 53% (46%–60%) | |
+| **LR: S+A+T (main)** | **68% (61%–75%)** | **34** |
+| Gradient boosting: S+A+T | 71% (63%–77%) | |
+| MLP: S+A+T | 74% (65%–78%) | |
+
+Chapter text adds +15.5 points (CI +7.5 to +23.5). MLP over LR is +5.5 (CI −2.0 to +9.8) and boosting +3.0, neither significant in 2023, so the main model stays LR. A post-hoc look with 2024 pooled in (8 quarters): MLP +6.2 (CI +1.0 to +9.3), boosting +5.2 (CI −0.7 to +10.1). The MLP may really add a few points at the very top of the list, but 2024 labels are immature and this comparison was made after seeing the results, so it only counts as a reason to compare again at each yearly retrain (`diff_pp_2023_2024` in `impact.json`). The fewer the slots, the larger the gap between model and rule: the slot picks' cumulative views are 7.7x the rule's at 25 slots per quarter, 5.5x at 50, 2.3x at 200 and 1.7x at 400.
+
+Money (base case: a slot lifts that serial's views by 10%; $3 of ad revenue per 1,000 views): the model's slots bring about 13 million extra views and about $39k a year; lift 5–20% and CPM $2–5 give a range of $13k to $130k. This only counts giving the same slots to the right serials, not readers staying on to read other serials, so it is conservative. In 2023 the quarter's top 10% took 86% of all views, which is also why "hit" is defined as the top 10%.
+
+Supplementary: if an editor needs 10 minutes per serial and, with the model, reads only the top 200 each quarter, that saves about 1,200 hours a year (about $36k at $30 an hour). This is what makes human review feasible, not money Royal Road spends today.
+
+`impact.json` also lists examples for the video opening: 2023 first-time authors whose serials later reached the top 10% and that the model already ranked in the quarter's top 50 at chapter 3 (the first is "Reborn as a Demonic Tree": ranked 31st of 1,775 in 2023Q1, now 15,595 followers).
+
 ## Drift (`04_drift.py`)
 
 ![drift](out/figs/drift_auc.png)
@@ -125,6 +176,30 @@ Rules built on tags go stale fast; the text signal lasts longer. Part of the tag
 - **The blurb (D) leaks.** In the test year, 7.8% of blurbs mention Amazon, Kindle, Patreon, Audible, "Book 2" or Discord. 45.5% of those books are hits (10% overall), and the flag alone has an AUC of 0.652. Authors mostly add these words after a book takes off, so D stays out of the main model. Dropping those books lowers the blurb-only model's AUC from 0.873 to 0.837.
 - **Watermarks do not affect the model.** 9.7% of test books contain watermarks; 11.1% of them are hits (about the overall rate), and the flag alone has an AUC of 0.506. Dropping them gives a main-model AUC of 0.889 (was 0.887), so there is no need to redo the embeddings for modeling.
 - **Not ruled out**: tags and chapter text are also 2025 versions, and authors may have edited them later (added tags, author notes in chapters). This dataset cannot recover the earlier versions.
+
+## Validation-year experiments (`06_experiments.py`, 2026-11-16)
+
+Attempts to improve the main model. **All compared on the 2022 validation year only** (trained on 2017–2021); the 2023 test year was not touched, so these numbers cannot be compared directly with the test-year results above. 2022 has 571 hits, so Recall@slots has a standard error of about 0.02; differences smaller than that count as no difference. Full numbers in `out/experiments_val.json`.
+
+The baseline is the main model `lr_SAT`: validation AUC 0.8775, Recall@slots 0.454.
+
+| Attempt | How | Validation AUC | Recall@slots | Conclusion |
+|---|---|---|---|---|
+| Larger embedding | Keep only the first k dimensions of `book_vec` as a smaller model (v3 embeddings can be truncated) to see the marginal value of dimensions. Text only: 512-d 0.839, 1,024-d 0.846, 1,536-d 0.849 | | | The marginal gain is already small; `text-embedding-3-large` (3,072-d, 6.5x the price) would add an estimated 0.005–0.015 AUC. Not done |
+| Chapters side by side | The three chapter vectors as separate features (3 x 1,536 = 4,608 columns) instead of their mean | 0.869 | 0.427 | Worse. Three times the columns needs stronger regularization, and the differences between chapters are mostly noise |
+| Chapter 1 only | The chapter-1 vector instead of the three-chapter mean | 0.867 | 0.431 | Worse. Text only: chapters 1, 2 and 3 each score about 0.82, the three-chapter mean 0.85 |
+| Chapter 1 next to the mean | S+A+T+chapter 1 | 0.875 | 0.450 | No difference |
+| **Equal-weight chapter mean** | Plain mean of the three chapter vectors (currently weighted by tokens) | **0.881** | **0.461** | The only small win, better at every C. With token weights a very long chapter dominates the book vector |
+| Neighbour features (kNN) | The 50 most similar books that started at least 365 days earlier and have a different author: share in the top 10%, mean rank, weighted share | 0.878 | 0.457 | No difference. They carry signal alone (AUC 0.756; S+A+neighbours 0.843), but T already covers it |
+| Stylometry | 17 statistics from the raw text of chapters 1–3 (sentence and paragraph length, dialogue share, `[ ]` status boxes, lowercase "i", dashes, -ly adverbs, vocabulary richness and more) | 0.877 | 0.452 | No difference. AUC 0.660 alone, helps on top of S+A (0.818 → 0.826), not on top of the main model |
+| Continuous target | Ridge on the quarter rank `pct_in_quarter` instead of 0/1 | 0.861 | 0.431 | Worse. The model is pushed to separate the lower ranks that slots never use |
+| Ridge on 0/1 | Control: only swaps log loss for squared error | 0.875 | 0.457 | No difference |
+| Pairwise ranking loss (hit vs non-hit) | Within each quarter, pair one hit with one non-hit and let LR learn which ranks higher (a linear RankNet); mean of 3 random pairings | 0.875 | 0.467 | +1.3 points of recall but within noise (0.457–0.475 across the three), slightly lower AUC; not adopted |
+| Pairwise ranking loss (by rank) | Pairs of books whose quarter ranks differ by at least 0.2 | 0.854 | 0.410 | Worse, for the same reason as the continuous target |
+
+Among the stylometric features alone, the strongest are frequent dashes (AUC 0.605), -ly adverbs (0.586) and `[ ]` game status boxes (0.581); books with more lowercase "i" are less likely to become hits (0.468).
+
+**Conclusion**: with the information available, the main model is close to its ceiling. More dimensions, separate chapters, neighbours and stylometry are all covered by the three-chapter vector, and changing the target or loss gives no reliable gain. The only candidate is the equal-weight chapter mean (AUC +0.003, recall +0.7 points, both within noise), not yet applied to the main model. Going further needs a different kind of information (an LLM rating the opening, or a fine-tuned text model).
 
 ## Known limitations
 
