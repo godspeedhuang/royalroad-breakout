@@ -14,7 +14,6 @@ const CONFIG = {
     why: [1250, 1250, 1250],
     hit: [1800, 3000],
     picks: [1500, 1500, 1500],
-    checks: [],
   },
   tPhaseMs: 1100,          // first-three-chapters animation: time per phase
   blocks: { S: "#45a89c", A: "#9a8ad6", T: "#5d9be0", C: "#d585a8" },   // one color per input block (kept quiet next to the orange)
@@ -269,7 +268,7 @@ function whyInit() {
    { n: pct(W0.views_share_hits_2023, 0), f: W0.views_share_hits_2023, lab: "of all views go to those hits (views as of June 2025)", c: CONFIG.colors.accent, s: 1 },
    { n: String(CONFIG.slots), f: CONFIG.slots / per, lab: "recommendation slots per quarter (our scenario)", c: CONFIG.colors.picked, s: 3 }].forEach((row) => {
     const r = el("div", { class: "fr", "data-s": row.s }), bar = el("i");
-    bar.style.background = row.c; bar.style.width = `max(6px, ${100 * row.f}%)`; bar.style.boxShadow = row.s ? `0 0 12px ${row.c}` : "none";
+    bar.style.background = row.c; bar.style.width = `max(6px, ${100 * row.f}%)`; bar.style.boxShadow = row.s ? `0 0 8px ${row.c}, 0 0 22px ${row.c}99` : "none";   // glow (99 = 60% alpha)
     const track = el("span", { class: "track" }); track.append(bar);
     r.append(el("b", {}, row.n), track, el("span", { class: "lab" }, row.lab));
     f.append(r);
@@ -841,7 +840,7 @@ function renderDetail() {
     const cb = el("div", { class: "chart-box", style: "height:200px;flex:none" });
     section(box, "Tuned on 2022: C, how freely the weights may grow (AUC on 2022, higher is better)", cb);
     lineChart(cb, Cs, ["lr_S", "lr_SA", "lr_T", "lr_SAT"].map((id) => ({ label: D.short[id], values: Cs.map((c) => H.lr[id].val_auc_by_C[c]),
-      color: id === m ? CONFIG.colors.accent : "#5c5f63", dim: id !== m, mark: id === m ? Cs.findIndex((c) => Number(c) === H.lr[id].C) : undefined })),
+      color: id === m ? CONFIG.colors.accent : "#5c5f63", dim: id !== m, glow: id === m, mark: id === m ? Cs.findIndex((c) => Number(c) === H.lr[id].C) : undefined })),
       { yMin: 0.78, yMax: 0.9, fmt: (v) => v.toFixed(2), xLabel: "C, log scale (smaller C keeps the weights smaller)" });
     section(box, "Why that matters", para(`S+A+T has ${nInputs().toLocaleString()} weights, 1,536 of them for the text, so a small C (strong penalty) works best. Refit on 2017–2022 with the chosen C, scored once on 2023.`));
   } else if (f === "gb") {
@@ -941,7 +940,7 @@ function paint(ctx, c, st, alpha, size) {
   const [fill, a] = { [STATE.dim]: [col, CONFIG.mosaic.dimAlpha], [STATE.picked]: [CONFIG.colors.picked, 1],
                       [STATE.hit]: [CONFIG.colors.accent, 1], [STATE.missed]: [CONFIG.colors.accent, CONFIG.mosaic.missedAlpha] }[st];
   ctx.globalAlpha = alpha * a; ctx.fillStyle = fill;
-  ctx.shadowColor = fill; ctx.shadowBlur = st === STATE.hit || st === STATE.picked ? 6 : 0;   // lit squares glow
+  ctx.shadowColor = fill; ctx.shadowBlur = st === STATE.hit || st === STATE.picked ? 14 : 0;   // lit squares glow
   ctx.fillRect(c.x, c.y, size, size);
   ctx.shadowBlur = 0;
 }
@@ -1003,15 +1002,8 @@ function renderCovers(picks) {   // shelves of overlapping covers, highest rank 
 }
 
 // ---------- screen 4: what else we checked ----------
-const CHK = { played: { leak: true, drift: true, taste: true } };   // screen 4: which charts have played since arriving
-function playCheck(id) {
-  if (CHK.played[id]) return;
-  CHK.played[id] = true; $(`${id}-card`).classList.remove("waiting");
-  if (id === "taste") renderTaste(true); else animateIn($(`${id}-chart`));
-}
-function resetChecks() {   // arriving: every chart waits in its "before" state until the mouse reaches it
-  for (const id of ["leak", "drift", "taste"]) { CHK.played[id] = false; $(`${id}-card`).classList.add("waiting"); }
-  hideChart($("leak-chart")); hideChart($("drift-chart")); renderTaste();
+function playChecks() {   // arriving: the three charts play at the same time
+  animateIn($("leak-chart")); animateIn($("drift-chart")); renderTaste(true);
 }
 function renderChecks(byQ) {
   const all = [...byQ.values()].flat();
@@ -1027,8 +1019,6 @@ function renderChecks(byQ) {
     { label: `Tags ${dr.S.per_year.toFixed(3)}/yr`, values: dr.S.auc, color: CONFIG.colors.rule },
     { label: `Text ${dr.T.per_year.toFixed(3)}/yr`, values: dr.T.auc, color: CONFIG.colors.accent, glow: true },
   ], { yMin: 0.7, yMax: 0.85, xLabel: "how much older the training data is (test year 2023)" });
-  if (!CHK.played.leak) hideChart($("leak-chart"));
-  if (!CHK.played.drift) hideChart($("drift-chart"));
   renderTaste();
 }
 
@@ -1046,7 +1036,7 @@ function renderTaste(animate = false) {
     $("taste-sub").textContent = "How much more often a tag becomes a hit than average (lift). Gray dot 2017–19, colored dot 2022–24.";
     $("taste-cap").textContent = "LitRPG and Xianxia rose, Romance and Harem fell.";
     dumbbell(box, D.extras.tag_movers.map((r) => ({ label: r.tag, a: r.early, b: r.late })), { min: 0.3, max: 2.7, aLabel: "2017–19", bLabel: "2022–24" });
-    if (animate) animateIn(box); else if (!CHK.played.taste) hideChart(box);
+    if (animate) animateIn(box);
     return;
   }
   const pca = tasteView === "pca";
@@ -1056,7 +1046,6 @@ function renderTaste(animate = false) {
                                    : "UMAP is good at clusters, not at distances; trends are measured in the full 1,536 numbers.";
   if (pca) lg.append(swatch(CONFIG.colors.light, "all serials, yearly average", true), swatch(CONFIG.colors.accent, "hits, yearly average", true));
   else lg.append(swatch(CONFIG.colors.light, "hits 2017–19"), swatch(CONFIG.colors.accent, "hits 2022–24"));
-  if (!animate && !CHK.played.taste) { cancelAnimationFrame(mapFrame); box.replaceChildren(); return; }   // waits for the mouse
   storyMap(box, pca, animate);
 }
 let mapFrame = 0;
@@ -1117,7 +1106,7 @@ function storyMap(box, pca, animate) {   // canvas; with animate (PCA only), a 2
       const show = Math.min(1, (ms - 2000) / 400);
       for (const [tr, col] of [[M2.traj_all, CONFIG.colors.light], [M2.traj_hits, CONFIG.colors.accent]]) {
         const yrs = Object.keys(tr), P = yrs.map((y) => [X(tr[y][0]), Y(tr[y][1])]), n = Math.max(1, Math.round(show * (P.length - 1)));
-        ctx.shadowColor = col; ctx.shadowBlur = 10; ctx.lineWidth = 2.5;
+        ctx.shadowColor = col; ctx.shadowBlur = 16; ctx.lineWidth = 2.5;
         for (let s = 0; s < n; s++) arrow(P[s][0], P[s][1], P[s + 1][0], P[s + 1][1], col);
         ctx.shadowBlur = 0;
         P.slice(0, n + 1).forEach(([x, y]) => { ctx.fillStyle = col; ctx.beginPath(); ctx.arc(x, y, 3.5, 0, 7); ctx.fill(); });
@@ -1274,7 +1263,7 @@ function renderSens(byQ, retry = true) {   // money (per year) as one assumption
   const ticks = logK ? [10, 25, 50, 100, 250, 500, 1000, nMax] : [0, 1, 2, 3, 4].map((i) => lo + (i / 4) * (hi - lo));
   ticks.forEach((v) => svg("text", { class: "muted", x: X(v), y: H - Bm + 20, "text-anchor": "middle" }, s, logK ? v.toLocaleString() : spec.fmt(v)));
   svg("text", { class: "muted", x: (L + W - R) / 2, y: H - 6, "text-anchor": "middle" }, s, logK ? `${spec.label} (K, log scale: up to all ${nMax.toLocaleString()} serials of a quarter)` : `${spec.label} (${spec.sym})`);
-  for (const l of on) svg("path", { d: pts.map((p, i) => `${i ? "L" : "M"}${X(p.x)},${Y(p[l.key])}`).join(""), class: "sline", style: `stroke:${l.color};stroke-width:${l.bold ? 3.5 : 2.4};${l.dash ? "stroke-dasharray:7 5" : ""}` }, s);
+  for (const l of on) svg("path", { d: pts.map((p, i) => `${i ? "L" : "M"}${X(p.x)},${Y(p[l.key])}`).join(""), class: "sline" + (l.bold ? " hot" : ""), style: `stroke:${l.color};stroke-width:${l.bold ? 3.5 : 2.4};${l.dash ? "stroke-dasharray:7 5" : ""}` }, s);
   svg("line", { x1: X(cur), x2: X(cur), y1: T, y2: H - Bm, class: "scur" }, s);
   if (SENS_LINES[2].on) { svg("circle", { cx: X(cur), cy: Y(curPt.total), r: 5, class: "sdot" }, s); svg("text", { class: "val", x: X(cur) + 10, y: Y(curPt.total) + 18 }, s, `now ${usd(curPt.total)}`); }
   let note = "Every unit adds the same amount: the money is a straight line in this assumption.";
@@ -1363,9 +1352,7 @@ function init() {
   document.querySelectorAll("[data-layer]").forEach((b) => b.addEventListener("click", () => { players.picks.pause(); setLayer(b.dataset.layer); }));
   $("dim").addEventListener("click", () => { players.picks.pause(); setDim(!$("covers").classList.contains("dim")); });
   $("covers-all").addEventListener("click", () => { showAllCovers = !showAllCovers; render(); });
-  document.querySelectorAll("[data-taste]").forEach((b) => b.addEventListener("click", () => { tasteView = b.dataset.taste; CHK.played.taste = true; $("taste-card").classList.remove("waiting"); renderTaste(true); }));
-  ["leak", "drift", "taste"].forEach((id) => $(`${id}-card`).addEventListener("mouseenter", () => playCheck(id)));
-  $("checks").addEventListener("dblclick", () => { $("check-cols").classList.toggle("spot"); ["leak", "drift", "taste"].forEach(playCheck); });   // double-click: play and light all / back to pointing
+  document.querySelectorAll("[data-taste]").forEach((b) => b.addEventListener("click", () => { tasteView = b.dataset.taste; renderTaste(true); }));
 
   players.title = makePlayer("title", [() => restart($("title"), "in")], []);
   players.p2 = makePlayer("p2", [() => restart($("p2"), "in")], []);
@@ -1382,7 +1369,7 @@ function init() {
   players.hit = makePlayer("hit", [0, 1, 2].map((s) => () => animShow(s)), CONFIG.waits.hit);
   players.model = makePlayer("model", [modelIntro], []);
   players.picks = makePlayer("picks", [() => { setDim(false); setLayer("picks"); }, () => setLayer("hits"), () => setLayer("both"), () => setDim(true)], CONFIG.waits.picks);
-  players.checks = makePlayer("checks", [resetChecks], CONFIG.waits.checks);
+  players.checks = makePlayer("checks", [playChecks], []);
   document.querySelectorAll("[data-play]").forEach((b) => b.addEventListener("click", () => players[b.dataset.play].toggle()));
   document.querySelectorAll("[data-step-of]").forEach((b) => b.addEventListener("click", () => players[b.dataset.stepOf].jump(Number(b.dataset.step))));
   document.addEventListener("click", (e) => e.target.closest("button")?.blur());   // keep the space bar for Play / Pause
