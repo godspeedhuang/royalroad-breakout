@@ -4,15 +4,15 @@
 
 const CONFIG = {
   quarter: "Y2023",        // default quarter: "Y2023" = all of 2023, or a quarter index
-  slots: 50,               // default slots per quarter
+  slots: 50,               // default slots per quarter (the slider runs from 10 to every serial of a quarter, finer steps at the low end)
   model: "lr_SAT",         // default model
   coversPerQuarter: 12,    // covers per quarter on the picks shelves before "Show all picks"
+  coversMax: 100,          // at most this many covers per quarter after "Show all picks"
   coverW: 110,             // largest cover width on the shelves (height = 1.5 ×); smaller when space is short
   mosaic: { maxSize: 9, minSize: 3, gap: 1, dimAlpha: 0.2, missedAlpha: 0.38, fadeMs: 500 },
   waits: {                 // how long each step stays on screen while playing (ms); the last step stays
     why: [1250, 1250, 1250],
     hit: [1800, 3000],
-    model: [550, 600, 600, 650, 550, 550, 600],
     picks: [1500, 1500, 1500],
     checks: [],
   },
@@ -32,7 +32,11 @@ const CONFIG = {
 const D = window.DEMO_DATA, B = D && D.books, N = B ? B.id.length : 0;
 const $ = (id) => document.getElementById(id);
 const pct = (x, d = 1) => (100 * x).toFixed(d) + "%";
-const slots = () => Number($("f-k").value) || CONFIG.slots;
+const K_STEPS = [];   // slider positions for slots per quarter: steps of 5 up to 100, then 10, 50 and 100 (roughly a log scale), up to 4,000 (more than any quarter)
+for (let k = 10; k <= 4000; k += k < 100 ? 5 : k < 500 ? 10 : k < 1000 ? 50 : 100) K_STEPS.push(k);
+const kAt = (pos) => K_STEPS[Math.max(0, Math.min(K_STEPS.length - 1, Math.round(pos)))];
+const posOfK = (k) => K_STEPS.reduce((b, x, i) => (Math.abs(x - k) < Math.abs(K_STEPS[b] - k) ? i : b), 0);
+const slots = () => kAt(Number($("f-k").value)) || CONFIG.slots;
 function el(tag, attrs = {}, text) {
   const e = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
@@ -44,26 +48,34 @@ function coverImg(src, alt = "") {   // a Royal Road cover; removes itself if th
   im.onerror = () => im.remove();
   return im;
 }
-const VEC_BASE = [24, 26, 29], VEC_POS = [226, 102, 42], VEC_NEG = [93, 155, 224];   // vector grids: zero, above zero, below zero
+const VEC_BASE = [24, 26, 29], VEC_POS = [255, 118, 48], VEC_NEG = [70, 160, 255];   // vector grids: zero, above zero, below zero (colors on a square-root scale)
 const FX = {   // formulas shown on the page (KaTeX): [formula, legend, optional second formula]
   target: [String.raw`y_i = \mathbf{1}\!\left[\, f_i \ge Q_{0.9}\{\, f_j : q_j = q_i \,\}\right]`, "f: followers in June 2025 · q: start quarter · Q₀.₉: 90th percentile"],
-  share: [String.raw`\text{share of slots} = \frac{1}{4K}\sum_{q=1}^{4}\ \sum_{i\,\in\,\mathrm{Top}_K(q)} y_i`, "Topₖ(q): the K highest scores in quarter q · random ≈ 10%"],
-  lr: [String.raw`\hat p_i = \sigma\!\left(\beta_0 + \beta^{\top} x_i\right), \quad x_i = [\,S_i,\ A_i,\ T_i\,]`, "every number standardized; C chosen on 2022 by AUC",
-       String.raw`\min_{\beta}\ -\sum_i \big[\, y_i \log \hat p_i + (1-y_i) \log (1-\hat p_i) \,\big] + \frac{\lVert \beta \rVert^2}{2C}`],
-  t: [String.raw`t_i = \frac{\sum_{c=1}^{3} n_c\, e_c}{\big\lVert \sum_{c=1}^{3} n_c\, e_c \big\rVert}, \qquad \text{match}_i = \cos(t_i,\, d), \quad d = \bar t_{\text{hit}} - \bar t_{\text{other}}`,
-      "eₒ: chapter c's 1,536 numbers (chunks over 8,000 tokens averaged by length) · nₒ: its tokens · d from 2017–2022"],
+  share: [String.raw`\textstyle \text{share of slots} = \frac{1}{4K}\sum_{q=1}^{4}\ \sum_{i\,\in\,\mathrm{Top}_K(q)} y_i`, "Topₖ(q): the K highest scores in quarter q · random ≈ 10%"],
+  t: [String.raw`t_i = \frac{n^{\top} E_i}{\lVert n^{\top} E_i \rVert}, \quad E_i = \begin{bmatrix} e_1 \\ e_2 \\ e_3 \end{bmatrix} \in \mathbb{R}^{3 \times 1536}, \quad n = (n_1, n_2, n_3)`,
+      "row c of Eᵢ: chapter c's 1,536 numbers (chunks over 8,000 tokens averaged by length) · n: tokens per chapter · match uses d from 2017–2022",
+      String.raw`\text{match}_i = \cos(t_i,\, d), \quad d = \bar t_{\text{hit}} - \bar t_{\text{other}}`],
   cover: [String.raw`\operatorname{logit} P(y_i = 1) = s_i + w^{\top} z_i`, "sᵢ: the main model's score, held fixed · zᵢ: standardized 768 CLIP numbers · no intercept · w fitted on valid covers with an L2 penalty · no valid cover: + 0"],
   lift: [String.raw`\text{lift}(g) = \frac{P(\text{hit} \mid \text{tag } g)}{P(\text{hit})}`, "1 = average"],
 };
 function fx(key, target = el("div", { class: "formula" })) {   // render a formula (and its legend) into an element
+  if (!key || !FX[key]) return target;
   const [src, legend, src2] = FX[key]; target.replaceChildren();
   for (const t of [src, src2].filter(Boolean)) {
     const m = el("div", { class: "fx-math" });
-    if (window.katex) katex.render(t, m, { throwOnError: false }); else m.textContent = t;   // no internet: show the source
+    if (window.katex) katex.render(t, m, { throwOnError: false, displayMode: true }); else m.textContent = t;   // display mode never breaks a formula over lines; no internet: show the source
     target.append(m);
   }
   if (legend) target.append(el("div", { class: "fx-legend" }, legend));
   return target;
+}
+function fitFormulas(root = document) {   // a formula that is wider than its box is scaled down instead of wrapped
+  requestAnimationFrame(() => root.querySelectorAll(".fx-math").forEach((m) => {
+    m.style.fontSize = "";
+    if (!m.clientWidth) return;
+    let fs = parseFloat(getComputedStyle(m).fontSize);
+    while (m.scrollWidth > m.clientWidth + 1 && fs > 9) { fs -= 0.5; m.style.fontSize = fs + "px"; }
+  }));
 }
 const restart = (node, cls) => { node.classList.remove(cls); node.offsetHeight; node.classList.add(cls); };   // replay a CSS animation
 
@@ -121,30 +133,37 @@ function tip(node, text) { svg("title", {}, node, text); return node; }
 function newChart(box, maxH = Infinity, minH = 120) {   // empty the box; return an SVG as wide as the box, at most maxH tall
   box.replaceChildren();
   const W = box.clientWidth || 600, H = Math.max(minH, Math.min(maxH, box.clientHeight || minH));
+  box.dataset.w = W;   // the width it was drawn at (see watchWidth)
   return { s: svg("svg", { class: "chart in", viewBox: `0 0 ${W} ${H}`, height: H }, box), W, H };
 }
 function labelWidth(s, labels) {         // width of the longest label, so labels never get cut off
   return Math.max(...labels.map((l) => { const t = svg("text", { x: -9999, y: -9999 }, s, l); const w = t.getComputedTextLength(); t.remove(); return w; })) + 14;
 }
+function watchWidth(box, redraw) {   // redraw a chart once its box has a new width (a drawer opened or closed next to it)
+  let timer = 0;
+  new ResizeObserver(() => {
+    clearTimeout(timer);
+    timer = setTimeout(() => { if (box.clientWidth && Math.abs(box.clientWidth - Number(box.dataset.w || 0)) >= 4) redraw(); }, 80);   // after the size stops changing
+  }).observe(box);
+}
 function hideChart(box) {               // put a chart in its "before" state without animating
   const s = box.querySelector("svg.chart"); if (!s) return;
   s.classList.add("noanim"); s.classList.remove("in"); s.getBoundingClientRect(); s.classList.remove("noanim");
 }
-function animateIn(box) {               // replay a chart's entrance: bars grow, lines draw, dots slide, labels fade in
+function animateIn(box, stagger = true) {   // replay a chart's entrance: bars grow, lines draw, dots slide, labels fade in (one after another, or all at once)
   const s = box.querySelector("svg.chart"); if (!s) return;
-  hideChart(box); s.classList.add("stagger");
+  hideChart(box); s.classList.toggle("stagger", stagger);
   requestAnimationFrame(() => requestAnimationFrame(() => s.classList.add("in")));
 }
 
 // Horizontal bars. rows: [{id, label, parts?, value, color, bold, title}]; parts = [[text, color]] colors parts of the label.
-// hidden / fresh: ids not shown yet / shown now (they grow in)
-function barChart(box, rows, { max = 1, fmt = (v) => pct(v), ref, refLabel, hidden = new Set(), fresh = new Set() } = {}) {
+function barChart(box, rows, { max = 1, fmt = (v) => pct(v), ref, refLabel } = {}) {
   const foot = ref !== undefined ? 28 : 0, { s, W, H } = newChart(box, rows.length * 68 + foot);
   const labelW = labelWidth(s, rows.map((r) => r.label)), plotW = W - labelW - 70;
   const slot = (H - foot) / rows.length, barH = Math.min(32, slot * 0.6);
   rows.forEach((r, j) => {
     const y = j * slot + (slot - barH) / 2, w = Math.max(2, (r.value / max) * plotW);
-    const g = svg("g", { "data-id": r.id || "", class: hidden.has(r.id) || fresh.has(r.id) ? "hide" : "", style: `--i:${j}` }, s);
+    const g = svg("g", { "data-id": r.id || "", style: `--i:${j}` }, s);
     const t = svg("text", { x: labelW - 12, y: y + barH / 2 + 5, "text-anchor": "end", style: r.bold ? "fill:var(--text);font-weight:700" : "" }, g);
     if (r.parts) r.parts.forEach(([txt, c]) => svg("tspan", c ? { style: `fill:${c}` } : {}, t, txt)); else t.textContent = r.label;
     tip(svg("rect", { class: "grow" + (r.bold ? " glow" : ""), x: labelW, y, width: w, height: barH, rx: 3, fill: r.color }, g), r.title || `${r.label}: ${fmt(r.value)}`);
@@ -155,11 +174,10 @@ function barChart(box, rows, { max = 1, fmt = (v) => pct(v), ref, refLabel, hidd
     svg("line", { x1: x, x2: x, y1: 0, y2: H - foot, stroke: CONFIG.colors.muted, "stroke-dasharray": "3 4" }, s);
     svg("text", { class: "muted", x, y: H - 6, "text-anchor": "middle" }, s, refLabel);
   }
-  if (fresh.size) { s.getBoundingClientRect(); s.querySelectorAll("g.hide").forEach((g) => fresh.has(g.dataset.id) && g.classList.remove("hide")); }
   return s;
 }
 
-// Lines over a small x axis, one y axis. series: [{label, values, color, glow}]
+// Lines over a small x axis, one y axis. series: [{label, values, color, glow, dim, mark}]; mark = index of a point to ring ("chosen")
 function lineChart(box, xs, series, { yMin, yMax, fmt = (v) => v.toFixed(2), xLabel = "" } = {}) {
   const { s, W, H } = newChart(box, 460);
   const L = 48, R = labelWidth(s, series.map((sr) => sr.label)) + 6, T = 14, Bm = 50;
@@ -172,11 +190,17 @@ function lineChart(box, xs, series, { yMin, yMax, fmt = (v) => v.toFixed(2), xLa
   }
   xs.forEach((x, i) => svg("text", { class: "muted", x: X(i), y: H - Bm + 22, "text-anchor": "middle" }, s, x));
   svg("text", { class: "muted", x: (L + W - R) / 2, y: H - 6, "text-anchor": "middle" }, s, xLabel);
+  const last = xs.length - 1, ends = series.map((sr, k) => ({ k, y: Y(sr.values[last]) + 5 })).sort((a, b) => a.y - b.y);
+  ends.forEach((e, i) => { if (i && e.y < ends[i - 1].y + 16) e.y = ends[i - 1].y + 16; });   // end labels never overlap
   series.forEach((sr, k) => {
-    svg("path", { class: "draw" + (sr.glow ? " glow" : ""), pathLength: 1, style: `--i:${k * 5}`, d: sr.values.map((v, i) => `${i ? "L" : "M"}${X(i)},${Y(v)}`).join(""), fill: "none", stroke: sr.color, "stroke-width": 2.5 }, s);
-    sr.values.forEach((v, i) => tip(svg("circle", { class: "fade", style: `--i:${k * 5 + i}`, cx: X(i), cy: Y(v), r: 5, fill: sr.color, stroke: "var(--panel)", "stroke-width": 2 }, s), `${sr.label}, ${xs[i]}: ${fmt(v)}`));
-    const last = sr.values.length - 1;
-    svg("text", { class: "val fade", style: `--i:${k * 5 + last}`, x: X(last) + 12, y: Y(sr.values[last]) + 5 }, s, sr.label);
+    svg("path", { class: "draw" + (sr.glow ? " glow" : ""), pathLength: 1, style: `--i:${k * 5}`, d: sr.values.map((v, i) => `${i ? "L" : "M"}${X(i)},${Y(v)}`).join(""), fill: "none", stroke: sr.color, "stroke-width": sr.dim ? 1.6 : 2.5 }, s);
+    sr.values.forEach((v, i) => tip(svg("circle", { class: "fade", style: `--i:${k * 5 + i}`, cx: X(i), cy: Y(v), r: sr.dim ? 3.5 : 5, fill: sr.color, stroke: "var(--panel)", "stroke-width": 2 }, s), `${sr.label}, ${xs[i]}: ${fmt(v)}`));
+    if (sr.mark !== undefined && sr.mark >= 0) {
+      const v = sr.values[sr.mark];
+      svg("circle", { class: "fade", cx: X(sr.mark), cy: Y(v), r: 10, fill: "none", stroke: sr.color, "stroke-width": 1.5 }, s);
+      svg("text", { class: "val fade", x: X(sr.mark), y: Y(v) - 16, "text-anchor": "middle" }, s, `chosen: ${fmt(v)}`);
+    }
+    svg("text", { class: (sr.dim ? "muted" : "val") + " fade", style: `--i:${k * 5 + last}`, x: X(last) + 12, y: ends.find((e) => e.k === k).y }, s, sr.label);
   });
 }
 
@@ -352,8 +376,9 @@ function animShow(step, instant = false) {
 }
 
 // ---------- screen 2: how we chose the model (inputs × algorithm, details, results) ----------
-const S3 = { inputs: new Set(["S", "A", "T"]), method: "lr", focus: "T", revealed: null, prevVisible: new Set(), say: null, fast: false };
+const S3 = { inputs: new Set(["S", "A", "T"]), method: "lr", focus: "lr", say: null, dkey: null };
 const nS = () => D.features.S.tags.length + D.features.S.warnings.length + 5;
+const nInputs = () => nS() + 2 + 1536;
 const BLOCKS = [
   { key: "S", name: "Tags and structure", summary: "tags, warnings, length, pace", dims: () => `${nS()} numbers` },
   { key: "A", name: "Author", summary: "first book? earlier books", dims: () => "2 numbers" },
@@ -362,22 +387,11 @@ const BLOCKS = [
 ];
 const METHODS = [
   { key: "rule", name: "Editors' rule", summary: "baseline: popular genres" },
-  { key: "lr", name: "Logistic regression", summary: "our model" },
-  { key: "gb", name: "Gradient boosting", summary: "many small trees" },
+  { key: "lr", name: "Logistic regression", summary: "our model: one weight per number" },
+  { key: "gb", name: "Gradient boosting", summary: "up to 300 small trees" },
   { key: "mlp", name: "Neural network", summary: "MLP, two hidden layers" },
 ];
 const sh = (m) => pct(hits(pick(pool(), m, slots())).share);
-const MODEL_STEPS = [   // what Play walks through (about 5 seconds); each step reveals its bar on the right
-  { label: "Rule", method: "rule", inputs: "SAT", focus: "rule", say: () => `Baseline: the editors' rule ranks serials by how often their tags became hits before: ${sh("rule_hot_genre")} of its slots go to hits.` },
-  { label: "S", method: "lr", inputs: "S", focus: "S", say: () => `Logistic regression on tags and structure alone: ${sh("lr_S")}.` },
-  { label: "+ A", method: "lr", inputs: "SA", focus: "A", say: () => `Adding the author's track record: ${sh("lr_SA")}.` },
-  { label: "+ T", method: "lr", inputs: "SAT", focus: "T", say: () => `Reading the first three chapters is the big step: ${sh("lr_SAT")}.` },
-  { label: "Boosting", method: "gb", inputs: "SAT", focus: "gb", say: () => `Gradient boosting on the same inputs: ${sh("gb_SAT")}.` },
-  { label: "MLP", method: "mlp", inputs: "SAT", focus: "mlp", say: () => `A neural network: ${sh("mlp_SAT")}. With confidence intervals, neither differs significantly from logistic regression.` },
-  ...(D && D.models.lr_SATC ? [{ label: "+ Cover", method: "lr", inputs: "SATC", focus: "C", say: () => `Adding the cover on top (tried): ${sh("lr_SATC")}, no better.` }] : []),
-  { label: "Choice", method: "lr", inputs: "SAT", focus: "lr", say: () => "So we keep the simple, explainable logistic regression on S+A+T. Click any item to look inside." },
-];
-const stepModel = (st) => (st.method === "rule" ? "rule_hot_genre" : `${st.method}_${st.inputs}`);
 function modelOf() {   // the trained model behind the current choice, or null if we never trained that combination
   if (S3.method === "rule") return "rule_hot_genre";
   const id = `${S3.method}_${["S", "A", "T", "C"].filter((k) => S3.inputs.has(k)).join("")}`;
@@ -388,22 +402,33 @@ function syncBuilder() {   // model picked in the filter bar → builder
   if (m === "rule_hot_genre") { S3.method = "rule"; return; }
   const [meth, key] = m.split("_"); S3.method = meth; S3.inputs = new Set(key);
 }
-function manualMode() { players.model.pause(); S3.revealed = null; S3.say = null; S3.fast = false; S3.hold = false; }
+function manualMode() { players.model.pause(); S3.say = null; }
+function setDetails(open) {   // the details drawer on the right; the chart takes the room when it is closed
+  const cols = $("model-cols"); if (cols.classList.contains("d-open") === open) return false;
+  cols.classList.toggle("d-open", open);   // the chart redraws itself at its new width (watchWidth)
+  return true;
+}
 function builderClick(kind, key, toggle) {   // toggle = the switch on an input was clicked (otherwise just show its details)
-  manualMode();
+  manualMode(); const moved = setDetails(true);
   if (kind === "block" && toggle) { S3.inputs.has(key) ? S3.inputs.delete(key) : S3.inputs.add(key); if (S3.method === "rule") S3.method = "lr"; }
   if (kind === "method") S3.method = key;
-  S3.focus = key;
+  S3.focus = key; S3.dkey = null;   // redraw (and replay) the details even if nothing else changed
   const m = modelOf();
   if (m) { $("f-model").value = m; render(); } else renderBuilder(pool(), slots());
+  if (kind === "block") setTimeout(() => flashBars(key), moved ? 560 : 0);   // after the chart has settled at its new width
 }
-function modelStep(i) {
-  const st = MODEL_STEPS[i];
-  if (i === 0) S3.prevVisible = new Set();   // start from an empty chart
-  S3.method = st.method; S3.inputs = new Set(st.inputs); S3.focus = st.focus; S3.say = st.say; S3.fast = true; S3.hold = i < MODEL_STEPS.length - 1;
-  S3.revealed = i === MODEL_STEPS.length - 1 ? null : new Set(MODEL_STEPS.slice(0, i + 1).map(stepModel));
-  $("f-model").value = stepModel(st);
-  render();
+function modelIntro() {   // Play: every bar grows at once, with the chosen model (logistic regression on S+A+T) lit
+  S3.method = "lr"; S3.inputs = new Set(["S", "A", "T"]); S3.focus = "lr"; S3.dkey = null;
+  S3.say = () => `Logistic regression on S+A+T gives ${sh("lr_SAT")} of the slots to future hits; the editors' rule, ${sh("rule_hot_genre")}. Boosting (${sh("gb_SAT")}) and the MLP (${sh("mlp_SAT")}) do not differ significantly${D.models.lr_SATC ? ` and the cover adds nothing (${sh("lr_SATC")})` : ""}, so we keep the simple one. Click any item to look inside.`;
+  $("f-model").value = "lr_SAT"; render();
+  animateIn($("models-chart"), false);
+}
+function flashBars(key) {   // an input was clicked: every bar whose model uses it flashes once in the input's color
+  document.querySelectorAll("#models-chart g[data-id]").forEach((g) => {
+    const id = g.dataset.id;
+    if (id === "rule_hot_genre" || !id.split("_")[1].includes(key)) return;
+    g.style.setProperty("--fc", CONFIG.blocks[key]); g.classList.remove("flash"); g.getBBox(); g.classList.add("flash");
+  });
 }
 const soft = (hex, a = "33") => hex + a;   // #rrggbb + alpha
 function labelParts(m) {   // "S+A+T" with each block letter in its color
@@ -417,13 +442,36 @@ function labelParts(m) {   // "S+A+T" with each block letter in its color
 function barColor(m) {   // quiet grays; only the selected model is orange (the label letters carry the block colors)
   return m === "rule_hot_genre" ? "#76797d" : "#3a3d41";
 }
-function option(cls, color, key, name, summary, right) {   // right: "switch", a short tag, or nothing
-  const b = el("button", { class: cls });
+const sigmoidD = (cx, cy, hw, hh) => Array.from({ length: 21 }, (_, i) => { const x = i / 10 - 1; return `${i ? "L" : "M"}${(cx + x * hw).toFixed(1)},${(cy + hh - (2 * hh) / (1 + Math.exp(-5 * x))).toFixed(1)}`; }).join("");
+function methodIcon(key) {   // small line icons for the four algorithms
+  const s = svg("svg", { class: "micon", viewBox: "0 0 28 28" });
+  if (key === "rule") [7, 14, 21].forEach((y, i) => svg("line", { x1: 4, x2: 24 - i * 7, y1: y, y2: y }, s));   // a ranked list
+  else if (key === "lr") svg("path", { d: sigmoidD(14, 14, 11, 9) }, s);   // a sigmoid
+  else if (key === "gb") { svg("path", { d: "M14 6V13M14 13L7 21M14 13L21 21" }, s); [[14, 6], [14, 13], [7, 21], [21, 21]].forEach(([cx, cy]) => svg("circle", { cx, cy, r: 2.6 }, s)); }   // a tree
+  else if (key === "mlp") {   // a small network
+    const L = [[5, [9, 19]], [14, [5, 14, 23]], [23, [14]]];
+    L.forEach(([x, ys], i) => { if (i) for (const y1 of L[i - 1][1]) for (const y2 of ys) svg("line", { x1: L[i - 1][0], y1, x2: x, y2, class: "thin" }, s); });
+    L.forEach(([x, ys]) => ys.forEach((cy) => svg("circle", { cx: x, cy, r: 2.4 }, s)));
+  }
+  return s;
+}
+function option(cls, color, key, name, summary, right) {   // key: a letter or an icon; right: "switch", a short tag, or nothing
+  const b = el("button", { class: cls }), k = el("span", { class: "key" });
   b.style.setProperty("--c", color); b.style.setProperty("--c-soft", soft(color, "2e")); b.style.setProperty("--c-glow", soft(color, "80"));
-  b.append(el("span", { class: "key" }, key), el("b", {}, name), el("span", { class: "sum" }, summary));
+  k.append(key); b.append(k, el("b", {}, name), el("span", { class: "sum" }, summary));
   if (right === "switch") b.append(el("span", { class: "sw", title: "add to / remove from the model" }));
   else if (right) b.append(el("span", { class: "dims" }, right));
   return b;
+}
+function drawShares(byQ, k) {   // the share-of-slots bars; the selected model is orange
+  const sel = modelOf(), base = baseRate(byQ), shares = {};
+  const rows = Object.keys(D.models).map((m) => {
+    const r = hits(pick(byQ, m, k)); shares[m] = r.share;
+    return { id: m, label: D.short[m], parts: labelParts(m), value: r.share, bold: m === sel, title: `${D.models[m]}: ${r.h} hits in ${r.n} slots (${pct(r.share)})`,
+             color: m === sel ? CONFIG.colors.accent : barColor(m) };
+  });
+  barChart($("models-chart"), rows, { max: Math.max(...rows.map((r) => r.value), base) * 1.1, ref: base, refLabel: `random ${pct(base, 0)}` });
+  return shares;
 }
 function renderBuilder(byQ, k) {
   const sel = modelOf();
@@ -436,23 +484,12 @@ function renderBuilder(byQ, k) {
   }
   const me = $("methods"); me.replaceChildren();
   for (const m of METHODS) {
-    const btn = option(`opt meth${S3.method === m.key ? " on" : ""}${S3.focus === m.key ? " focus" : ""}`, CONFIG.colors.accent, "", m.name, m.summary);
+    const btn = option(`opt meth${S3.method === m.key ? " on" : ""}${S3.focus === m.key ? " focus" : ""}`, CONFIG.colors.accent, methodIcon(m.key), m.name, m.summary);
     btn.addEventListener("click", () => builderClick("method", m.key));
     me.append(btn);
   }
   renderDetail();
-  const base = baseRate(byQ), all = Object.keys(D.models);
-  const visible = S3.revealed ? new Set(all.filter((m) => S3.revealed.has(m))) : new Set(all);
-  const fresh = new Set([...visible].filter((m) => !S3.prevVisible.has(m)));
-  S3.prevVisible = visible;
-  const shares = {};
-  const rows = all.map((m) => {
-    const r = hits(pick(byQ, m, k)); shares[m] = r.share;
-    return { id: m, label: D.short[m], parts: labelParts(m), value: r.share, bold: m === sel, title: `${D.models[m]}: ${r.h} hits in ${r.n} slots (${pct(r.share)})`,
-             color: m === sel ? CONFIG.colors.accent : barColor(m) };
-  });
-  barChart($("models-chart"), rows, { max: Math.max(...rows.map((r) => r.value), base) * 1.1, ref: base, refLabel: `random ${pct(base, 0)}`,
-                                       hidden: new Set(all.filter((m) => !visible.has(m))), fresh });
+  const shares = drawShares(byQ, k);
   $("models-cap").textContent = `${k} slots per quarter · ${quarterLabel(byQ)} · ${whoLabel()}`;
   const manual = S3.method === "rule" ? `The rule only looks at tags: ${pct(shares.rule_hot_genre)} of slots.` :
     sel ? `${D.models[sel]}: ${pct(shares[sel])} of the ${k} slots per quarter went to hits.` :
@@ -477,21 +514,33 @@ function chips(list) {   // list: [label, count?, color?]
   }
   return box;
 }
-function tileGrid(rowVals, colVals, get, { rowName = "", colName = "" } = {}) {   // a small grid of hyperparameter settings
-  const g = el("div", { class: "tiles" }); g.style.gridTemplateColumns = `auto repeat(${colVals.length}, 1fr)`;
-  g.append(el("span", { class: "th" }, rowName && colName ? `${rowName} ↓  ${colName} →` : colName));
-  colVals.forEach((c) => g.append(el("span", { class: "th" }, String(c))));
-  const aucs = rowVals.flatMap((r) => colVals.map((c) => get(r, c).auc)), lo = Math.min(...aucs), hi = Math.max(...aucs);
-  for (const r of rowVals) {
-    g.append(el("span", { class: "th" }, String(r)));
-    for (const c of colVals) {
-      const v = get(r, c), t = el("div", { class: "tile" + (v.chosen ? " chosen" : "") });
-      t.style.background = v.chosen ? "" : `rgba(255,255,255,${0.03 + 0.09 * ((v.auc - lo) / (hi - lo || 1))})`;   // higher AUC = lighter gray
-      t.append(el("b", {}, v.auc.toFixed(3)), el("span", {}, v.chosen ? (v.note ? "chosen · " + v.note : "chosen") : v.note || ""));
-      g.append(t);
-    }
-  }
-  return g;
+let heatId = 0;
+function heatmap(rows, cols, get, { rowName = "", colName = "", fmt = (v) => v.toFixed(3), scale = "AUC on 2022" } = {}) {   // a standard heatmap: rows on the y axis, columns on the x axis, lighter = higher, color scale on the right
+  const cw = 132, ch = 52, L = 104, T = 8, gw = cols.length * cw, gh = rows.length * ch, W = L + gw + 118, H = T + gh + 46, id = `heat${heatId++}`;
+  const s = svg("svg", { class: "heat", viewBox: `0 0 ${W} ${H}`, width: W, height: H });
+  const vals = rows.flatMap((r) => cols.map((c) => get(r, c).v)), lo = Math.min(...vals), hi = Math.max(...vals);
+  const dark = [30, 32, 35], light = [112, 116, 121], shade = (t) => `rgb(${dark.map((x, i) => Math.round(x + (light[i] - x) * t))})`;
+  rows.forEach((r, i) => {
+    svg("text", { x: L - 10, y: T + i * ch + ch / 2 + 5, "text-anchor": "end", class: "tick" }, s, String(r));
+    cols.forEach((c, j) => {
+      const v = get(r, c), x = L + j * cw, y = T + i * ch, sub = [v.chosen ? "chosen" : "", v.sub || ""].filter(Boolean).join(" · ");
+      tip(svg("rect", { x: x + 1, y: y + 1, width: cw - 2, height: ch - 2, fill: shade((v.v - lo) / (hi - lo || 1)) }, s), `${rowName} ${r}, ${colName} ${c}: ${fmt(v.v)}${v.sub ? " · " + v.sub : ""}`);
+      if (v.chosen) svg("rect", { x: x + 1, y: y + ch - 5, width: cw - 2, height: 4, class: "pick" }, s);
+      svg("text", { x: x + cw / 2, y: y + (sub ? 24 : 32), "text-anchor": "middle", class: "v" }, s, fmt(v.v));
+      if (sub) svg("text", { x: x + cw / 2, y: y + 40, "text-anchor": "middle", class: "s" + (v.chosen ? " on" : "") }, s, sub);
+    });
+  });
+  cols.forEach((c, j) => svg("text", { x: L + j * cw + cw / 2, y: T + gh + 18, "text-anchor": "middle", class: "tick" }, s, String(c)));
+  svg("text", { x: L + gw / 2, y: T + gh + 40, "text-anchor": "middle", class: "axis" }, s, colName);
+  svg("text", { x: -(T + gh / 2), y: 14, transform: "rotate(-90)", "text-anchor": "middle", class: "axis" }, s, rowName);
+  const gr = svg("linearGradient", { id, x1: 0, y1: 1, x2: 0, y2: 0 }, svg("defs", {}, s));   // the color scale: low at the bottom, high at the top
+  svg("stop", { offset: 0, "stop-color": shade(0) }, gr); svg("stop", { offset: 1, "stop-color": shade(1) }, gr);
+  const bx = L + gw + 22;
+  svg("rect", { x: bx, y: T + 1, width: 12, height: gh - 2, fill: `url(#${id})` }, s);
+  svg("text", { x: bx + 18, y: T + 12, class: "tick" }, s, fmt(hi));
+  svg("text", { x: bx + 18, y: T + gh - 3, class: "tick" }, s, fmt(lo));
+  svg("text", { x: bx + 6, y: T + gh + 40, "text-anchor": "middle", class: "axis" }, s, scale);
+  return s;
 }
 function vecGrid(v, scale, s = 5) {   // 1,536 numbers as a 48 × 32 grid: orange above zero, blue below
   const cv = el("canvas", { class: "vec" }), cols = 48, rows = v.length / cols, dpr = window.devicePixelRatio || 1;
@@ -513,106 +562,200 @@ function drawVec(cv, v, scale, s) {   // paint 1,536 numbers into an existing gr
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   const mix = (a, b, t) => a.map((x, i) => Math.round(x + (b[i] - x) * t));
   v.forEach((x, i) => {
-    const t = Math.min(1, Math.abs(x) / scale), c = mix(VEC_BASE, x > 0 ? VEC_POS : VEC_NEG, t);
+    const t = Math.min(1, Math.sqrt(Math.abs(x) / scale)), c = mix(VEC_BASE, x > 0 ? VEC_POS : VEC_NEG, t);
     ctx.fillStyle = `rgb(${c})`; ctx.fillRect((i % cols) * s, Math.floor(i / cols) * s, s - 0.5, s - 0.5);
   });
 }
-function tStage(animate) {
-  const ex = D.emb.examples[0], st = el("div", { class: "tstage" }), s = 3;
+function drawStrip(cv, v, scale) {   // 1,536 numbers as one thin row: orange above zero, blue below; one sharp color per screen pixel (no blending into brown)
+  const ctx = cv.getContext("2d"), Wd = cv.width, Hd = cv.height;
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, Wd, Hd);
+  for (let px = 0; px < Wd; px++) {
+    const x = v[Math.floor((px * v.length) / Wd)], t = Math.min(1, Math.sqrt(Math.abs(x) / scale)), c = (x > 0 ? VEC_POS : VEC_NEG).map((p, j) => Math.round(VEC_BASE[j] + (p - VEC_BASE[j]) * t));
+    ctx.fillStyle = `rgb(${c})`; ctx.fillRect(px, 0, 1, Hd);
+  }
+}
+function tStage(animate) {   // first lines → tokens → a 3 × 1,536 matrix (one row per chapter) → its length-weighted sum, scaled to length 1
+  const ex = D.emb.examples[0], st = el("div", { class: "tstage" }), SW = 440, SH = 20;
+  st.style.setProperty("--sw", SW + "px");
   const head = el("div", { class: "t-head" }), cap = el("span", { class: "t-label" }), replay = el("button", { class: "mini" }, "↻ Replay");
   if (ex.u) head.append(coverImg(ex.u));
   const hb = el("div"); hb.append(el("b", {}, ex.title), cap); head.append(hb, replay);
   const toks = el("div", { class: "t-tokens" });
   (D.emb.tokens || []).forEach((w, i) => { const sp = el("span", {}, w.trim() || "·"); sp.style.setProperty("--h", soft(TOKEN_COLORS[i % 5], "55")); toks.append(sp); });
-  const chs = el("div", { class: "t-chs" }), cards = [1, 2, 3].map((n) => {
-    const c = el("div", { class: "t-ch" + (n > 1 ? " ghost" : "") });
-    const cv = n === 1 ? vecGrid(ex.c1, 0.08, s) : el("canvas", { class: "vec", style: `width:${48 * s}px;height:${32 * s}px` });   // chapters 2 and 3: not stored, drawn hatched
-    c.append(cv, el("span", {}, n === 1 ? "Chapter 1: 1,536 numbers" : `Chapter ${n}: same, not kept separately`)); chs.append(c); return { c, cv };
-  });
-  st.append(head, el("div", { class: "t-text" }, D.emb.excerpt || ex.title), toks, chs);
+  const mat = el("div", { class: "t-mat" });
+  const strip = (cls) => { const cv = el("canvas", { class: "t-strip " + cls }), dpr = window.devicePixelRatio || 1; cv.width = SW * dpr; cv.height = SH * dpr; cv.style.width = SW + "px"; cv.style.height = SH + "px"; return cv; };
+  const row = (left, cv, right, cls = "") => { const r = el("div", { class: "t-row " + cls }); r.append(el("span", { class: "t-w" }, left), cv, el("span", { class: "t-lab" }, right)); mat.append(r); return r; };
+  const c1 = strip("");
+  row("n₁ ×", c1, "e₁: chapter 1");
+  const ghost = (txt) => { const cv = strip("ghost"), g = cv.getContext("2d"), dpr = window.devicePixelRatio || 1;
+    g.scale(dpr, dpr); g.font = `600 12px ${CONFIG.sans}`; g.fillStyle = "#c9ccd0"; g.textAlign = "center"; g.fillText(txt, SW / 2, SH / 2 + 4); return cv; };
+  row("n₂ ×", ghost("its 1,536 numbers were not saved"), "e₂: chapter 2", "ghost");
+  row("n₃ ×", ghost("only chapter 1 and the average were kept"), "e₃: chapter 3", "ghost");
+  mat.append(el("div", { class: "t-sum" }, "Σ  weighted by length, then scaled to length 1"));
+  const res = strip("res");
+  row("t =", res, `the serial (ch. 1 alone: cos ${ex.cos_c1_book.toFixed(2)})`, "res");
+  const col = el("div", { class: "t-col" }); mat.append(col);   // one column = one of the 1,536 numbers, averaged over the 3 chapters
+  st.append(head, el("div", { class: "t-text" }, D.emb.excerpt || ex.title), toks, mat);
+  drawStrip(c1, ex.c1, 0.08);
   const caps = ["Chapter 1, first lines",
-    `Tokens, as the embedding model reads them (${ex.tokens.toLocaleString()} in chapters 1–3)`,
-    "Each chapter is embedded on its own: 1,536 numbers per chapter",
-    `Weighted by length, averaged and scaled to length 1: the serial's vector (chapter 1 alone points ${ex.cos_c1_book.toFixed(2)} the same way)`];
-  const morph = (anim) => {   // chapter 1's numbers turn into the serial's numbers as chapters 2 and 3 are averaged in
+    `Tokens, as the model reads them (${ex.tokens.toLocaleString()} in chapters 1–3)`,
+    "Each chapter embedded on its own: one row of 1,536 numbers",
+    "Columns averaged over the chapters, weighted by length n"];
+  const morph = (anim) => {   // the result row starts as chapter 1 and turns into the real average as chapters 2 and 3 come in
     cancelAnimationFrame(tFrame);
     const t0 = performance.now(), dur = anim ? 1200 : 0;
     const step = (now) => {
       const t = dur ? Math.min(1, (now - t0) / dur) : 1;
-      drawVec(cards[0].cv, ex.c1.map((a, i) => a + (ex.v[i] - a) * t), 0.08, s);
+      drawStrip(res, ex.c1.map((a, i) => a + (ex.v[i] - a) * t), 0.08);
       if (t < 1) tFrame = requestAnimationFrame(step);
     };
     tFrame = requestAnimationFrame(step);
   };
-  const go = (k) => {
-    st.dataset.phase = "abcd"[k]; cap.textContent = caps[k];
-    const mid = cards[1].c.offsetLeft;
-    cards.forEach(({ c }) => c.style.setProperty("--shift", mid - c.offsetLeft + "px"));
-    cards[0].c.lastChild.textContent = k === 3 ? "The serial: 1,536 numbers" : "Chapter 1: 1,536 numbers";
-    if (k === 3) morph(animate); else drawVec(cards[0].cv, ex.c1, 0.08, s);
-  };
+  const go = (k) => { st.dataset.phase = "abcd"[k]; cap.textContent = caps[k]; if (k === 3) morph(animate); };
   const run = (anim) => {
     animate = anim; tTimers.forEach(clearTimeout); tTimers = [];
-    if (!anim) return requestAnimationFrame(() => go(3));
+    if (!anim) return go(3);
     go(0); [1, 2, 3].forEach((k) => tTimers.push(setTimeout(() => go(k), k * CONFIG.tPhaseMs)));
   };
   replay.addEventListener("click", () => run(true));
-  requestAnimationFrame(() => run(animate));
+  run(animate);
   return st;
 }
 
-// The two-stage cover model: main score + a cover adjustment (plays when the cover is opened by hand)
-function coverFlow(animate) {   // an SVG sketch: two lanes (main model, cover) meeting at a "+"; icons instead of boxes
-  const byQ = pool(), cand = [...byQ.values()].flat().filter((i) => B.cover_status[i] === 0 && B.cover[i]).sort((a, c) => B.score.lr_SAT[c] - B.score.lr_SAT[a]);
-  const C = CONFIG.blocks, acc = CONFIG.colors.accent, mute = CONFIG.colors.muted, W = 760, H = 196, y1 = 50, y2 = 142, ym = 96;
-  const X0 = -24, VW = W - X0;   // a little room on the left for the labels
-  const wrap = el("div", { class: "cflow2-wrap" }), s = svg("svg", { class: "cflow2" + (animate ? "" : " done"), viewBox: `${X0} 0 ${VW} ${H}` }, wrap);
+// Diagrams drawn as SVG sketches (thin lines, icons, few labels); their groups fade in one after another
+function sketch(W, H, x0 = 0, animate = true) {
+  const wrap = el("div", { class: "cflow2-wrap" }), s = svg("svg", { class: "cflow2" + (animate ? "" : " done"), viewBox: `${x0} 0 ${W - x0} ${H}` }, wrap);
   let k = 0;
-  const grp = () => svg("g", { class: "cfx", style: `--k:${k++}` }, s);
-  const label = (g, x, y, txt, cls = "lab") => svg("text", { x, y, "text-anchor": "middle", class: cls }, g, txt);
-  const arrow = (g, x1, y1_, x2, y2_) => {
-    svg("line", { x1, y1: y1_, x2, y2: y2_, class: "arw" }, g);
-    const a = Math.atan2(y2_ - y1_, x2 - x1), h = 6;
-    svg("path", { d: `M${x2},${y2_}L${x2 - h * Math.cos(a - 0.5)},${y2_ - h * Math.sin(a - 0.5)}L${x2 - h * Math.cos(a + 0.5)},${y2_ - h * Math.sin(a + 0.5)}Z`, class: "arh" }, g);
+  const K = { wrap, s };
+  K.grp = () => svg("g", { class: "cfx", style: `--k:${k++}` }, s);
+  K.label = (g, x, y, txt, cls = "lab", anchor = "middle") => svg("text", { x, y, "text-anchor": anchor, class: cls }, g, txt);
+  K.arrow = (g, x1, y1, x2, y2) => {
+    svg("line", { x1, y1, x2, y2, class: "arw" }, g);
+    const a = Math.atan2(y2 - y1, x2 - x1), h = 6;
+    svg("path", { d: `M${x2},${y2}L${x2 - h * Math.cos(a - 0.5)},${y2 - h * Math.sin(a - 0.5)}L${x2 - h * Math.cos(a + 0.5)},${y2 - h * Math.sin(a + 0.5)}Z`, class: "arh" }, g);
   };
-  const sigmoid = (g, cx, cy) => {   // logistic regression: a sigmoid in a circle
-    svg("circle", { cx, cy, r: 17, class: "ico" }, g);
-    const pts = Array.from({ length: 21 }, (_, i) => { const x = -10 + i; return `${i ? "L" : "M"}${cx + x},${cy + 7 - 14 / (1 + Math.exp(-x / 2.2))}`; }).join("");
-    svg("path", { d: pts, class: "icoline" }, g);
+  K.sigmoid = (g, cx, cy) => { svg("circle", { cx, cy, r: 17, class: "ico" }, g); svg("path", { d: sigmoidD(cx, cy, 10, 7), class: "icoline" }, g); };   // logistic: a sigmoid in a circle
+  K.pill = (g, cx, cy, txt, fill, w = 52) => { svg("rect", { x: cx - w / 2, y: cy - 13, width: w, height: 26, rx: 2, fill }, g); svg("text", { x: cx, y: cy + 5, "text-anchor": "middle", class: "pilltxt" }, g, txt); };
+  K.chip = (g, x, y, key, w = 19) => { svg("rect", { x, y: y - 10, width: w, height: 20, rx: 2, fill: CONFIG.blocks[key] }, g); svg("text", { x: x + w / 2, y: y + 5, "text-anchor": "middle", class: "chiptxt" }, g, key); };
+  K.net = (g, layers, x, y, dx, dy, cls = "") => {   // layers: node counts per column; every node linked to the next column
+    const pos = layers.map((n, i) => Array.from({ length: n }, (_, j) => [x + i * dx, y + (j - (n - 1) / 2) * dy]));
+    pos.forEach((col, i) => { if (i) for (const [x1, y1] of pos[i - 1]) for (const [x2, y2] of col) svg("line", { x1, y1, x2, y2, class: "nnl " + cls }, g); });
+    pos.flat().forEach(([cx, cy]) => svg("circle", { cx, cy, r: 3, class: "nnn " + cls }, g));
+    return pos;
   };
-  const pill = (g, cx, cy, txt, fill) => { svg("rect", { x: cx - 26, y: cy - 13, width: 52, height: 26, rx: 2, fill }, g); svg("text", { x: cx, y: cy + 5, "text-anchor": "middle", class: "pilltxt" }, g, txt); };
+  K.start = () => {
+    if (animate) requestAnimationFrame(() => requestAnimationFrame(() => { s.classList.add("run"); wrap.classList.add("run"); }));
+    else wrap.classList.add("run");
+    return wrap;
+  };
+  return K;
+}
 
+// Logistic regression: every number times its weight, added up, squeezed to 0–1, ranked within the quarter
+function lrFlow(animate) {
+  const K = sketch(680, 170, 0, animate), { label, arrow } = K, ys = [36, 82, 128], n = [nS(), 2, 1536];
+  let g = K.grp();
+  ["S", "A", "T"].forEach((key, j) => { K.chip(g, 6, ys[j], key, 22); label(g, 36, ys[j] + 4, `${n[j].toLocaleString()} numbers`, "lab", "start"); });
+  label(g, 6, 162, "each standardized: mean 0, sd 1", "lab small", "start");
+  g = K.grp(); ys.forEach((y) => arrow(g, 126, y, 236, 82 + (y - 82) * 0.3));
+  label(g, 181, 16, `× its own weight β (${nInputs().toLocaleString()} weights)`);
+  g = K.grp(); svg("circle", { cx: 256, cy: 82, r: 17, class: "ico" }, g); svg("text", { x: 256, y: 89, "text-anchor": "middle", class: "sigma" }, g, "Σ"); label(g, 256, 118, "add up");
+  g = K.grp(); arrow(g, 274, 82, 330, 82); K.sigmoid(g, 350, 82); label(g, 350, 118, "squeeze to 0–1");
+  g = K.grp(); arrow(g, 368, 82, 424, 82); K.pill(g, 452, 82, "p̂ᵢ", "#2a2c2f"); label(g, 452, 112, "chance of a hit");
+  g = K.grp(); arrow(g, 480, 82, 534, 82);
+  [0, 1, 2, 3, 4].forEach((j) => svg("rect", { x: 546, y: 58 + j * 10, width: 76 - j * 12, height: 6, rx: 1, fill: j < 2 ? CONFIG.colors.accent : "#3a3d41" }, g));
+  label(g, 584, 126, "rank in the quarter:"); label(g, 584, 140, "the top K get the slots");
+  return K.start();
+}
+
+// Gradient boosting: tree 1 + tree 2 + tree 3 + … (each fitted to what is still wrong), summed with a learning rate
+function gbFlow(animate, eta, leaves) {
+  const K = sketch(680, 176, 0, animate), { label, arrow } = K, yc = 84;
+  let g = K.grp();
+  ["S", "A", "T"].forEach((key, j) => K.chip(g, 4 + j * 24, yc, key, 21));
+  label(g, 4, yc + 30, "S + A + T", "lab", "start"); label(g, 4, yc + 44, "T: 1,536 → 32 (PCA)", "lab small", "start");
+  label(g, 330, 16, `each tree has at most ${leaves} leaves and is fitted to what the trees before it still get wrong`);
+  const tree = (g, cx) => {   // three levels of splits → 8 leaves
+    const lv = [[cx], [cx - 22, cx + 22], [cx - 33, cx - 11, cx + 11, cx + 33]], ty = [yc - 42, yc - 18, yc + 6];
+    const leafX = Array.from({ length: 8 }, (_, i) => cx - 38.5 + i * 11), leafY = yc + 30;
+    lv.forEach((xs, d) => xs.forEach((x, i) => {
+      (d < 2 ? lv[d + 1].slice(2 * i, 2 * i + 2) : leafX.slice(2 * i, 2 * i + 2)).forEach((kx) => svg("line", { x1: x, y1: ty[d], x2: kx, y2: d < 2 ? ty[d + 1] : leafY, class: "tline" }, g));
+      svg("circle", { cx: x, cy: ty[d], r: 3.2, class: "tnode" }, g);
+    }));
+    leafX.forEach((x) => svg("rect", { x: x - 4, y: leafY - 4, width: 8, height: 8, rx: 1, class: "tleaf" }, g));
+  };
+  g = K.grp(); arrow(g, 80, yc, 100, yc);
+  [[145, "tree 1", "a first guess"], [275, "tree 2", "fixes tree 1's errors"], [405, "tree 3", "fixes what is left"]].forEach(([cx, a, b]) => {
+    g = K.grp(); tree(g, cx); label(g, cx, yc + 56, a, "lab strong"); label(g, cx, yc + 70, b);
+    svg("text", { x: cx + 65, y: yc + 7, "text-anchor": "middle", class: "op" }, g, "+");
+  });
+  g = K.grp(); svg("text", { x: 528, y: yc + 6, "text-anchor": "middle", class: "op" }, g, "···"); label(g, 528, yc + 56, "up to 300 trees", "lab strong"); label(g, 528, yc + 70, "until no gain");
+  g = K.grp(); arrow(g, 560, yc, 592, yc); K.pill(g, 630, yc, "score", CONFIG.colors.accent, 66); label(g, 630, yc + 56, "votes added up,"); label(g, 630, yc + 70, `each × η = ${eta}`);
+  return K.start();
+}
+
+// Neural network: frozen text encoder → T; with S and A into two hidden layers (ReLU); an inset shows ReLU itself
+function mlpFlow(animate, drop, epochs) {
+  const K = sketch(680, 266, 0, animate), { label, arrow } = K;
+  let g = K.grp();   // frozen: chapter text → text-embedding-3-small → 1,536 numbers
+  [0, 1, 2, 3].forEach((j) => svg("line", { x1: 6, x2: j === 3 ? 28 : 40, y1: 40 + j * 7, y2: 40 + j * 7, class: "txtline" }, g));
+  label(g, 23, 80, "ch. 1–3");
+  g = K.grp(); arrow(g, 46, 50, 74, 50); K.net(g, [3, 4, 4, 3], 86, 50, 18, 9, "frozen");
+  label(g, 113, 12, "text-embedding-3-small", "lab strong"); label(g, 113, 25, "pretrained, frozen", "lab small");
+  g = K.grp(); arrow(g, 146, 50, 176, 50);
+  for (let j = 0; j < 20; j++) svg("rect", { x: 184 + j * 3, y: 40, width: 2, height: 20, fill: CONFIG.blocks.T, opacity: 0.3 + 0.7 * ((j * 7919) % 13) / 13 }, g);
+  label(g, 214, 80, "T: 1,536 numbers");
+  g = K.grp(); K.chip(g, 184, 120, "S", 21); label(g, 212, 124, `S: ${nS()}`, "lab", "start"); K.chip(g, 184, 156, "A", 21); label(g, 212, 160, "A: 2", "lab", "start");
+  g = K.grp();   // trained here: inputs → 256 → 64 → 1
+  [50, 120, 156].forEach((y) => arrow(g, 252, y, 298, 106 + (y - 106) * 0.35));
+  K.net(g, [7, 6, 4, 1], 312, 106, 80, 18);
+  svg("path", { d: "M304,40V34H560V40", class: "brk" }, g);
+  label(g, 432, 26, `trained from scratch here: AdamW, ${epochs} epochs, 3 seeds averaged`, "lab strong");
+  [[312, `${nInputs().toLocaleString()} inputs`, "standardized"], [392, "256 units", "ReLU", `dropout ${drop}`], [472, "64 units", "ReLU", `dropout ${drop}`], [552, "1 output"]].forEach(([x, ...t]) => {
+    t.forEach((txt, i) => label(g, x, 188 + i * 14, txt, i ? "lab" : "lab strong"));
+  });
+  g = K.grp(); arrow(g, 558, 106, 584, 106); K.sigmoid(g, 603, 106); arrow(g, 621, 106, 634, 106); K.pill(g, 656, 106, "p̂ᵢ", "#2a2c2f", 42);
+  g = K.grp();   // inset: what ReLU does
+  const ox = 80, oy = 254;
+  svg("line", { x1: 24, x2: 140, y1: oy, y2: oy, class: "axisl" }, g); svg("line", { x1: ox, x2: ox, y1: oy - 36, y2: oy + 5, class: "axisl" }, g);
+  svg("path", { d: `M24,${oy}H${ox}L136,${oy - 32}`, class: "relu" }, g);
+  label(g, 82, 192, "ReLU(x) = max(0, x)", "lab strong"); label(g, 82, 206, "below zero → 0, above passes", "lab small");
+  g = K.grp();   // legend: frozen vs trained
+  svg("line", { x1: 330, x2: 356, y1: 240, y2: 240, class: "nnl frozen" }, g); label(g, 362, 244, "frozen: not changed (no fine-tuning)", "lab", "start");
+  svg("line", { x1: 330, x2: 356, y1: 256, y2: 256, class: "nnl" }, g); label(g, 362, 260, "trained here, from a random start", "lab", "start");
+  return K.start();
+}
+
+// The two-stage cover model: main score + a cover adjustment (plays when the cover is opened by hand)
+function coverFlow(animate) {   // two lanes (main model, cover) meeting at a "+"
+  const byQ = pool(), cand = [...byQ.values()].flat().filter((i) => B.cover_status[i] === 0 && B.cover[i]).sort((a, c) => B.score.lr_SAT[c] - B.score.lr_SAT[a]);
+  const C = CONFIG.blocks, W = 760, H = 196, y1 = 50, y2 = 142, ym = 96, X0 = -24, VW = W - X0;   // X0: a little room on the left for the labels
+  const K = sketch(W, H, X0, animate), { label, arrow, sigmoid, pill } = K;
   // main lane: S A T → logistic regression → main score
-  let g = grp(); ["S", "A", "T"].forEach((key, j) => { svg("rect", { x: 14 + j * 22, y: y1 - 10, width: 19, height: 20, rx: 2, fill: C[key] }, g); svg("text", { x: 23.5 + j * 22, y: y1 + 5, "text-anchor": "middle", class: "chiptxt" }, g, key); });
+  let g = K.grp(); ["S", "A", "T"].forEach((key, j) => K.chip(g, 14 + j * 22, y1, key));
   label(g, 46, y1 + 30, "tags, author, chapters");
-  g = grp(); arrow(g, 86, y1, 150, y1); sigmoid(g, 172, y1); label(g, 172, y1 + 34, "logistic regression");
-  g = grp(); arrow(g, 192, y1, 300, y1); pill(g, 328, y1, "sᵢ", "#2a2c2f"); label(g, 328, y1 + 30, "main score, held fixed");
+  g = K.grp(); arrow(g, 86, y1, 150, y1); sigmoid(g, 172, y1); label(g, 172, y1 + 34, "logistic regression");
+  g = K.grp(); arrow(g, 192, y1, 300, y1); pill(g, 328, y1, "sᵢ", "#2a2c2f"); label(g, 328, y1 + 30, "main score, held fixed");
   // cover lane: cover → CLIP (a neural network) → 768 numbers → cover head → adjustment
-  g = grp();
+  g = K.grp();
   svg("rect", { x: 26, y: y2 - 24, width: 32, height: 48, fill: "#2a2c2f" }, g);   // the real cover is an <img> laid over this spot
   if (cand.length) {
     const im = coverImg(B.cover[cand[0]]); im.className = "cfx-cover";
     Object.assign(im.style, { left: `${((26 - X0) / VW) * 100}%`, top: `${((y2 - 24) / H) * 100}%`, width: `${(32 / VW) * 100}%`, height: `${(48 / H) * 100}%` });
-    wrap.append(im);
+    K.wrap.append(im);
   }
   label(g, 42, y2 + 40, "cover (before ch. 3)");
-  g = grp(); arrow(g, 64, y2, 116, y2);
-  const layers = [3, 5, 5, 2], lx = (i) => 134 + i * 16, ly = (n, j) => y2 + (j - (n - 1) / 2) * 9;   // CLIP ViT-L/14: frozen network
-  layers.forEach((n, i) => { if (i) for (let a = 0; a < layers[i - 1]; a++) for (let b = 0; b < n; b++) svg("line", { x1: lx(i - 1), y1: ly(layers[i - 1], a), x2: lx(i), y2: ly(n, b), class: "nnl" }, g); });
-  layers.forEach((n, i) => { for (let j = 0; j < n; j++) svg("circle", { cx: lx(i), cy: ly(n, j), r: 3, class: "nnn" }, g); });
-  label(g, 158, y2 + 40, "CLIP ViT-L/14 (frozen)");
-  g = grp(); arrow(g, 192, y2, 232, y2);
+  g = K.grp(); arrow(g, 64, y2, 116, y2); K.net(g, [3, 5, 5, 2], 134, y2, 16, 9, "frozen"); label(g, 158, y2 + 40, "CLIP ViT-L/14 (frozen)");
+  g = K.grp(); arrow(g, 192, y2, 232, y2);
   for (let j = 0; j < 24; j++) svg("rect", { x: 240 + j * 3, y: y2 - 10, width: 2, height: 20, fill: C.C, opacity: 0.25 + 0.75 * ((j * 7919) % 13) / 13 }, g);
   label(g, 276, y2 + 40, "zᵢ: 768 numbers");
-  g = grp(); arrow(g, 318, y2, 372, y2); sigmoid(g, 394, y2); label(g, 394, y2 + 40, "cover head w (valid covers)");
-  g = grp(); arrow(g, 414, y2, 476, y2); pill(g, 504, y2, "w·zᵢ", soft(C.C, "55")); label(g, 504, y2 + 40, "adjustment");
+  g = K.grp(); arrow(g, 318, y2, 372, y2); sigmoid(g, 394, y2); label(g, 394, y2 + 40, "cover head w (valid covers)");
+  g = K.grp(); arrow(g, 414, y2, 476, y2); pill(g, 504, y2, "w·zᵢ", soft(C.C, "55")); label(g, 504, y2 + 40, "adjustment");
   // merge: + → final score
-  g = grp(); arrow(g, 356, y1, 600, ym - 12); arrow(g, 530, y2, 600, ym + 12);
+  g = K.grp(); arrow(g, 356, y1, 600, ym - 12); arrow(g, 530, y2, 600, ym + 12);
   svg("circle", { cx: 614, cy: ym, r: 14, class: "plus" }, g); svg("text", { x: 614, y: ym + 6, "text-anchor": "middle", class: "plustxt" }, g, "+");
-  g = grp(); arrow(g, 628, ym, 680, ym); pill(g, 710, ym, "s′ᵢ", acc); label(g, 710, ym + 30, "final score"); label(g, 652, ym + 54, "no valid cover: + 0", "lab small");
-  if (animate) requestAnimationFrame(() => requestAnimationFrame(() => { s.classList.add("run"); wrap.classList.add("run"); }));
-  else wrap.classList.add("run");
-  return wrap;
+  g = K.grp(); arrow(g, 628, ym, 680, ym); pill(g, 710, ym, "s′ᵢ", CONFIG.colors.accent); label(g, 710, ym + 30, "final score"); label(g, 652, ym + 54, "no valid cover: + 0", "lab small");
+  return K.start();
 }
 
 // Tags and structure: everything a serial's page shows → drop what is only known later or edited later → S (plays when S is opened by hand)
@@ -647,19 +790,17 @@ function sStage(animate) {
 }
 
 function renderDetail() {
-  const box = $("detail"), card = $("detail-card");
+  const box = $("detail"), f = S3.focus, H = D.hyper;
+  const key = [f, f === "lr" ? modelOf() : "", f === "C" ? $("f-quarter").value + $("f-authors").value : ""].join("|");
+  if (key === S3.dkey) return;   // redraw (and replay the animations) only when what the panel shows changes
+  S3.dkey = key;
   const set = (title, sub) => { $("detail-title").textContent = title; $("detail-sub").textContent = sub; };
-  if (S3.hold) {   // during Play the panel stays still and gray; it fills in after the last step
-    if (!card.classList.contains("held")) { card.classList.add("held"); box.replaceChildren(); set("Details", "Shown when the walkthrough ends. Then click any input or algorithm."); }
-    return;
-  }
-  card.classList.remove("held");
   box.replaceChildren();
   restart(box, "enter");   // content slides in when it changes
-  const f = S3.focus, H = D.hyper, anim = !S3.fast;
+  setTimeout(() => fitFormulas(box), 0);
   if (f === "S") {
     set("S · Tags and structure", `${nS()} numbers per serial, all known when chapter 3 goes up`);
-    box.append(sStage(anim));
+    box.append(sStage(true));
     section(box, `The ${D.features.S.tags.length} tags, colored by genre group (brighter = more common)`, chips(D.features.S.tags));
     section(box, `The ${D.features.S.warnings.length} content warnings`, chips(D.features.S.warnings.map((w) => [w, 0, "#9a4a3c"])));
   } else if (f === "A") {
@@ -671,18 +812,18 @@ function renderDetail() {
     section(box, "Left out on purpose", para("Whether an earlier book became a hit. Those followers are a 2025 snapshot, and a new hit pulls readers back to the author's older books, so it would leak the answer."));
   } else if (f === "T") {
     set("T · First three chapters", "Each serial's opening becomes 1,536 numbers (text-embedding-3-small)");
-    box.append(tStage(anim));
+    box.append(tStage(true));
     section(box, "In formulas", fx("t"));
     const grids = el("div", { class: "vecs" }), E = D.emb, low = E.examples[1];
     const card = (cv, u, title, sub) => { const g = el("div"); const top = el("div", { class: "vtop" }); if (u) top.append(coverImg(u)); top.append(cv); g.append(top, el("b", {}, title), el("span", {}, sub)); return g; };
-    grids.append(card(vecGrid(low.v, 0.08, 4), low.u, `${low.label}: ${low.title.length > 26 ? low.title.slice(0, 25) + "…" : low.title}`,
+    grids.append(card(vecGrid(low.v, 0.08, 3), low.u, `${low.label}: ${low.title.length > 26 ? low.title.slice(0, 25) + "…" : low.title}`,
                       `rank ${low.rank.toLocaleString()} of ${low.n.toLocaleString()} · ${low.hit ? "became a hit" : "not a hit"} · match ${low.cos.toFixed(2)} (top pick ${E.examples[0].cos.toFixed(2)})`),
-                 card(vecGrid(E.direction, 0.072, 4), "", "The hit direction", "average hit minus average serial, 2017–2022"));
-    section(box, "Compare: orange above zero, blue below", grids, el("div", { id: "vec-readout", class: "note small" }, "Logistic regression gives each of the 1,536 numbers a weight; \"match\" = how closely a serial points the same way as past hits. Hover a grid to read a number."));
+                 card(vecGrid(E.direction, 0.072, 3), "", "The hit direction", "average hit minus average serial, 2017–2022"));
+    section(box, "Compare: orange above zero, blue below", grids, el("div", { id: "vec-readout", class: "note small" }, "\"Match\" = how closely a serial points the same way as past hits. Hover a grid to read a number."));
   } else if (f === "C") {
     const valid = B.cover_status.filter((s) => s === 0).length / B.cover_status.filter((s) => s >= 0).length;
     set("Cover · tried, not used", "Added on top of the main model, only for covers set before chapter 3");
-    section(box, "How it works", coverFlow(anim), fx("cover"));
+    section(box, "How it works", coverFlow(true), fx("cover"));
     const lg = el("div", { class: "legend" });
     lg.innerHTML = '<span><i style="background:var(--other)"></i>main model</span><span><i style="background:var(--c-cover)"></i>+ cover</span>';
     const cb = el("div", { class: "chart-box", style: "height:150px;flex:none" });
@@ -694,29 +835,29 @@ function renderDetail() {
     section(box, "How it scores a serial", para("The average past hit rate of its tags (2017–2022). A LitRPG serial inherits LitRPG's hit rate, and so on. No text, no author.", "note big-note"));
     section(box, "Ties", para("Serials with the same tags get the same score; ties are broken by serial id."));
   } else if (f === "lr") {
-    const m = ["lr_S", "lr_SA", "lr_SAT", "lr_T"].includes(modelOf()) ? modelOf() : "lr_SAT", h = H.lr[m];
-    set("Logistic regression · our model", "Standardize every number, give each one a weight, add them up into a score");
-    section(box, "The model", fx("lr"));
-    section(box, `Tuned on 2022: C, how freely the weights may grow (${D.short[m]}, AUC on 2022)`,
-      tileGrid([""], Object.keys(h.val_auc_by_C), (r, c) => ({ auc: h.val_auc_by_C[c], chosen: Number(c) === h.C }), { colName: "C →" }));
-    section(box, "Size", para(`S+A+T: ${nS()} + 2 + 1,536 = ${(nS() + 2 + 1536).toLocaleString()} weights. Smaller C keeps them small, which matters with 1,536 text numbers.`));
-    section(box, "Then", para("Refit on 2017–2022 with the chosen C and scored once on 2023."));
+    const m = ["lr_S", "lr_SA", "lr_SAT", "lr_T"].includes(modelOf()) ? modelOf() : "lr_SAT", Cs = Object.keys(H.lr.lr_SAT.val_auc_by_C);
+    set("Logistic regression · our model", "Every number gets one weight; the weighted sum becomes a chance of a hit");
+    section(box, "How it scores a serial", lrFlow(true));
+    const cb = el("div", { class: "chart-box", style: "height:200px;flex:none" });
+    section(box, "Tuned on 2022: C, how freely the weights may grow (AUC on 2022, higher is better)", cb);
+    lineChart(cb, Cs, ["lr_S", "lr_SA", "lr_T", "lr_SAT"].map((id) => ({ label: D.short[id], values: Cs.map((c) => H.lr[id].val_auc_by_C[c]),
+      color: id === m ? CONFIG.colors.accent : "#5c5f63", dim: id !== m, mark: id === m ? Cs.findIndex((c) => Number(c) === H.lr[id].C) : undefined })),
+      { yMin: 0.78, yMax: 0.9, fmt: (v) => v.toFixed(2), xLabel: "C, log scale (smaller C keeps the weights smaller)" });
+    section(box, "Why that matters", para(`S+A+T has ${nInputs().toLocaleString()} weights, 1,536 of them for the text, so a small C (strong penalty) works best. Refit on 2017–2022 with the chosen C, scored once on 2023.`));
   } else if (f === "gb") {
-    const h = H.gb, key = (r, c) => `(${r}, ${c})`;
-    set("Gradient boosting", "Up to 300 small decision trees, each fixing the last ones' mistakes (HistGradientBoosting)");
+    const h = H.gb, [eta, leaves] = h.chosen;
+    set("Gradient boosting", "Small decision trees added one after another, each correcting the ones before it (HistGradientBoosting)");
+    section(box, "How it scores a serial", gbFlow(true, eta, leaves));
     section(box, "Tuned on 2022: learning rate × leaves per tree (AUC on 2022)",
-      tileGrid([0.03, 0.1], [8, 31], (r, c) => ({ auc: h.val_auc_by_param[key(r, c)], chosen: h.chosen[0] === r && h.chosen[1] === c }), { rowName: "learning rate", colName: "leaves" }));
-    section(box, "Inputs", para("S + A + the 1,536 text numbers squeezed to 32 with PCA, so a few strong features are not drowned."));
+      heatmap([0.03, 0.1], [8, 31], (r, c) => ({ v: h.val_auc_by_param[`(${r}, ${c})`], chosen: r === eta && c === leaves }), { rowName: "learning rate η", colName: "max leaves per tree" }));
     section(box, "Near ties", para("The four settings are within 0.007 of each other, so tiny numerical differences between machines can change the winner (2023 result: 0.465 in this export, 0.476 in the repo's results file)."));
   } else if (f === "mlp") {
-    const h = H.mlp;
-    set("Neural network (MLP)", "Two hidden layers on the same numbers; the text encoder stays frozen");
-    const arch = el("div", { class: "pipe" });
-    [`${(nS() + 2 + 1536).toLocaleString()} inputs`, "256 units", "64 units", "1 score"].forEach((t, i) => { if (i) arch.append(el("span", { class: "arr" }, i < 3 ? "→ ReLU, dropout →" : "→")); arch.append(el("span", { class: "step" }, t)); });
-    section(box, "Architecture", arch);
-    section(box, "Tuned on 2022: dropout × weight decay (AUC on 2022, epochs by early stopping)",
-      tileGrid([0.2, 0.5], [0.0001, 0.01], (r, c) => { const v = h.val_auc_by_param[`(${r}, ${c})`]; return { auc: v[0], note: `${v[1]} epochs`, chosen: h.chosen[0] === r && h.chosen[1] === c }; }, { rowName: "dropout", colName: "weight decay" }));
-    section(box, "Training", para("AdamW, learning rate 0.001, batch 256, early stopping on 2022 (patience 5), average of 3 seeds."));
+    const h = H.mlp, [drop, wd, ep] = h.chosen;
+    set("Neural network (MLP)", "Not fine-tuned: a small network trained from scratch on top of frozen text vectors");
+    section(box, "How it scores a serial", mlpFlow(true, drop, ep));
+    section(box, "Tuned on 2022: dropout × weight decay (AUC on 2022; epochs by early stopping)",
+      heatmap([0.2, 0.5], [0.0001, 0.01], (r, c) => { const v = h.val_auc_by_param[`(${r}, ${c})`]; return { v: v[0], sub: `${v[1]} epochs`, chosen: r === drop && c === wd }; }, { rowName: "dropout", colName: "weight decay" }));
+    section(box, "Training", para(`AdamW, learning rate 0.001, batches of 256, up to 40 epochs with early stopping on 2022 (patience 5); then refit on 2017–2022 for ${ep} epochs, average of 3 seeds.`));
   }
 }
 
@@ -845,7 +986,7 @@ function renderCovers(picks) {   // shelves of overlapping covers, highest rank 
   const shelfH = Math.min(196, (box.clientHeight - 16) / nShelves), ch = shelfH - 30, cw = Math.min(CONFIG.coverW, ch / 1.5), W = box.clientWidth;
   box.style.setProperty("--sh", shelfH + "px"); box.style.setProperty("--cw", cw + "px"); box.style.setProperty("--ch", cw * 1.5 + "px");
   for (const [q, ix] of picks) {
-    const list = showAllCovers ? ix : ix.slice(0, CONFIG.coversPerQuarter), size = Math.ceil(list.length / perShelf);
+    const list = ix.slice(0, showAllCovers ? CONFIG.coversMax : CONFIG.coversPerQuarter), size = Math.ceil(list.length / perShelf);
     for (let s = 0; s < perShelf; s++) {
       const part = list.slice(s * size, (s + 1) * size); if (!part.length) continue;
       const shelf = el("div", { class: "shelf" });
@@ -856,7 +997,8 @@ function renderCovers(picks) {   // shelves of overlapping covers, highest rank 
     }
   }
   const all = [...picks.values()].flat(), nHit = all.filter((i) => B.y[i]).length;
-  $("covers-all").textContent = showAllCovers ? "Show fewer" : `Show all ${all.length} picks`;
+  const many = [...picks.values()].some((ix) => ix.length > CONFIG.coversMax);
+  $("covers-all").textContent = showAllCovers ? "Show fewer" : many ? `Show the top ${CONFIG.coversMax} per quarter` : `Show all ${all.length} picks`;
   $("hit-share").replaceChildren(el("b", {}, `${nHit} hits`), el("i", { style: `--p:${nHit / all.length}` }), el("span", {}, `${all.length - nHit} misses`));
 }
 
@@ -899,6 +1041,7 @@ function renderTaste(animate = false) {
   const swatch = (bg, text, line) => { const i = el("i"); i.style.background = bg; if (line) i.style.height = "3px"; const sp = el("span"); sp.append(i, text); return sp; };
   lg.replaceChildren();
   $("fx-lift").style.display = tasteView === "tags" ? "" : "none";
+  $("taste-take").textContent = `Taste mostly moves with the market: from 2017 to 2024 the average hit shifted the same way as the average new serial (cosine ${M2.shift_cos_1536.toFixed(2)}).`;
   if (tasteView === "tags") {
     $("taste-sub").textContent = "How much more often a tag becomes a hit than average (lift). Gray dot 2017–19, colored dot 2022–24.";
     $("taste-cap").textContent = "LitRPG and Xianxia rose, Romance and Harem fell.";
@@ -909,7 +1052,7 @@ function renderTaste(animate = false) {
   const pca = tasteView === "pca";
   $("taste-sub").textContent = pca ? "Each serial's 1,536 numbers squeezed to 2 (PCA). 4,000 serials, 2017–2024, colored by genre."
                                    : "UMAP: similar stories sit together; colors are genres. Where the hits sat, early vs late.";
-  $("taste-cap").textContent = pca ? `PCA keeps ${pct(M2.pca_explained_2d, 0)} of the information, so the picture is only a sketch. Measured in all 1,536 numbers, the 2017→2024 moves of hits and of all serials point the same way (cosine ${M2.shift_cos_1536.toFixed(2)}).`
+  $("taste-cap").textContent = pca ? `PCA keeps ${pct(M2.pca_explained_2d, 0)} of the information, so the map is only a sketch; the similarity above is measured in all 1,536 numbers.`
                                    : "UMAP is good at clusters, not at distances; trends are measured in the full 1,536 numbers.";
   if (pca) lg.append(swatch(CONFIG.colors.light, "all serials, yearly average", true), swatch(CONFIG.colors.accent, "hits, yearly average", true));
   else lg.append(swatch(CONFIG.colors.light, "hits 2017–19"), swatch(CONFIG.colors.accent, "hits 2022–24"));
@@ -938,7 +1081,11 @@ function storyMap(box, pca, animate) {   // canvas; with animate (PCA only), a 2
     const a = Math.atan2(by - ay, bx - ax), h = 7;
     ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx - h * Math.cos(a - 0.45), by - h * Math.sin(a - 0.45)); ctx.lineTo(bx - h * Math.cos(a + 0.45), by - h * Math.sin(a + 0.45)); ctx.fill();
   };
-  const label = (txt, x, y, col = CONFIG.colors.text, align = "center", size = 14) => { ctx.font = `600 ${size}px ${CONFIG.sans}`; ctx.fillStyle = col; ctx.textAlign = align; ctx.fillText(txt, x, y); ctx.textAlign = "left"; };
+  const label = (txt, x, y, col = CONFIG.colors.text, align = "center", size = 14) => {   // text with a dark outline, readable over the dots
+    ctx.font = `700 ${size}px ${CONFIG.sans}`; ctx.textAlign = align; ctx.lineJoin = "round";
+    ctx.lineWidth = 5; ctx.strokeStyle = "rgba(0, 0, 0, .9)"; ctx.strokeText(txt, x, y);
+    ctx.fillStyle = col; ctx.fillText(txt, x, y); ctx.textAlign = "left";
+  };
   const wrap = (txt, y) => {   // centered caption, wrapped to the canvas width
     ctx.font = `600 14px ${CONFIG.sans}`; const lines = [""];
     txt.split(" ").forEach((w) => { const t = lines[lines.length - 1] ? lines[lines.length - 1] + " " + w : w; if (ctx.measureText(t).width > W - 24) lines.push(w); else lines[lines.length - 1] = t; });
@@ -962,7 +1109,7 @@ function storyMap(box, pca, animate) {   // canvas; with animate (PCA only), a 2
     if (appear > 0) {
       pts.forEach((p, i) => {
         const r = M2.raw[i], x = pca ? RX(r[0]) + (X(p[0]) - RX(r[0])) * mo : X(p[0]), y = pca ? RY(r[1]) + (Y(p[1]) - RY(r[1])) * mo : Y(p[1]);
-        ctx.globalAlpha = 0.65 * appear; ctx.fillStyle = colors[i]; ctx.fillRect(x - 1.6, y - 1.6, 3.2, 3.2);
+        ctx.globalAlpha = (pca && ms >= 2000 ? 0.4 : 0.65) * appear; ctx.fillStyle = colors[i]; ctx.fillRect(x - 1.6, y - 1.6, 3.2, 3.2);
       });
       ctx.globalAlpha = 1;
     }
@@ -974,10 +1121,10 @@ function storyMap(box, pca, animate) {   // canvas; with animate (PCA only), a 2
         for (let s = 0; s < n; s++) arrow(P[s][0], P[s][1], P[s + 1][0], P[s + 1][1], col);
         ctx.shadowBlur = 0;
         P.slice(0, n + 1).forEach(([x, y]) => { ctx.fillStyle = col; ctx.beginPath(); ctx.arc(x, y, 3.5, 0, 7); ctx.fill(); });
-        label(yrs[0], P[0][0] + 10, P[0][1] - 9, col, "left");
-        if (show >= 1) label(yrs[yrs.length - 1], P[P.length - 1][0] - 10, P[P.length - 1][1] - 9, col, "right");
+        label(yrs[0], P[0][0] + 10, P[0][1] - 10, col, "left", 18);
+        if (show >= 1) label(yrs[yrs.length - 1], P[P.length - 1][0] - 10, P[P.length - 1][1] - 10, col, "right", 18);
       }
-      if (show >= 1) { ctx.strokeStyle = CONFIG.colors.text; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(X(ex.p[0]), Y(ex.p[1]), 6, 0, 7); ctx.stroke(); label(ex.title, X(ex.p[0]), Y(ex.p[1]) + 24); }
+      if (show >= 1) { ctx.strokeStyle = CONFIG.colors.text; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(X(ex.p[0]), Y(ex.p[1]), 6, 0, 7); ctx.stroke(); label(ex.title, X(ex.p[0]), Y(ex.p[1]) + 26, CONFIG.colors.text, "center", 16); }
       if (show >= 1) label(`PC1 and PC2 keep ${pct(M2.pca_explained_2d, 0)} of the information`, cx, 18, CONFIG.colors.muted, "center", 13);
     }
     if (!pca) {
@@ -993,6 +1140,164 @@ function storyMap(box, pca, animate) {   // canvas; with animate (PCA only), a 2
   mapFrame = requestAnimationFrame(frame);
 }
 
+// ---------- screen 5: business value (a scenario: sliders → ad revenue + editor time, our model minus the editors' rule) ----------
+const BIZ = [   // the sliders; tex + note open under each one
+  { id: "k", label: "Slots per quarter", short: "slots per quarter", sym: "K", min: 0, max: K_STEPS.length - 1, step: 1, value: posOfK(CONFIG.slots), real: kAt, fmt: (v) => v.toLocaleString(),
+    tex: String.raw`\mathrm{Top}_K(q) = \text{the } K \text{ highest-scored new serials of quarter } q`, note: (b) => `${b.k} slots are ${pct(b.k / b.perQ, 1)} of the ${Math.round(b.perQ).toLocaleString()} new serials a quarter. Same slider as "slots per quarter" in the top bar.` },
+  { id: "lambda", label: "Share of a pick's views the slot brings", short: "views from the slot", sym: "λ", min: 0.01, max: 0.5, step: 0.01, value: 0.10, fmt: (v) => pct(v, 0),
+    tex: String.raw`\text{views from the slot} = \lambda \times \text{views of the pick}`, note: () => "Not knowable from this data: the picks would partly have been read anyway. An A/B pilot would measure it." },
+  { id: "cpm", label: "Ad revenue per 1,000 views", short: "per 1,000 views", sym: "CPM", min: 0.5, max: 10, step: 0.5, value: 3, fmt: (v) => "$" + v.toFixed(2),
+    tex: String.raw`\text{revenue per view} = \text{CPM} / 1000`, note: () => "What the platform earns from 1,000 page views." },
+  { id: "wage", label: "Editor cost per hour", short: "editor hour", sym: "w", min: 15, max: 120, step: 5, value: 35, fmt: (v) => "$" + v,
+    tex: String.raw`\text{cost} = \text{hours} \times w`, note: () => "Salary and overhead of one editor hour." },
+  { id: "mins", label: "Minutes to vet one serial", short: "per serial", sym: "m", min: 5, max: 60, step: 5, value: 20, fmt: (v) => v + " min",
+    tex: String.raw`K'_q = \min\{\,k : \text{hits in the rule's top } k \ge \text{hits in the model's top } K\,\}`,
+    note: () => "To find as many hits as the model's K picks, editors following the rule read K′ serials; each takes m minutes. (Our definition: the deck's editor-time formula is not in the repo.)" },
+];
+const bizVal = (id) => Number($(`biz-${id}`).value);
+const bizReal = (b, raw) => (b.real ? b.real(raw) : raw);   // slider position → value (only the slots slider differs)
+let sensVar = "k";
+function bizInit() {
+  const box = $("biz-sliders");
+  for (const b of BIZ) {
+    const row = el("div", { class: "bz" }), top = el("div", { class: "bz-top" });
+    top.append(el("b", {}, b.label), el("span", { class: "bz-sym" }, b.sym), el("span", { class: "bz-val", id: `biz-${b.id}-val` }, b.fmt(bizReal(b, b.value))));
+    const input = el("input", { type: "range", id: `biz-${b.id}`, min: b.min, max: b.max, step: b.step, value: b.value });
+    const det = el("details", { class: "bz-more" }), sum = el("summary", {}, "formula");
+    det.append(sum, el("div", { class: "formula small", id: `biz-${b.id}-fx` }), el("p", { class: "note", id: `biz-${b.id}-note` }));
+    det.addEventListener("toggle", () => fitFormulas(det));
+    row.append(top, input, det); box.append(row);
+    let queued = false;
+    input.addEventListener("input", () => {
+      $(`biz-${b.id}-val`).textContent = b.fmt(bizReal(b, Number(input.value)));
+      if (b.id === "k") { $("f-k").value = input.value; $("f-k-val").textContent = slots(); }   // one slots slider for the whole page
+      if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; b.id === "k" ? render() : renderBiz(pool()); }); }
+    });
+    input.addEventListener("change", () => input.blur());
+    const vb = el("button", { "data-sens": b.id, class: "schip" });
+    vb.addEventListener("click", () => { sensVar = b.id; renderSens(pool()); });
+    $("sens-vars").append(vb);
+  }
+  $("sens-slider").addEventListener("input", (e) => { const src = $(`biz-${sensVar}`); src.value = e.target.value; src.dispatchEvent(new Event("input")); });
+  $("sens-slider").addEventListener("change", (e) => e.target.blur());
+  const sens = (open) => {   // the drawer takes the sliders' place; its own button brings them back
+    $("biz-drawer").classList.toggle("open", open); $("biz-drawer").parentElement.classList.toggle("drawer-open", open);
+    setTimeout(() => { renderSens(pool()); fitFormulas($("biz")); }, 520);   // after the drawer has opened
+  };
+  $("sens-open").addEventListener("click", () => sens(true));
+  $("sens-close").addEventListener("click", () => sens(false));
+}
+let bizCache = { key: "" };
+function bizPrep(byQ) {   // per quarter: both rankings with running sums of views and hits, so any K is cheap
+  const key = [...byQ.keys()].join(",") + $("f-authors").value;
+  if (bizCache.key === key) return bizCache;
+  const s = B.score.lr_SAT, r = B.score.rule_hot_genre, run = (ix, f) => { const a = [0]; ix.forEach((i, j) => a.push(a[j] + f(i))); return a; };
+  const qs = [...byQ.values()].map((idx) => {
+    const ms = [...idx].sort((a, c) => s[c] - s[a] || B.id[a] - B.id[c]), rs = [...idx].sort((a, c) => r[c] - r[a] || B.id[a] - B.id[c]);
+    return { n: idx.length, mV: run(ms, (i) => B.views[i]), rV: run(rs, (i) => B.views[i]), mH: run(ms, (i) => B.y[i]), rH: run(rs, (i) => B.y[i]) };
+  });
+  bizCache = { key, qs };
+  return bizCache;
+}
+function bizNumbers(byQ, k) {   // views of each side's top K, and how far down the rule's list editors must read to match the model's hits
+  const out = { vm: 0, vr: 0, readRule: 0, readModel: 0, n: 0, nq: byQ.size, k };
+  for (const q of bizPrep(byQ).qs) {
+    const kk = Math.min(k, q.n), hm = q.mH[kk];
+    out.vm += q.mV[kk]; out.vr += q.rV[kk]; out.readModel += kk; out.n += q.n;
+    let j = kk; while (j < q.n && q.rH[j] < hm) j++;
+    out.readRule += j;
+  }
+  out.perQ = out.n / out.nq;
+  return out;
+}
+function bizMoney(bz, a) {   // a = { lambda, cpm, wage, mins }
+  const adM = bz.vm * a.lambda * a.cpm / 1000, adR = bz.vr * a.lambda * a.cpm / 1000;
+  const costR = bz.readRule * a.mins / 60 * a.wage, costM = bz.readModel * a.mins / 60 * a.wage;
+  return { adM, adR, ad: adM - adR, costR, costM, labor: costR - costM, total: adM - adR + costR - costM };
+}
+const usd = (v) => (v < 0 ? "−$" : "$") + Math.abs(Math.round(v)).toLocaleString();
+function renderBiz(byQ) {
+  if (!B.views) { $("biz-cap").textContent = "This data.js has no view counts: rerun modeling/05_demo_data.py."; return; }   // an older data.js must not break the rest of the page
+  const k = slots(), bz = bizNumbers(byQ, k), a = { lambda: bizVal("lambda"), cpm: bizVal("cpm"), wage: bizVal("wage"), mins: bizVal("mins") }, mo = bizMoney(bz, a);
+  $("biz-k").value = posOfK(k); $("biz-k-val").textContent = k.toLocaleString();
+  const per = bz.nq === 4 ? "per year" : bz.nq === 1 ? "per quarter" : `over ${bz.nq} quarters`;
+  const money = $("biz-money"); money.replaceChildren();
+  const cell = (cls, label, value, sub) => { const c = el("div", { class: "mcell " + cls }); c.append(el("span", {}, label), el("b", {}, value), el("small", {}, sub)); return c; };
+  const rowOf = (title, cells) => { const r = el("div", { class: "mrow" }); r.append(el("div", { class: "mtitle" }, title)); cells.forEach((c, i) => { if (i) r.append(el("div", { class: "m-op" }, i === 1 ? "−" : "=")); r.append(c); }); money.append(r); };
+  rowOf("Ad revenue", [cell("model", "Our model's picks", usd(mo.adM), `${(bz.vm / 1e6).toFixed(1)}M views × λ × CPM`), cell("rule", "Editors' rule picks", usd(mo.adR), `${(bz.vr / 1e6).toFixed(1)}M views × λ × CPM`), cell("net", "gained", "+" + usd(mo.ad), per)]);
+  rowOf("Editor time", [cell("rule", "Reading with the rule", usd(mo.costR), `${bz.readRule.toLocaleString()} serials × m × w`), cell("model", "Reading our picks", usd(mo.costM), `${bz.readModel.toLocaleString()} serials × m × w`), cell("net", "saved", "+" + usd(mo.labor), `${Math.round((bz.readRule - bz.readModel) * a.mins / 60).toLocaleString()} hours ${per}`)]);
+  const tot = el("div", { class: "mtotal" }); tot.append(el("span", {}, `Net value ${per}`), el("b", {}, "+" + usd(mo.total)), el("small", {}, "= ad revenue gained + editor time saved, both measured against the editors' rule"));
+  money.append(tot);
+  for (const b of BIZ) { const f = $(`biz-${b.id}-fx`); if (!f.dataset.done) { f.dataset.done = 1; FX[`biz_${b.id}`] = [b.tex]; fx(`biz_${b.id}`, f); } $(`biz-${b.id}-note`).textContent = b.note(bz); }
+  const n = (v) => Math.round(v).toLocaleString().replace(/,/g, "{,}");
+  FX.biz = [String.raw`\text{Value} = \sum_{q}\Big[\big(V^{\text{model}}_{q} - V^{\text{rule}}_{q}\big)\,\lambda\,\tfrac{\text{CPM}}{1000}\Big] + \sum_{q}\Big[\big(K'_{q} - K\big)\,\tfrac{m}{60}\,w\Big]`,
+            "Vq: total views (June 2025) of the K serials each side picks in quarter q · K′q: serials read down the rule's list to match the model's hits"];
+  FX.biz_num = [String.raw`= \big[${n(bz.vm)} - ${n(bz.vr)}\big] \times ${a.lambda.toFixed(2)} \times \tfrac{${a.cpm}}{1000} \; + \; \big[${n(bz.readRule)} - ${n(bz.readModel)}\big] \times \tfrac{${a.mins}}{60} \times ${a.wage}`, "",
+                String.raw`= (\$${n(mo.adM)} - \$${n(mo.adR)}) + (\$${n(mo.costR)} - \$${n(mo.costM)}) = \$${n(mo.ad)} + \$${n(mo.labor)} = \$${n(mo.total)}`];
+  fx("biz", $("fx-biz")); fx("biz_num", $("fx-biz-num")); fitFormulas($("biz"));
+  $("biz-cap").textContent = `${quarterLabel(byQ)} · ${whoLabel()} · our model = logistic regression on S+A+T. Views are a June 2025 snapshot and would partly have come anyway, so λ, CPM, w and m are assumptions to be measured in a pilot.`;
+  if ($("biz-drawer").classList.contains("open")) renderSens(byQ);
+}
+const SENS_LINES = [   // lines in the sensitivity chart; click a legend entry to show or hide it
+  { key: "adM", label: "our model's picks: ad revenue", color: "#4c9bff", on: true },
+  { key: "adR", label: "editors' rule picks: ad revenue", color: "#7f8287", on: true },
+  { key: "total", label: "net value (gap + time saved)", color: "#e2662a", on: true, bold: true },
+  { key: "ad", label: "ad revenue gained", color: "#e8c547", on: false, dash: true },
+  { key: "labor", label: "editor time saved", color: "#f08fc0", on: false, dash: true },
+];
+function renderSens(byQ, retry = true) {   // money (per year) as one assumption moves; the others stay put
+  const a = { lambda: bizVal("lambda"), cpm: bizVal("cpm"), wage: bizVal("wage"), mins: bizVal("mins") }, k = slots();
+  document.querySelectorAll("[data-sens]").forEach((b) => {   // the chips show the current values (the sliders may be folded away)
+    const sp = BIZ.find((x) => x.id === b.dataset.sens);
+    b.classList.toggle("on", b.dataset.sens === sensVar);
+    b.replaceChildren(el("small", {}, sp.short), el("b", {}, `${sp.sym} = ${sp.fmt(sp.id === "k" ? k : a[sp.id])}`));
+  });
+  const lg = $("sens-legend"); lg.replaceChildren();   // the legend first: its height decides how tall the chart can be
+  SENS_LINES.forEach((l) => {
+    const i = el("i"); i.style.background = l.dash ? `repeating-linear-gradient(90deg, ${l.color} 0 7px, transparent 7px 11px)` : l.color;
+    const sp = el("button", { class: "lg" + (l.on ? " on" : "") }); sp.append(i, l.label);
+    sp.addEventListener("click", () => { l.on = !l.on; renderSens(pool()); });
+    lg.append(sp);
+  });
+  const spec = BIZ.find((b) => b.id === sensVar), logK = sensVar === "k";
+  const nMax = Math.max(...bizPrep(byQ).qs.map((q) => q.n));   // slots can go up to every serial of the quarter
+  const lo = spec.min, hi = logK ? nMax : spec.max, xs = [];
+  if (logK) { for (let x = 10; x < nMax; x += x < 300 ? 5 : 20) xs.push(x); xs.push(nMax); } else for (let i = 0; i <= 48; i++) xs.push(lo + (i / 48) * (hi - lo));
+  const pts = xs.map((x) => { const aa = { ...a }; if (!logK) aa[sensVar] = x; return { x, ...bizMoney(bizNumbers(byQ, logK ? x : k), aa) }; });
+  const cur = logK ? Math.min(k, nMax) : a[sensVar], curPt = { x: cur, ...bizMoney(bizNumbers(byQ, k), a) };
+  const box = $("sens-chart"), { s, W, H } = newChart(box), L = 74, R = 24, T = 18, Bm = 48, on = SENS_LINES.filter((l) => l.on);
+  const ymax = Math.max(1, ...pts.flatMap((p) => on.map((l) => p[l.key]))) * 1.08, ymin = Math.min(0, ...pts.flatMap((p) => on.map((l) => p[l.key])));
+  const X = logK ? (x) => L + (Math.log(x / 10) / Math.log(hi / 10)) * (W - L - R) : (x) => L + ((x - lo) / (hi - lo)) * (W - L - R);
+  const Y = (y) => T + (1 - (y - ymin) / (ymax - ymin)) * (H - T - Bm);
+  const g = svg("g", { class: "grid" }, s);
+  for (let i = 0; i <= 4; i++) { const v = ymin + (i / 4) * (ymax - ymin); svg("line", { x1: L, x2: W - R, y1: Y(v), y2: Y(v) }, g); svg("text", { class: "muted", x: L - 8, y: Y(v) + 4, "text-anchor": "end" }, s, "$" + Math.round(v / 1000) + "k"); }
+  const ticks = logK ? [10, 25, 50, 100, 250, 500, 1000, nMax] : [0, 1, 2, 3, 4].map((i) => lo + (i / 4) * (hi - lo));
+  ticks.forEach((v) => svg("text", { class: "muted", x: X(v), y: H - Bm + 20, "text-anchor": "middle" }, s, logK ? v.toLocaleString() : spec.fmt(v)));
+  svg("text", { class: "muted", x: (L + W - R) / 2, y: H - 6, "text-anchor": "middle" }, s, logK ? `${spec.label} (K, log scale: up to all ${nMax.toLocaleString()} serials of a quarter)` : `${spec.label} (${spec.sym})`);
+  for (const l of on) svg("path", { d: pts.map((p, i) => `${i ? "L" : "M"}${X(p.x)},${Y(p[l.key])}`).join(""), class: "sline", style: `stroke:${l.color};stroke-width:${l.bold ? 3.5 : 2.4};${l.dash ? "stroke-dasharray:7 5" : ""}` }, s);
+  svg("line", { x1: X(cur), x2: X(cur), y1: T, y2: H - Bm, class: "scur" }, s);
+  if (SENS_LINES[2].on) { svg("circle", { cx: X(cur), cy: Y(curPt.total), r: 5, class: "sdot" }, s); svg("text", { class: "val", x: X(cur) + 10, y: Y(curPt.total) + 18 }, s, `now ${usd(curPt.total)}`); }
+  let note = "Every unit adds the same amount: the money is a straight line in this assumption.";
+  if (logK) {   // the peak of the net value, and the turning point on the way up (smoothed: single blockbusters make the curve jagged)
+    const sm = pts.map((p, i) => { const w = pts.slice(Math.max(0, i - 3), i + 4); return w.reduce((t, q) => t + q.total, 0) / w.length; });
+    const iPeak = sm.indexOf(Math.max(...sm)), pk = pts[iPeak];
+    const up = sm.slice(0, iPeak + 1), y0 = Math.min(...up), y1 = Math.max(...up);
+    let iKnee = 0, best = -1; up.forEach((v, i) => { const dd = (v - y0) / (y1 - y0 || 1) - i / Math.max(1, up.length - 1); if (dd > best) { best = dd; iKnee = i; } });
+    const kn = pts[iKnee];
+    if (SENS_LINES[2].on) {
+      svg("circle", { cx: X(pk.x), cy: Y(pk.total), r: 7, class: "speak" }, s);
+      svg("text", { class: "kneetxt", x: X(pk.x), y: Y(pk.total) - 14, "text-anchor": "middle" }, s, `peak: K ≈ ${pk.x} → ${usd(pk.total)} a year`);
+      svg("circle", { cx: X(kn.x), cy: Y(kn.total), r: 5, class: "skneedot" }, s);
+      svg("text", { class: "kneetxt dim", x: X(kn.x) - 8, y: Y(kn.total) - 10, "text-anchor": "end" }, s, `turning point ≈ ${kn.x}`);
+    }
+    note = `Net value rises fast up to about ${kn.x} slots a quarter, peaks at about ${pk.x} (${usd(pk.total)} a year) and then falls: with very many slots both lists hold nearly the same serials, so the gap closes (at all ${nMax.toLocaleString()} serials it is $0).`;
+  }
+  $("sens-cap").textContent = note;
+  if (retry && box.clientHeight + 2 < H) return renderSens(byQ, false);   // the caption grew and squeezed the chart: draw it once more at the new height
+  const sl = $("sens-slider"), src = $(`biz-${sensVar}`);   // the drawer's own slider moves the chosen assumption
+  Object.assign(sl, { min: src.min, max: src.max, step: src.step }); sl.value = src.value; $("sens-val").textContent = spec.fmt(bizReal(spec, Number(src.value)));
+}
+
 // ---------- page ----------
 function render() {
   syncBuilder();
@@ -1001,9 +1306,10 @@ function render() {
   renderBuilder(byQ, k);
   renderPicks(byQ, k, model);
   renderChecks(byQ);
+  renderBiz(byQ);
 }
 
-const SCREENS = ["title", "why", "hit", "model", "picks", "checks", "p2"];
+const SCREENS = ["title", "why", "hit", "model", "picks", "checks", "biz", "p2"];
 const barOffset = (id) => (id === "model" || id === "picks" ? $("filters").offsetHeight : 0);   // the filter bar sticks over these two
 const topOf = (id) => $(id).getBoundingClientRect().top + scrollY - barOffset(id);
 function currentScreen() {
@@ -1033,6 +1339,8 @@ function goTo(k) {
 function init() {
   if (!D) { document.body.prepend(el("p", { style: "padding:20px" }, "Could not load data.js. Run modeling/05_demo_data.py to create docs/demo/data.js next to this page.")); return; }
   document.documentElement.style.setProperty("--c-cover", CONFIG.blocks.C);
+  FX.shift = [String.raw`\cos(\Delta_{\text{hit}},\, \Delta_{\text{all}}) = \frac{\Delta_{\text{hit}} \cdot \Delta_{\text{all}}}{\lVert \Delta_{\text{hit}} \rVert\, \lVert \Delta_{\text{all}} \rVert} = ${D.story_map.shift_cos_1536.toFixed(2)}, \quad \Delta_g = \bar t_{g,\,2024} - \bar t_{g,\,2017}`,
+              "measured in all 1,536 numbers, so it holds for every tab below · t̄: average of a group's vectors that year (hits, or all new serials; no watermarked serials) · 1 = same direction, 0 = unrelated"];
   const fq = $("f-quarter");
   fq.append(el("option", { value: "Y2023" }, "2023, all quarters"));
   D.quarters.forEach((q, i) => q.startsWith("2023") && fq.append(el("option", { value: i }, q)));
@@ -1040,11 +1348,12 @@ function init() {
   D.quarters.forEach((q, i) => q.startsWith("2024") && fq.append(el("option", { value: i }, q + " (not settled)")));
   fq.value = CONFIG.quarter;
   for (const [m, label] of Object.entries(D.models)) $("f-model").append(el("option", { value: m }, label));
-  $("f-model").value = CONFIG.model; $("f-k").value = CONFIG.slots; $("f-k-val").textContent = CONFIG.slots;
+  Object.assign($("f-k"), { min: 0, max: K_STEPS.length - 1, step: 1 }); $("f-k").value = posOfK(CONFIG.slots);
+  $("f-model").value = CONFIG.model; $("f-k-val").textContent = slots();
   ["f-quarter", "f-authors"].forEach((id) => $(id).addEventListener("change", render));
   $("f-model").addEventListener("change", () => { manualMode(); render(); });
   let queued = false;   // the slider re-renders at most once per frame
-  $("f-k").addEventListener("input", () => { $("f-k-val").textContent = $("f-k").value; if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; render(); }); } });
+  $("f-k").addEventListener("input", () => { $("f-k-val").textContent = slots(); if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; render(); }); } });
   $("f-k").addEventListener("change", () => $("f-k").blur());   // so the arrow keys go back to moving between screens
   document.querySelectorAll("[data-story]").forEach((b) => b.addEventListener("click", () => {
     const s = CONFIG.stories[b.dataset.story]; $("f-model").value = s.model; $("f-authors").value = s.authors;
@@ -1060,15 +1369,20 @@ function init() {
 
   players.title = makePlayer("title", [() => restart($("title"), "in")], []);
   players.p2 = makePlayer("p2", [() => restart($("p2"), "in")], []);
+  players.biz = makePlayer("biz", [() => restart($("biz-money"), "in")], []);
+  watchWidth($("models-chart"), () => drawShares(pool(), slots()));
+  $("detail-drawer").addEventListener("transitionend", (e) => e.target === e.currentTarget && e.propertyName === "width" && drawShares(pool(), slots()));   // and once more when the drawer stops
+  watchWidth($("sens-chart"), () => $("biz-drawer").classList.contains("open") && renderSens(pool()));
+  $("detail-close").addEventListener("click", () => setDetails(false));
+  $("detail-open").addEventListener("click", () => setDetails(true));
   document.querySelectorAll("[data-go]").forEach((b) => b.addEventListener("click", () => jump(SCREENS.indexOf(b.dataset.go))));
-  fx("target", $("fx-target")); fx("share", $("fx-share")); fx("lift", $("fx-lift"));
+  fx("target", $("fx-target")); fx("share", $("fx-share")); fx("lift", $("fx-lift")); fx("shift", $("fx-shift"));
+  setTimeout(() => fitFormulas(), 300);
   players.why = makePlayer("why", [0, 1, 2, 3].map((s) => () => whyShow(s)), CONFIG.waits.why);
   players.hit = makePlayer("hit", [0, 1, 2].map((s) => () => animShow(s)), CONFIG.waits.hit);
-  players.model = makePlayer("model", MODEL_STEPS.map((_, i) => () => modelStep(i)), CONFIG.waits.model);
+  players.model = makePlayer("model", [modelIntro], []);
   players.picks = makePlayer("picks", [() => { setDim(false); setLayer("picks"); }, () => setLayer("hits"), () => setLayer("both"), () => setDim(true)], CONFIG.waits.picks);
   players.checks = makePlayer("checks", [resetChecks], CONFIG.waits.checks);
-  const chips = $("model-steps");
-  MODEL_STEPS.forEach((st, i) => chips.append(el("button", { "data-step-of": "model", "data-step": i }, st.label)));
   document.querySelectorAll("[data-play]").forEach((b) => b.addEventListener("click", () => players[b.dataset.play].toggle()));
   document.querySelectorAll("[data-step-of]").forEach((b) => b.addEventListener("click", () => players[b.dataset.stepOf].jump(Number(b.dataset.step))));
   document.addEventListener("click", (e) => e.target.closest("button")?.blur());   // keep the space bar for Play / Pause
@@ -1081,7 +1395,7 @@ function init() {
     else if (e.key === " ") { e.preventDefault(); players[SCREENS[currentScreen()]].toggle(); }
   });
   // every content screen gets a 1920 × 1080 stage that is scaled to the window, like a slide; the cover and Project Two fill the window as they are
-  for (const id of ["why", "hit", "model", "picks", "checks"]) {
+  for (const id of ["why", "hit", "model", "picks", "checks", "biz"]) {
     const scr = $(id), st = el("div", { class: "stage" + (scr.classList.contains("full") ? " full" : "") });
     while (scr.firstChild) st.append(scr.firstChild);
     scr.append(st); scr.classList.add("scaled");
@@ -1095,7 +1409,7 @@ function init() {
     });
   };
   setBar();
-  heroInit(); whyInit(); layoutWall();
+  heroInit(); whyInit(); layoutWall(); bizInit();
   animInit();
   render();
   // arriving at a screen plays it from the start; leaving it jumps to its end state

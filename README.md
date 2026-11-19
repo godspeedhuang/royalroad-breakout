@@ -35,7 +35,7 @@ Things that shaped the design:
 | `cover/` | Cover images: which covers predate chapter 3, frozen image embeddings (01–02 run on Colab), and a two-stage merge into the main model (03); results in `cover/out/` |
 | `walkthrough/` | Six narrative notebooks, in slide order, that read the saved results |
 | `EXPERIMENTS.md` | What we tried, what happened, what we decided |
-| `docs/demo/` | Demo page in five screens (why, target, model choice, the model's picks, checks; ↓/↑ to move, space to play or pause): pick a quarter, number of slots, model and author group, and see which serials each model recommends and whether they became hits; data from `modeling/05_demo_data.py` |
+| `docs/demo/` | Demo page (cover, why, target, model choice, the model's picks, checks, business value; ↓/↑ to move, space to play or pause): pick a quarter, number of slots, model and author group, and see which serials each model recommends and whether they became hits; data from `modeling/05_demo_data.py` |
 | `reports/` | EDA figures and HTML report sources |
 
 ## Reproduce

@@ -61,7 +61,7 @@ if PREDS_COVER.exists():
     p = p.merge(pd.read_parquet(PREDS_COVER), on="fiction_id", how="left")
     MODELS["lr_SATC"] = "LR + cover adjustment (S+A+T+cover, tried)"
     SHORT["lr_SATC"] = "S+A+T+Cover"
-meta = pq.read_table(ROOT / "embedding" / "out" / "books.parquet", columns=["fiction_id", "title", "tags", "cover_url"]).to_pandas()
+meta = pq.read_table(ROOT / "embedding" / "out" / "books.parquet", columns=["fiction_id", "title", "tags", "cover_url", "total_views"]).to_pandas()
 p = p.merge(meta, on="fiction_id", how="left").sort_values(["quarter", "fiction_id"]).reset_index(drop=True)
 assert len(p) == 8075 + 12165, len(p)
 
@@ -247,6 +247,7 @@ data = {
         "cover": list(url),
         "cover_status": cover_status.tolist(),
         "blurb_flag": p.desc_marker.astype(int).tolist(),
+        "views": p.total_views.fillna(0).astype(int).tolist(),   # total views in the June 2025 snapshot (business screen)
         "color": color,
         "score": {m: np.round(p[m].values.astype(float), 4).tolist() for m in MODELS},
     },
@@ -261,6 +262,11 @@ def share_of_slots(d, m, k):
 
 
 t23 = p[p.year == 2023]
+def top_views(d, m, k):
+    d = d.assign(_s=np.round(d[m].values.astype(float), 4)).sort_values(["_s", "fiction_id"], ascending=[False, True])
+    return int(d.groupby("quarter").head(k).total_views.sum())
+ad = {k: round((top_views(t23, "lr_SAT", k) - top_views(t23, "rule_hot_genre", k)) * 0.10 * 3 / 1000) for k in [25, 50, 100]}
+print("Ad revenue vs rule, 2023 (10% lift, $3 per 1,000 views):", ad)
 checks = {"recall_at_slots_2023": {m: round(float(recall_at_slots(t23.top10.values, t23[m].values, t23.quarter.values)), 3) for m in MODELS}}
 for k in [50]:
     checks[f"share_of_{k}_slots_2023"] = {m: dict(zip(["share", "hits", "slots"], share_of_slots(t23, m, k))) for m in MODELS}
