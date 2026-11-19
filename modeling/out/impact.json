@@ -1,0 +1,345 @@
+{
+ "assumptions": {
+  "slots_per_quarter": 50,
+  "lift": {
+   "low": 0.05,
+   "base": 0.1,
+   "high": 0.2
+  },
+  "cpm_usd": {
+   "low": 2.0,
+   "base": 3.0,
+   "high": 5.0
+  },
+  "editor_minutes_per_book": 10,
+  "editor_shortlist": 200,
+  "editor_hourly_usd": 30.0,
+  "test_year": 2023
+ },
+ "precision_at_slots": {
+  "rule_fast_update": {
+   "value": 0.14,
+   "ci95": [
+    0.095,
+    0.19
+   ],
+   "recent_2024": 0.205
+  },
+  "rule_hot_genre": {
+   "value": 0.28,
+   "ci95": [
+    0.22,
+    0.35
+   ],
+   "recent_2024": 0.24
+  },
+  "rule_known_author": {
+   "value": 0.17,
+   "ci95": [
+    0.125,
+    0.225
+   ],
+   "recent_2024": 0.22
+  },
+  "lr_S": {
+   "value": 0.525,
+   "ci95": [
+    0.462,
+    0.598
+   ],
+   "recent_2024": 0.515
+  },
+  "lr_SA": {
+   "value": 0.525,
+   "ci95": [
+    0.455,
+    0.603
+   ],
+   "recent_2024": 0.575
+  },
+  "lr_SAT": {
+   "value": 0.68,
+   "ci95": [
+    0.612,
+    0.745
+   ],
+   "recent_2024": 0.62
+  },
+  "lr_T": {
+   "value": 0.58,
+   "ci95": [
+    0.515,
+    0.653
+   ],
+   "recent_2024": 0.525
+  },
+  "gb_SAT": {
+   "value": 0.71,
+   "ci95": [
+    0.63,
+    0.77
+   ],
+   "recent_2024": 0.695
+  },
+  "mlp_T": {
+   "value": 0.59,
+   "ci95": [
+    0.51,
+    0.655
+   ],
+   "recent_2024": 0.465
+  },
+  "mlp_SAT": {
+   "value": 0.735,
+   "ci95": [
+    0.652,
+    0.78
+   ],
+   "recent_2024": 0.69
+  },
+  "random": {
+   "value": 0.1
+  }
+ },
+ "diff_pp": {
+  "model_vs_rule": {
+   "diff": 40.0,
+   "ci95": [
+    32.0,
+    48.0
+   ]
+  },
+  "text": {
+   "diff": 15.5,
+   "ci95": [
+    7.5,
+    23.5
+   ]
+  },
+  "author": {
+   "diff": 0.0,
+   "ci95": [
+    -5.0,
+    3.8
+   ]
+  },
+  "boosting_vs_lr": {
+   "diff": 3.0,
+   "ci95": [
+    -5.3,
+    8.5
+   ]
+  },
+  "mlp_vs_lr": {
+   "diff": 5.5,
+   "ci95": [
+    -2.0,
+    9.8
+   ]
+  }
+ },
+ "hits_per_quarter": {
+  "rule_hot_genre": 14.0,
+  "lr_SAT": 34.0,
+  "random": 5.0
+ },
+ "by_group": {
+  "first_time_author": {
+   "slots_per_quarter": 33,
+   "rule_hot_genre": 0.273,
+   "lr_SAT": 0.614
+  },
+  "returning_author": {
+   "slots_per_quarter": 17,
+   "rule_hot_genre": 0.324,
+   "lr_SAT": 0.75
+  }
+ },
+ "day30": {
+  "test": {
+   "lr_SAT": 0.68,
+   "day30": 0.76,
+   "diff_pp": 8.0,
+   "diff_ci95": [
+    0.5,
+    14.0
+   ]
+  },
+  "test_first_time": {
+   "lr_SAT": 0.614,
+   "day30": 0.667
+  },
+  "recent_2024": {
+   "lr_SAT": 0.62,
+   "day30": 0.82
+  }
+ },
+ "money": {
+  "by_slots": {
+   "25": {
+    "views_model_per_q": 24697655,
+    "views_rule_per_q": 3226148,
+    "views_random_per_q": 1921124,
+    "ratio_model_to_rule": 7.66,
+    "extra_revenue_per_year": {
+     "low_low": 8589,
+     "low_base": 12883,
+     "low_high": 21472,
+     "base_low": 17177,
+     "base_base": 25766,
+     "base_high": 42943,
+     "high_low": 34354,
+     "high_base": 51532,
+     "high_high": 85886
+    }
+   },
+   "50": {
+    "views_model_per_q": 39568244,
+    "views_rule_per_q": 7188528,
+    "views_random_per_q": 3842248,
+    "ratio_model_to_rule": 5.5,
+    "extra_revenue_per_year": {
+     "low_low": 12952,
+     "low_base": 19428,
+     "low_high": 32380,
+     "base_low": 25904,
+     "base_base": 38856,
+     "base_high": 64759,
+     "high_low": 51808,
+     "high_base": 77711,
+     "high_high": 129519
+    }
+   },
+   "100": {
+    "views_model_per_q": 54068182,
+    "views_rule_per_q": 15320256,
+    "views_random_per_q": 7684497,
+    "ratio_model_to_rule": 3.53,
+    "extra_revenue_per_year": {
+     "low_low": 15499,
+     "low_base": 23249,
+     "low_high": 38748,
+     "base_low": 30998,
+     "base_base": 46498,
+     "base_high": 77496,
+     "high_low": 61997,
+     "high_base": 92995,
+     "high_high": 154992
+    }
+   },
+   "200": {
+    "views_model_per_q": 83387948,
+    "views_rule_per_q": 36692880,
+    "views_random_per_q": 15368993,
+    "ratio_model_to_rule": 2.27,
+    "extra_revenue_per_year": {
+     "low_low": 18678,
+     "low_base": 28017,
+     "low_high": 46695,
+     "base_low": 37356,
+     "base_base": 56034,
+     "base_high": 93390,
+     "high_low": 74712,
+     "high_base": 112068,
+     "high_high": 186780
+    }
+   },
+   "400": {
+    "views_model_per_q": 117134258,
+    "views_rule_per_q": 70915634,
+    "views_random_per_q": 30737986,
+    "ratio_model_to_rule": 1.65,
+    "extra_revenue_per_year": {
+     "low_low": 18487,
+     "low_base": 27731,
+     "low_high": 46219,
+     "base_low": 36975,
+     "base_base": 55462,
+     "base_high": 92437,
+     "high_low": 73950,
+     "high_base": 110925,
+     "high_high": 184874
+    }
+   }
+  },
+  "base": {
+   "slots": 50,
+   "ratio_model_to_rule": 5.5,
+   "extra_views_per_year": 12951886,
+   "extra_revenue_per_year": 38856,
+   "low": 12952,
+   "high": 129519
+  },
+  "views_share_top10": 0.859
+ },
+ "editor": {
+  "books_per_quarter": 2019,
+  "hours_per_quarter_before": 336,
+  "hours_per_quarter_after": 33,
+  "hours_saved_per_year": 1212,
+  "usd_saved_per_year": 36375
+ },
+ "example_candidates": [
+  {
+   "fiction_id": 62881,
+   "title": "Reborn as a Demonic Tree",
+   "author": "XKARNATION",
+   "quarter": "2023Q1",
+   "rank_in_quarter": 31,
+   "books_in_quarter": 1775,
+   "followers": 15595
+  },
+  {
+   "fiction_id": 67742,
+   "title": "Elydes",
+   "author": "Drewells",
+   "quarter": "2023Q2",
+   "rank_in_quarter": 11,
+   "books_in_quarter": 2128,
+   "followers": 14846
+  },
+  {
+   "fiction_id": 66455,
+   "title": "A Novel Concept - He Who Eludes Death",
+   "author": "Priam",
+   "quarter": "2023Q2",
+   "rank_in_quarter": 34,
+   "books_in_quarter": 2128,
+   "followers": 13732
+  },
+  {
+   "fiction_id": 69938,
+   "title": "Magic is Programming",
+   "author": "Douglas M",
+   "quarter": "2023Q2",
+   "rank_in_quarter": 22,
+   "books_in_quarter": 2128,
+   "followers": 9481
+  },
+  {
+   "fiction_id": 71408,
+   "title": "Hyperion Evergrowing: A Monster Evolution LitRPG",
+   "author": "Nilsimus",
+   "quarter": "2023Q3",
+   "rank_in_quarter": 9,
+   "books_in_quarter": 2056,
+   "followers": 8965
+  }
+ ],
+ "diff_pp_2023_2024": {
+  "boosting_vs_lr": {
+   "diff": 5.2,
+   "ci95": [
+    -0.7,
+    10.1
+   ]
+  },
+  "mlp_vs_lr": {
+   "diff": 6.2,
+   "ci95": [
+    1.0,
+    9.3
+   ]
+  }
+ }
+}
