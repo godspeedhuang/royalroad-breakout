@@ -20,3 +20,6 @@ embedding/out/emb_parts/*
 # 個人編輯器設定
 .vscode/
 .claude/
+
+# Office 開檔時的鎖定檔
+~$*

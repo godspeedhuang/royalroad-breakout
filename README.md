@@ -30,7 +30,7 @@ Things that shaped the design:
 | `embedding/06, 08, 13` | Launch the atlas locally; export the public static atlas to `docs/atlas/` |
 | `embedding/out/` | Small results (JSON, CSV, figures) are tracked; parquet files are not |
 | `modeling/` | Rule baselines, logistic regression, gradient boosting, PyTorch MLP, drift test; results in `modeling/out/` |
-| `reports/` | EDA figures and HTML report sources |
+| `reports/` | EDA figures, HTML report sources, and the draft slide deck (`reports/slides/`) |
 
 ## Reproduce
 
@@ -69,6 +69,9 @@ uv run python 01_ml.py        # rules, logistic regression, gradient boosting
 uv run python 02_dl.py        # MLP on the frozen embeddings
 uv run python 03_compare.py   # → out/results.json, results.md, figs/model_comparison.png
 uv run python 04_drift.py     # → out/drift_auc.json, figs/drift_auc.png
+uv run python 05_experiments.py   # validation-year attempts to improve the main model → out/experiments_val.json
+uv run python 06_day30.py     # day-30 re-ranking with posting rhythm → out/day30.json
+uv run python 07_impact.py    # business impact at a fixed number of slots → out/impact.json (assumptions at the top of the file)
 ```
 
 ## Large files
@@ -115,6 +118,9 @@ Train 2017–2021, tune on 2022, test once on 2023 (8,075 books, 811 positives).
 - **Impact.** With about 203 slots per quarter in 2023, the model surfaces 98 future hits per quarter versus 53 for the best rule and 20 at random.
 - **First-time authors** (two thirds of books) are harder: recall 0.43, still well above the rule's 0.25.
 - **Blurbs are excluded on purpose.** The blurb is the 2025 version, and 7.8% of test books have blurbs mentioning Amazon, Kindle, Patreon, Audible or a second volume; 46% of those are hits. Adding the blurb lifts recall to 0.57, but that is an upper bound contaminated by edits made after success.
+- **Tried and not adopted** (validation year only): more embedding dimensions, separate vectors per chapter, chapter 1 only, nearest-neighbour hit rates, 17 stylometric features, a continuous rank target and pairwise ranking loss. None beat the main model beyond noise; text embeddings already capture what the extra features add. See [`modeling/README.md`](modeling/README.md).
+- **Does it matter.** With a fixed 50 slots per quarter (the size of a Rising Stars list), the model fills 68% of slots with future hits against 28% for the best rule, 34 vs 14 hits per quarter. The top 10% of each quarter take 86% of all views, so the model's picks gather 5.5x the views of the rule's. If a slot lifts a serial's views by 10% and ads earn $3 per 1,000 views, that is about $39k a year (range $13k to $130k). Assumptions live at the top of `modeling/07_impact.py`; the pitch deck and video script in `reports/slides/` are generated from its output.
+- **A second look at day 30.** Adding the first month's posting rhythm (future hits post a median 15 chapters in their first 30 days, others 6) lifts recall from 0.454 to 0.506 on the 2022 validation year but only from 0.482 to 0.490 on 2023 (+0.7 pp, 95% CI −2.0 to +3.1); first-time authors gain +2.4 pp, also not significant. Treat it as a confirmation pass to A/B test, not a replacement. See `modeling/06_day30.py`.
 - **Retraining.** Holding the test year fixed, each extra year of age in the training window costs 0.026 AUC for a tags-only model and 0.008 for a text-only model. Retrain at least yearly.
 
 ## Exploratory findings
