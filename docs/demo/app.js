@@ -20,7 +20,7 @@ const CONFIG = {
   blocks: { S: "#45a89c", A: "#9a8ad6", T: "#5d9be0", C: "#d585a8" },   // one color per input block (kept quiet next to the orange)
   colors: { accent: "#e2662a", picked: "#5d9be0", rule: "#95a0a6", other: "#46545c", text: "#f2f4f5", muted: "#7a878e", light: "#e8e9ea", panel: "#000000" },
   sans: '"Helvetica Neue", Helvetica, Arial, sans-serif',   // labels inside canvases
-  team: ["Hongyu Yue", "SyuanBo", "Yinqi Yu"],   // names on the cover page
+  team: ["Hongyu Yue", "Syuanbo Huang", "Yinqi Yu"],   // names on the cover page
   stories: {               // the four story buttons in the filter bar
     1: { model: "rule_hot_genre", authors: "all" },
     2: { model: "lr_S", authors: "all" },
