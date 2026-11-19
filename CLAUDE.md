@@ -1,128 +1,139 @@
-# Royal Road Breakout：給 Claude 的專案脈絡
+# Royal Road Breakout: project context for Claude
 
-MIT 15.071 The AI Edge（Fall 2026）Project 1，三人小組。**截止 2026-11-20。**
-課程要求見 `docs/project-brief.md`，建模設計見 `modeling/README.md`，對外說明見 `README.md`。
+MIT 15.071 The AI Edge (Fall 2026) Project 1, team of three. **Due 2026-11-20.**
+Course requirements: `docs/project-brief.md`. Modeling design: `modeling/README.md`. Public overview: `README.md`.
 
-## 一句話
+## In one sentence
 
-Stakeholder 是 Royal Road 的推薦團隊：新連載很多、推薦位有限。用第 3 章發布當下拿得到的資訊（前三章文字、tags、作者是不是第一次寫書），預測一本書最後會不會進「同一季開始連載的書裡 followers 前 10%」。成績最重要的是**第一次寫書的作者**那一組，因為他們沒有前作可以參考。
+The stakeholder is Royal Road's recommendation team: many new serials, few recommendation slots. Using only what is available when chapter 3 is published (text of the first three chapters, tags, whether the author is writing a first book), predict whether a book ends up in the top 10% of followers among books first released in the same quarter. The result that matters most is for **first-time authors**, who have no earlier books to go on.
 
-簡報的三幕：(1) 新作者被淹沒 → (2) 模型比 baseline 多挑中幾本熱門書 → (3) 口味會不會漂移、模型多久要重訓。**主模型是主角，口味研究是配角。**
+The deck's three acts: (1) new authors get buried → (2) how many more future hits the model picks than a baseline → (3) does taste drift, and how often must the model be retrained. **The main model is the lead; the taste study is supporting.**
 
-## 現在的狀態
+## Status
 
-| 部分 | 狀態 |
+| Part | Status |
 |---|---|
-| EDA（`eda/`） | 完成 |
-| Embedding 與口味漂移分析（`embedding/`） | 完成 |
-| 公開版 Atlas（`docs/atlas/`） | 已上線：https://godspeedhuang.github.io/royalroad-breakout/（main 分支 /docs，push 後自動重新部署） |
-| 主預測模型（`modeling/`） | 完成第一版：規則、LR、gradient boosting、MLP。主模型 `lr_SAT`，2023 測試年 AUC 0.887、Recall@名額 0.482（最好的規則 0.261） |
-| AUC 漂移測試（固定測試年、換訓練年代） | 完成：訓練資料每舊一年，tags 模型 AUC 掉 0.026，文字模型掉 0.008 |
-| 驗證年改進實驗（`05_experiments.py`，2026-11-16） | 完成，只看 2022 驗證年。維度、三章並列、只用第一章、鄰居特徵、文風統計、連續目標、排序 loss 都沒有穩定贏主模型；只有「三章等權平均」小贏（驗證 AUC 0.8775 → 0.881），還沒採用。細節在 `modeling/README.md`「驗證年實驗」 |
-| 第 30 天版本（`06_day30.py`，2026-11-16） | 完成：主模型加前 30 天更新節奏。驗證年 Recall@名額 0.454 → 0.506，但測試年 2023 只有 0.482 → 0.490（+0.7，不顯著），2024 年 0.453 → 0.516（2024 標籤不穩，可能高估）。當第二輪確認，不取代主模型。換成每季 50 個版位時，2023 是 68% → 76%（+8.0，CI +0.5 到 +14.0），名額越少差距越明顯 |
-| 商業影響（`07_impact.py`，2026-11-16） | 完成：每季固定 50 個版位（對應 Rising Stars 每類型最多 50 本）。2023 模型挑中 68%、規則 28%（每季 34 對 14 本）；版位上的書累積瀏覽量是規則的 5.5 倍；base case（lift 10%、CPM $3）每年多約 $3.9 萬廣告收入，範圍 $1.3 萬到 $13 萬；編輯初篩一年省約 1,200 小時（補充）。簡報主數字用這裡的 50 個版位，README 繼續報 Recall@名額 |
-| 簡報、影片 | `reports/slides/royalroad_breakout_draft.pptx`：10 頁 pitch，英文，標題都是一句 statement，有講者備註；黑白灰加一個橘色，不用「·」。`video_storyboard.pptx`：2 分鐘影片 6 個畫面，逐字稿在 `video_script.md`（約 224 字）。三份都由 `reports/slides/build_deck.js` 讀 `modeling/out/*.json` 產生。還沒做：第 3 頁封面範例圖（等隊友）、影片的 Atlas 螢幕錄影和旁白錄音（誰錄未定） |
+| EDA (`eda/`) | Done |
+| Embeddings and taste-drift analysis (`embedding/`) | Done |
+| Public Atlas (`docs/atlas/`) | Live: https://godspeedhuang.github.io/royalroad-breakout/ (main branch /docs, redeploys on push) |
+| Main prediction model (`modeling/`) | First version done: rules, LR, gradient boosting, MLP. Main model `lr_SAT`, 2023 test year AUC 0.887, Recall@slots 0.482 (best rule 0.261) |
+| AUC drift test (fixed test year, training data of different ages) | Done: each extra year of training-data age costs 0.026 AUC for tags, 0.008 for text |
+| Covers (`cover/01`, `02`, teammate Yinqi Yu on Colab) | Cover status, embeddings from 4 frozen image models, ablation done: on valid-cover books only, adding CLIP ViT-L/14 to S+A+T takes Recall@slots from 0.289 to 0.360. Results in `cover/out/`; cover embeddings on the teammate's Google Drive |
+| Covers merged into the main model (`cover/03_cover_merge.ipynb`) | Done. Plan 1: on the same valid-cover test books, the main model trained on all books already scores 0.348, so covers must be compared against 0.348, not 0.289. Plan 2 (two-stage merge): covers add 4.0 points among valid-cover books in 2023 (significant) and 0 in 2024; merged into the ranking of all books there is no gain (0.482 vs 0.481 in 2023, −2.1 in 2024) because the cover adjustment drifts upward on newer books. Recommendation (team has not decided): no covers in the main model; report covers as exploratory |
+| Walkthrough (`walkthrough/01–06`) and experiment log (`EXPERIMENTS.md`) | 01–06 done; 06 can now read `modeling/out/day30.json` and `impact.json` (from `07_day30.py` and `08_impact.py`), not wired in yet |
+| Demo page (`docs/demo/`) | Black theme, one orange accent (#e2662a), nearly square corners, few glows; columns sit directly on the page (no panels behind them), with wide margins and a gap between screens; seven screens that each fit one 1920×1080 frame (for recording the video). Order: cover page (title, MIT logo loaded from Wikimedia, team names from `CONFIG.team`, course, two buttons that jump straight (behind a short black fade, no scrolling past other screens): Project One to screen 0, Project Two to a "still working on it" placeholder at the end; over a slowly drifting tilted wall of real covers, kept fairly visible; subtitle, course line, names and project titles all in the serif), 0 why we built this, 1 what counts as a hit (Y), 2 how we chose the model (X and training), 3 the model's picks, 4 what else we checked. The filter bar (quarter, slots slider (10 to 4,000 in uneven steps, roughly log scale; picks shelves show at most 100 covers per quarter), authors (orange when not All), model, story buttons 1–4) sticks only over screens 2 and 3. ↓/↑ scroll smoothly between screens; each screen has a step player (Play button, space pauses or resumes) that starts on arrival and jumps to its end state when you leave. Covers are loaded live from royalroad.com wherever they help (page sets `referrer: no-referrer`). 0 (about 5 s): a wall of 96 real 2023 Q1 covers, hits lit, first books badged; funnel 2,019 new serials → 203 hits, which collect 86% of all views (2023 serials, views as of June 2025) → 50 slots per quarter; first books become hits 8.4% of the time vs 13.4% for returning authors; "what we built" flow (Royal Road → RoyalRoad-1.61M → 45,245-serial sample → S/A/T at chapter 3 → model → slots). 1: the four 2016 quarters (20 real serials each, shown with their covers: 2 hits + 18 others) → followers counted in June 2025 → each quarter sorted, top 10% lit (443 followers needed in 2016 Q1, 120 in 2024 Q4). 2: builder with one color per input block (S/A/T/cover, on/off switches) and the four algorithms listed the same way, with line icons (rule, LR, boosting, MLP); clicking an input flashes once, in its color, every bar of the share chart whose model uses it; layout: share chart (with first-time authors) on the left, the builder in the middle so its S A T C sit next to the chart's labels, details in a drawer on the right (Hide closes it, a vertical Details handle or any click in the builder reopens it; the chart redraws at its new width); detail panel that always fits without scrolling (S: an animation from everything on a serial's page → crossing out what is only known after chapter 3 and what authors edit later → the fields that make S, T and A; tags colored by genre; author features; T: an animation from the top pick's first lines → its real cl100k_base tokens → a 3 × 1,536 matrix, one row per chapter (only chapter 1's row is stored; rows 2 and 3 hatched) → its length-weighted column sum, morphing into the serial's real vector, with the matrix formula (chapter 1 alone has cosine 0.91 with it), plus a low pick and the hit direction; hyperparameter grids; cover: the two-stage model drawn as an SVG sketch with icons (sigmoid for logistic regression, a small network for CLIP, a barcode for the 768 numbers, a "+" where the lanes meet), animated); share-of-slots bars colored by the block each model adds, including S+A+T+Cover (tried); Play grows every bar at once with the chosen model (LR on S+A+T) lit; algorithm details as SVG sketches in the cover sketch's style: LR (S, A, T → one weight each → Σ → sigmoid → p̂ → rank, top K get slots; AUC on 2022 against C as a line chart, the chosen C ringed), boosting (S + A + T with T reduced to 32 by PCA → tree 1 + tree 2 + tree 3 + … each with at most 8 leaves → votes × η → score; the 2 × 2 learning rate × leaves grid as a heatmap with axes and a color scale), MLP (not fine-tuned: chapter text → frozen text-embedding-3-small → T, with S and A → 1,613 → 256 → 64 → 1 with ReLU and dropout → sigmoid; a ReLU inset; frozen vs trained legend; dropout × weight decay heatmap with epochs); the detail panel only redraws when what it shows changes; first-time authors 2.1× the rule. 3: KPIs, canvas mosaic of every test serial (blue picked, orange hit, dim orange missed hit; hover shows the cover), picked covers on rotated, overlapping shelves sized to fit (12 per quarter, or all 200 stacked), gray-out turns misses into flat gray blocks, with a hits/misses bar; Play steps through picked → hits → both → gray out. 4: leaks, AUC drift, taste over time (PCA story map (labels outlined in black so they read over the dots) with a 2.4-second intro: two raw numbers (the ones most correlated with PC1 and PC2) as x and y, then the dots glide to the PCA positions, yearly-average arrows for all serials and hits; tag lift; UMAP), headed by a box (it holds for every tab) with a one-line conclusion (taste mostly moves with the market) and its formula cos(Δhit, Δall) = 0.90 with Δ = 2024 mean − 2017 mean in 1,536 dimensions (`shift_cos_1536`); each chart waits until the mouse reaches it, then plays its own animation (others dim); double-click plays and lights all. Vector strips use one sharp color per screen pixel on a square-root scale (thin columns blended into brown); the T matrix's rows for chapters 2 and 3 say inside them that those vectors were not saved (only chapter 1 and the 3-chapter average were). Formulas rendered with KaTeX (cdnjs) in display mode, one line each, scaled down to fit their box instead of wrapping: the target y (screen 1), share of slots (screen 2 chart), the T pooling and match, the cover two-stage model (detail panels), the 2017→2024 shift similarity and tag lift (screen 4). Our own class names must not reuse KaTeX's (`.mop` once enlarged its operators). Arrow keys scroll with the page's own frame-driven animation. Content screens are laid out on a fixed 1920 × 1080 stage that is scaled to the window like a slide (the cover and Project Two fill the window as they are), so smaller windows shrink the screen instead of reflowing it. Type: Source Serif 4 for headings and prose, Helvetica/Arial for labels; one corner and spacing scale. Code: `index.html`, `style.css`, `app.js` (`CONFIG` at the top). Data `docs/demo/data.js` from `modeling/05_demo_data.py` (reads `cover/out/preds_cover.parquet` for the cover bar when present); it reproduces the deck's 50-slot numbers (S+A+T 68.0%, 34 per quarter; rule 28.5%; with cover 66.0%) and its ad revenue ($25,766 / $38,671 / $46,498 at 25 / 50 / 100 slots). 5 business value (added on request): sliders for slots per quarter (shared with the top bar), slot lift λ, CPM, editor hourly cost and minutes per serial, each with an expandable formula; money shown as subtractions (our model's picks − the rule's picks = ad revenue gained; reading with the rule − reading our picks = editor time saved; their sum = net value); the overall equation and the same equation with the slider values plugged in; a collapsible sensitivity drawer (opened by the orange "Sensitivity chart" button in the Assumptions header, closed by "Back to the sliders"; it takes the sliders' place; chips show the current values) plots, with switchable lines in five distinct colors (blue model, gray rule, orange net value, dashed yellow and pink for the two parts; checked for color-blind separation), our model's picks, the rule's picks and the net value against any one assumption; for slots per quarter the axis runs (log scale) up to every serial of a quarter, and marks the turning point and the peak of the net value (2023, defaults: turning point about 95, peak about 285 slots for about $73.5k a year; at all serials the gap is $0); ad revenue = Σ_q (views of the model's top K − the rule's top K) × λ × CPM / 1,000 (reproduces the deck), editor time = Σ_q (K′_q − K) × m / 60 × w with K′_q = serials read down the rule's list to match the model's hits (our definition; the deck uses a simpler one in `modeling/08_impact.py`: with the model, editors read only its top 200 per quarter instead of every new serial). Linked from the README, not yet from `docs/index.html` |
+| Deck, video | Draft deck `reports/slides/royalroad_breakout_draft.pptx`: a 10-slide pitch in English, every title a one-sentence statement, with speaker notes; black, white and gray plus one orange; no "·". `video_storyboard.pptx`: 6 frames for the 2-minute video, script in `video_script.md` (about 224 words). All three are generated by `reports/slides/build_deck.js` from `modeling/out/*.json`. The deck's 50-slot numbers and revenue come from `modeling/08_impact.py`; `05_demo_data.py` reproduces them (its MLP comes out 72.5% against the deck's 74%). Still to do: example covers on slide 3 (from the teammate), the video's Atlas screen recording and voice-over (who records is open) |
+| Validation-year improvement experiments (`modeling/06_experiments.py`, 2026-11-16) | Done, 2022 validation year only. More embedding dimensions, separate chapter vectors, chapter 1 only, neighbour features, stylometry, a continuous target and pairwise ranking loss did not reliably beat the main model; only an equal-weight mean of the three chapters won slightly (validation AUC 0.8775 → 0.881), not adopted yet. Details under "Validation-year experiments" in `modeling/README.md` |
+| Day-30 version (`modeling/07_day30.py`, 2026-11-16) | Done: main model plus the first 30 days of posting rhythm. Validation Recall@slots 0.454 → 0.506, but test year 2023 only 0.482 → 0.490 (+0.7, not significant); 2024 0.453 → 0.516 (2024 labels are immature and may overstate it). A confirmation pass, not a replacement. At 50 slots per quarter, 2023 goes 68% → 76% (+8.0, CI +0.5 to +14.0); fewer slots make the gap clearer |
+| Business impact (`modeling/08_impact.py`, 2026-11-16) | Done: a fixed 50 slots per quarter (Rising Stars shows at most 50 per genre). 2023: model 68%, rule 28% (34 vs 14 hits per quarter); the picks' cumulative views are 5.5x the rule's; base case (lift 10%, CPM $3) about $39k a year in extra ad revenue, range $13k to $130k; about 1,200 editor hours saved a year (supplementary). The deck's headline numbers use these 50 slots; the README keeps reporting Recall@slots |
 
-## 連結
+## Links
 
-- GitHub（公開）：https://github.com/godspeedhuang/royalroad-breakout
-- Atlas（GitHub Pages）：https://godspeedhuang.github.io/royalroad-breakout/ ，第一次載入約 110 MB、要等一分鐘左右
-- HF dataset（公開）：https://huggingface.co/datasets/syuanbo/royalroad-breakout ，放 `books`、`books_meta`、`atlas`、`atlas_pca` 四個 parquet，路徑和 repo 一樣
-- GitHub 帳號是 `godspeedhuang`，HF 帳號是 `syuanbo`，兩個不同，不要互換。
+- GitHub (public): https://github.com/godspeedhuang/royalroad-breakout
+- Atlas (GitHub Pages): https://godspeedhuang.github.io/royalroad-breakout/ ; the first load is about 110 MB and takes about a minute
+- HF dataset (public): https://huggingface.co/datasets/syuanbo/royalroad-breakout , holding the `books`, `books_meta`, `atlas` and `atlas_pca` parquet files at the same paths as in the repo
+- The GitHub account is `godspeedhuang` and the HF account is `syuanbo`. They differ; do not swap them.
 
-## 待辦（2026-11-13 整理）
+## To do (updated 2026-11-19)
 
-- [ ] 簡報 5–10 頁、2 分鐘影片，對象是 Royal Road 推薦團隊（11/20 截止）
-- [ ] README 縮回一頁：課程要「one-page README」，現在約 1,350 字。embedding 細節可移到 `embedding/README.md`（要加進下面的文件表）
-- [ ] 隊友：把兩位加成 GitHub collaborator（不加的話信裡要改成「先 fork 再發 PR」），再寄說明信。2026-11-11 擬好的信：連 repo 首頁、`uv sync`、README 的「Large files」、`modeling/out/results.md`、Atlas 入口頁；向量成本寫 about $7（3.55 億 token），不是 $8
-- [ ] Does it matter：現在只換算成「每季多挑中幾本熱門書」（98 對規則 53），還沒換成營收或讀者時間
+- [ ] Deck (5–10 slides) and 2-minute video for Royal Road's recommendation team, due 11/20 (draft deck exists, see Status)
+- [ ] Shrink the README back to one page: the course asks for a one-page README. Embedding details could move to `embedding/README.md` (add it to the table below)
+- [ ] Teammates: add both as GitHub collaborators (otherwise the email must say "fork, then open a PR"), then send the email drafted on 2026-11-11: link the repo, `uv sync`, the README's "Large files", `modeling/out/results.md`, the Atlas page; embedding cost about $7 (355M tokens), not $8
 
-模型方面可以再試、但不是必要的：
+Model ideas worth trying but not required:
 
-- 三章等權平均取代 token 加權平均（`05_experiments.py` 驗證年小贏，改 `features.py` 的 T 後要重跑 01–04 並更新文件數字）
-- 近年資料加權、LR／MLP／排序 loss 的 ensemble：還沒測
-- 作者經驗只算樣本內的前作（2016–2024、至少 3 章），可從 `data/interim/fictions_47.parquet` 補完整
-- fine-tune 文字模型（`chapters.parquet` 有原文）。凍結向量上的 MLP 跟 LR 沒差，先不做
-- LLM 評分開頭（structured output）：唯一可能補上「寫得好不好」的方向；有名的書 LLM 可能認得，要遮書名作者並檢查冷門書
-- 已經試過、不要再試：換 `text-embedding-3-large`、三章並列、只用第一章、鄰居特徵、文風統計、連續目標（同季排名）、依排名配對的排序 loss（見 `modeling/README.md`）
-- 測試年目前是 2023。原本的設計寫「2023–2024 不適合當測試年」，後來只排除 2024；要改回 2022 只動 `modeling/features.py` 的 `TRAIN_YEARS / VAL_YEAR / TEST_YEAR`
+- Equal-weight mean of the three chapters instead of the token-weighted mean (wins slightly on validation in `06_experiments.py`; changing T in `features.py` means rerunning 01–05 and updating the numbers in the docs)
+- Weighting recent years, and an ensemble of LR, MLP and the pairwise-ranking model: not tested yet
+- LLM rating of the opening chapters (structured output): the one direction that might add "how well it is written"; LLMs may recognise famous books, so hide titles and authors and check on obscure books
+- Fine-tuning a text model (`chapters.parquet` has the text). An MLP on frozen vectors does no better than LR, so not now
+- Already tried, do not retry: `text-embedding-3-large`, separate chapter vectors, chapter 1 only, neighbour features, stylometry, a continuous target (quarter rank), pairwise ranking by rank, full author history from all books (see `modeling/README.md`)
+- The test year is 2023. The original design said 2023–2024 were unsuitable; only 2024 was excluded in the end. To move it back to 2022, change only `TRAIN_YEARS / VAL_YEAR / TEST_YEAR` in `modeling/features.py`
 
-## 資料的關鍵事實
+## Key facts about the data
 
-- 來源：HF `OmniAICreator/RoyalRoad-1.61M`，一章一列，86,959 本書，至少 3 章的 57,997 本。
-- `followers`、`total_views`、`average_views` 是約 2025-06-16 的**單一快照**，同一本書每一章的值都一樣，沒有成長曲線。
-- 五個 score 欄位和 `pages` 全空；`status` 82.5% 是空的。
-- 連載越久 followers 越多（連載不到 3 個月的書進前 10% 的比例 2.7%，超過 3 年的 12.8%），所以 Y 一定要用**同季排名**。
-- 本專案樣本：2016–2024 年開始連載、至少 3 章 → 45,245 本，135,735 章。
+- Source: HF `OmniAICreator/RoyalRoad-1.61M`, one row per chapter, 86,959 books, 57,997 with at least 3 chapters.
+- `followers`, `total_views`, `average_views` are a **single snapshot** from about 2025-06-16, identical on every chapter of a book; there is no growth curve.
+- The five score columns and `pages` are entirely empty; `status` is 82.5% empty.
+- Older books have more followers (books out for under 3 months reach the top 10% 2.7% of the time, over 3 years 12.8%), so Y must be a **within-quarter rank**.
+- Project sample: first released 2016–2024 with at least 3 chapters → 45,245 books, 135,735 chapters.
 
-## 已經做過的決定（不要重新討論）
+## Decisions already made (do not reopen)
 
-- 資料集用 RoyalRoad，不用 AniList、Bangumi。
-- Y = 同季 followers 前 10%（`top10`）。
-- 只看前三章：後面的章節是紅了之後才寫的，會倒果為因。
-- 每章一個向量；超過 8,000 token 的章平均切塊再依 token 數加權合併；每本書前三章上限 20,000 token。
-- 書的向量 = 三章依 token 數加權平均後 L2 正規化。簡介另外一個向量，不混進書的向量。
-- 模型 `text-embedding-3-small`（1,536 維），經 MIT Parley 的 OpenAI 相容 API。Parley 沒有 Batch API，用並行請求。
-- 向量存 parquet，不用向量資料庫。
-- 趨勢的結論以 1,536 維算出的數字為準，2D 圖只用來說明。PCA 看軌跡，UMAP 看分群，不用 t-SNE。
-- 視覺化工具用 Apple Embedding Atlas（`uvx embedding-atlas`），不用 SQLRooms。
-- 作者歷史用資料裡的 `author_url` 自己算，不去爬作者頁。
-- 作者特徵只放「以前寫過幾本書」「是不是第一次寫書」（只算更早開始連載的書）。前作的 followers 是 2025 年快照，這本書紅了會回頭拉高前作，所以「前作是不是前 10%」要標注有回推問題，前作的 followers 原始數字不用。「老作者優先」當 business-rule baseline，成績分成第一次寫書和有前作兩組報。
+- Dataset: Royal Road, not AniList or Bangumi.
+- Y = top 10% of followers within the release quarter (`top10`).
+- Only the first three chapters: later chapters are written after a book takes off, which would reverse cause and effect.
+- One vector per chapter; chapters over 8,000 tokens are split evenly and recombined by token-weighted mean; at most 20,000 tokens for a book's first three chapters.
+- Book vector = token-weighted mean of the three chapters, L2-normalized. The blurb gets its own vector and is not mixed into the book vector.
+- Model `text-embedding-3-small` (1,536-d) through MIT Parley's OpenAI-compatible API. Parley has no Batch API, so requests run in parallel.
+- Vectors are stored as parquet, no vector database.
+- Trend conclusions use numbers computed in 1,536 dimensions; 2D plots are for illustration only. PCA for trajectories, UMAP for clusters, no t-SNE.
+- Visualization tool: Apple Embedding Atlas (`uvx embedding-atlas`), not SQLRooms.
+- Author history is computed from `author_url` in the data; author pages are not scraped.
+- Author features are only "number of earlier books" and "first book or not" (counting only books first released earlier). Earlier books' followers are a 2025 snapshot and a new hit pulls readers back to them, so "earlier book reached the top 10%" is flagged as leak-prone and raw follower counts of earlier books are not used. "Experienced authors first" is a business-rule baseline, and results are reported separately for first-time and returning authors.
 
-## 已知的坑
+## Known pitfalls
 
-- **浮水印**：約 6,507 本書的章節含防盜句子（提到 Amazon、Royal Road），2016 年 75% 的書有，其他年 10–15%。之前看到的「2016→2017 大跳動」幾乎全是它造成的。建模時檢查過：模型從 2017 年起訓練，測試年拿掉含浮水印的書後主模型 AUC 不變（0.889 對 0.887），所以不用為了建模重做 embedding。比對用子字串，可能誤標正常提到這些字的書。
-- **引用漂移數字要用去浮水印版**：偏好方向相隔 8 年的相似度是 0.935（`watermark_check.json`），不是舊的 0.85。`drift_summary.json`、`direction_summary.json` 和 `reports/artifacts/workflow*.html` 裡的數字都是去浮水印前的。
-- **簡介有 leak**：簡介是 2025 年的版本。測試年 7.8% 的書簡介裡有 Amazon、Kindle、Patreon、Audible、"Book 2" 這類字，其中 45.5% 是熱門書。所以簡介向量（D）和前作表現（P）不放進主模型，只當上限參考（加上去 Recall 到 0.573）。tags 和章節內容也可能被事後改過，這個資料集無法還原。
-- 供給和熱門的移動方向在 1,536 維幾乎平行（cosine 0.90）。「市場往一邊走、熱門書沒跟著走」是 PCA 圖造成的錯覺，不要這樣講。
-- PCA 2D 只解釋 10.4% 的變異。
-- 2024 年觀察時間最短（0.5–1.5 年），只當補充；2023 年（1.5–2.5 年）是測試年。2016–2017 年每季前 10% 只有 52–60 本。
-- Progression 這個 tag 的 lift 下降，是標籤後來才普及，不是讀者變心。
-- `12_explain_direction.py` 只產生去浮水印版（`*_clean`）；概念探針的點估計和信賴區間用的估計式不同（各年等權平均 vs. 合併後 bootstrap）。
-- `--labels` 傳給 Embedding Atlas 會報錯，`atlas_pca_labels.parquet` 沒在用。
+- **Watermarks**: about 6,507 books contain anti-piracy sentences in chapter text (mentioning Amazon or Royal Road); 75% of 2016 books, 10–15% in other years. The apparent "2016 → 2017 jump" was almost entirely caused by them. Checked for modeling: models train from 2017, and dropping watermarked books from the test year leaves the main model's AUC unchanged (0.889 vs 0.887), so the embeddings do not need to be redone for modeling. Matching is by substring and may flag books that mention these words normally.
+- **Cite the watermark-free drift numbers**: the preference direction eight years apart has similarity 0.935 (`watermark_check.json`), not the old 0.85. Numbers in `drift_summary.json`, `direction_summary.json` and `reports/artifacts/workflow*.html` are from before watermarks were removed.
+- **Blurbs leak**: blurbs are the 2025 version. 7.8% of test-year blurbs mention Amazon, Kindle, Patreon, Audible, "Book 2" and the like, and 45.5% of those books are hits. So the blurb vector (D) and earlier books' success (P) stay out of the main model and serve only as an upper bound (recall 0.573 with them). Tags and chapter text may also have been edited later; this dataset cannot recover earlier versions.
+- **Covers leak**: `time=` in the cover URL is the upload time of the current cover. Books whose cover appeared or changed after chapter 3 have a 21% hit rate in 2017–2022, against 7% for valid covers (uploaded before chapter 3 and never changed). So a cover model can only be trained on valid covers; filling zeros for books without a valid cover and adding covers to the main model would leak this status. Valid covers are almost all from 2020 onward (earlier URLs have no `time=`).
+- Supply and hits move in almost the same direction in 1,536 dimensions (cosine 0.90). "The market moves one way and hits do not follow" is an artifact of the PCA plot; do not say it.
+- PCA 2D explains only 10.4% of the variance.
+- 2024 has the shortest observation time (0.5–1.5 years) and is only supplementary; 2023 (1.5–2.5 years) is the test year. 2016–2017 have only 52–60 top-10% books per quarter.
+- The falling lift of the Progression tag reflects the tag spreading later, not readers changing their minds.
+- `12_explain_direction.py` only produces the watermark-free version (`*_clean`); the concept probes' point estimates and confidence intervals use different estimators (equal-weight mean across years vs. pooled bootstrap). `--plot-only` redraws its figure from the saved JSON without the data or the API.
+- Passing `--labels` to Embedding Atlas errors out; `atlas_pca_labels.parquet` is unused.
+- Gradient boosting is not exactly reproducible across machines (PCA floating point decides between near-tied settings): on another machine it scored 0.465 instead of 0.476. Rules, LR and MLP reproduce exactly. `out/results.json` and `selection_*.json` keep the original run; `docs/demo/data.js` uses the newer run.
 
-## 隊友已有的結果
+## A teammate's earlier results
 
-一位隊友先前用同一個資料集做過一版（不在這個 repo）：2021–2023 年、至少 5 章的 13,998 本；指標是 314 個推薦位的 Recall@10%；logistic regression（結構化 + 標題簡介 + 內文）約 50%，規則 baseline 16–38%；標題簡介的增量顯著（+6.1 pp），內文和封面不顯著。這個 repo 的模型是從零寫的，沒有接這一版；差異寫在 `modeling/README.md` 的「已知限制」。
+A teammate built an earlier version on the same dataset (not in this repo): 13,998 books from 2021–2023 with at least 5 chapters; metric Recall@10% with 314 slots; logistic regression (structured + title and blurb + body text) about 50%, rule baselines 16–38%; title and blurb added a significant 6.1 points, body text and covers were not significant. This repo's models were written from scratch and do not build on that version; differences are in "Known limitations" in `modeling/README.md`.
 
-## 檔案與資料
+## Files and data
 
-- `embedding/out/` 裡只有 JSON、CSV、圖進 git。`data/` 和所有 `.parquet` 都被 gitignore，資料夾用 `.gitkeep` 保留；例外是 `docs/atlas/*/data/dataset.parquet`（Pages 要用）。要花錢重算的向量放在公開的 HF dataset，下載指令在 README 的「Large files」；其他大檔用程式重建，不用 Google Drive。
-- 資料都在這個資料夾裡（2026-11-11 從舊資料夾 `../final project 1/royalroad/` 搬過來，不是 symlink）：`data/raw`（12 GB 原始資料）、`data/interim`、`embedding/out/*.parquet`、`embedding/out/emb_parts`（3,129 個請求的原始向量），合計約 17 GB。舊資料夾只剩程式碼的舊副本。
-- `books.parquet`（826 MB）是建模的輸入。它和 `books_meta`、`atlas*.parquet` 放在公開的 HF dataset 分享（`embedding/14_publish_hf.sh`），作者名一起公開，使用者決定的：上游資料集本來就公開。`chapters*.parquet` 有章節全文，不上傳，要用就跑 `01_prepare.py` 重建。`modeling/05_experiments.py` 要用 `chapters.parquet` 的逐章向量和原文；它由 `03_pool_project.py` 產生，需要本機的 `emb_parts`，所以隊友沒辦法直接重跑 05。
-- `embedding/.env` 放 Parley 金鑰，不進 git。不要讀它、不要印出來。
-- `docs/` 是 GitHub Pages 的內容。`docs/atlas/` 由 `embedding/13_export_atlas.sh` 產生，不要手改。公開版拿掉了作者名，節錄限 300 字。
+- In `embedding/out/` only JSON, CSV and figures are in git. `data/` and all `.parquet` files are gitignored; folders are kept with `.gitkeep`. Exception: `docs/atlas/*/data/dataset.parquet` (needed by Pages). Vectors that cost money to rebuild are on the public HF dataset (download command under "Large files" in the README); other large files are rebuilt by code. Cover files are the exception (see below).
+- On the original author's machine all data lives in this folder (moved on 2026-11-11 from the old folder `../final project 1/royalroad/`, not a symlink): `data/raw` (12 GB raw data), `data/interim`, `embedding/out/*.parquet`, `embedding/out/emb_parts` (raw vectors from 3,129 requests), about 17 GB in total. The old folder only holds old copies of the code. Other machines only have what was downloaded from HF.
+- `books.parquet` (826 MB) is the modeling input. It is shared with `books_meta` and `atlas*.parquet` on the public HF dataset (`embedding/14_publish_hf.sh`), author names included, by the user's decision: the upstream dataset is public anyway. `chapters*.parquet` contain full chapter text and are not uploaded; rebuild them with `01_prepare.py`. `modeling/06_experiments.py` needs the per-chapter vectors and text in `chapters.parquet`; that file comes from `03_pool_project.py` and needs the local `emb_parts`, so teammates cannot rerun 06 directly.
+- Cover files from the teammate (`cover_status.parquet`, `cover_emb_*.parquet`) go in `data/cover/`, not in git. Without `cover_status.parquet`, `cover/03_cover_merge.ipynb` uses the book list in `cover/out/clusters/cover_clusters.parquet` as the valid-cover list (clustering used valid covers only). Cover images belong to their authors and must not go into the repo; `cover/out/clusters/cluster_*.png` are thumbnail sheets and are gitignored.
+- `walkthrough/` notebooks only read JSON, CSV and figures from the `out/` folders and `reports/eda/`; they do not recompute and run in seconds. Rerun them when upstream results change: `cd walkthrough && for f in 0*.ipynb; do uv run jupyter nbconvert --to notebook --execute --inplace "$f"; done`.
+- `embedding/.env` holds the Parley key and is not in git. Do not read it or print it.
+- `docs/` is the GitHub Pages content. `docs/atlas/` is produced by `embedding/13_export_atlas.sh`; do not edit it by hand. The public version drops author names and limits excerpts to 300 characters. Exception made on 2026-11-17: the Chinese labels in `docs/atlas/*/data/dataset.parquet` (`kind`, `top10`, centroid titles) were relabeled in place to the English labels the current code produces; nothing else changed.
 
-## 慣例
+## Conventions
 
-- 用 uv：`uv sync`、`uv run python ...`、`uv add <pkg>`。不要用 pip。
-- 腳本用兩位數編號表示執行順序；路徑一律從 `Path(__file__).parent` 算。
-- 跟 SyuanBo 對話用繁體中文，專有名詞保留英文。README 用英文（課程交付物）。
-- 新的數字要能從 `embedding/out/*.json`、`modeling/out/*.json` 或程式重現，不要只寫在對話裡。
-- Commit 依功能分開（環境、EDA、embedding、modeling、docs 各自一個），訊息用英文。
-- 公開上傳到外部網站（HF 上傳、`gh repo create --public`）會被 auto mode 擋，給使用者完整指令讓他自己跑。
-- 這個資料夾常有好幾個 Claude session 同時在改。動文件前先重讀，不要用舊內容整份覆寫。
-- 文件不用破折號（— 或 ——），改用括號、逗號、冒號或拆句。數字區間的 – 照用。簡報和對外文字也不用間隔號「·」當分隔。
+- Use uv: `uv sync`, `uv run python ...`, `uv add <pkg>`. Do not use pip.
+- Scripts are numbered with two digits in run order; paths are always built from `Path(__file__).parent`.
+- Talk to SyuanBo in Traditional Chinese, keeping technical terms in English. Everything in the repo is in English: all READMEs, `EXPERIMENTS.md`, this file, code, comments, notebook text and outputs, and figure labels. Notebooks use short one- or two-sentence notes instead of large headings.
+- Chinese that intentionally remains: the teammate's Google Drive folder name `封面向量_V区块_交接`; the legacy-label mappings (written as `\u` escapes) in `07_atlas_pca.py`, `09_pca_trajectory.py` and `13_export_atlas.sh`, because the `atlas*.parquet` files on HF still store the old Chinese labels; book titles, blurbs and chapter text in the data (authors' original content). Figures from `eda/01_eda.ipynb` (`reports/eda/figs/`, also embedded in that notebook and in `walkthrough/01`) still have Chinese labels because rerunning the EDA needs the 12 GB raw data. The text outputs of `eda/01` and `cover/01–02` were translated in place (numbers unchanged) because those notebooks cannot be rerun here.
+- New numbers must be reproducible from `embedding/out/*.json`, `modeling/out/*.json` or code, not only stated in conversation.
+- Commits are split by function (environment, EDA, embedding, modeling, docs), with English messages.
+- Public uploads to outside sites (HF uploads, `gh repo create --public`) are blocked by auto mode; give the user the full command to run.
+- Several Claude sessions often edit this folder at the same time. Reread a document before editing it; never overwrite it whole from an old copy.
+- Documents do not use em dashes (— or ——); use parentheses, commas, colons or separate sentences. En dashes in number ranges (–) are fine. Decks and outward-facing text also do not use the middle dot "·" as a separator.
 
-## 簡報與影片怎麼更新
+## Updating the deck and video
 
-- **金額和版位的假設只改 `modeling/07_impact.py` 最上面那一區**（版位數、lift、CPM、編輯時間與時薪），不要直接改簡報上的數字。
-- 更新順序：`03_compare.py`、`06_day30.py`、`07_impact.py`（模型或資料變了才要重跑前面的）→ `uv run python reports/slides/make_figs.py`（UMAP 圖）→ `NODE_PATH=<pptxgenjs 所在的 node_modules> node reports/slides/build_deck.js`，一次產生簡報、影片分鏡和 `video_script.md`。pptxgenjs 沒放進 repo，裝在本機 scratchpad，換機器要先 `npm install pptxgenjs@3.12.0`。
-- 圖片在 `reports/slides/img/`：`rr_*.png` 是 Internet Archive 2025 年 6 月的 royalroad.com（網站本身有 Cloudflare 機器人檢查，不要用 headless 繞過）；`atlas_screenshot.png` 由 `reports/slides/shot_atlas.js` 用可見的 Chrome 截（headless 沒有 WebGPU，地圖是空的），要先在 `docs/` 開 `python3 -m http.server 8071`。
-- 簡報標題都寫成一句 statement（可以有數字），不要寫成「Model: xxx」這種標籤。主數字用每季 50 個版位；README 用 Recall@名額（名額 = 熱門書數，約 200），兩者在講者備註裡有說明。
+- **Change money and slot assumptions only in the block at the top of `modeling/08_impact.py`** (number of slots, lift, CPM, editor time and hourly cost); never edit numbers on the slides directly.
+- Order: `03_compare.py`, `07_day30.py`, `08_impact.py` (rerun the earlier ones only if the model or data changed) → `uv run python reports/slides/make_figs.py` (UMAP figure) → `NODE_PATH=<node_modules holding pptxgenjs> node reports/slides/build_deck.js`, which writes the deck, the video storyboard and `video_script.md` in one go. pptxgenjs is not in the repo; on a new machine run `npm install pptxgenjs@3.12.0` first.
+- Images live in `reports/slides/img/`: `rr_*.png` are royalroad.com as captured by the Internet Archive in June 2025 (the live site has a Cloudflare bot check; do not get around it with a headless browser); `atlas_screenshot.png` is taken by `reports/slides/shot_atlas.js` in a visible Chrome (headless has no WebGPU, so the map is blank), after starting `python3 -m http.server 8071` in `docs/`.
+- Slide titles are one-sentence statements (numbers allowed), never labels like "Model: xxx". Headline numbers use 50 slots per quarter; the README uses Recall@slots (slots = number of hits, about 200); the speaker notes explain both.
 
-## 改完程式碼之後：檢查文件
+## After changing code: check the documents
 
-每次改完程式碼（新增、改名或刪除腳本，改參數，產生新結果），回報完成之前先把下面每份文件看過一次，過時的地方一起改。回報時列出改了哪些文件、哪些看過但不用改。
+Every time code changes (scripts added, renamed or deleted, parameters changed, new results), read each document below before reporting done and update anything out of date. When reporting, list which documents changed and which were read and needed no change.
 
-| 文件 | 什麼情況要改 |
+| Document | Update when |
 |---|---|
-| `README.md` | 指令、檔案位置、樣本數、重現步驟、主要結果變了 |
-| `CLAUDE.md` | 狀態表、已做的決定、已知的坑、檔案與資料的說明變了 |
-| `modeling/README.md` | 特徵、切分、指標、baseline 的設計或結果變了 |
-| `docs/index.html` | Atlas 的版本、樣本數、頁面上的說明變了 |
-| `docs/project-brief.md` | 只有課程要求變了才改 |
-| `reports/slides/`（簡報、分鏡、`video_script.md`） | `modeling/out/` 的結果或 `07_impact.py` 的假設變了：重跑 `build_deck.js`，再用 PowerPoint 看一次版面 |
+| `README.md` | Commands, file locations, sample sizes, reproduction steps or headline results change |
+| `CLAUDE.md` | Status table, decisions, known pitfalls, or file and data notes change |
+| `modeling/README.md` | Feature, split, metric or baseline design or results change |
+| `cover/README.md` | The cover pipeline, file locations or results change |
+| `EXPERIMENTS.md` | An experiment is added or finished, or a decision changes |
+| `walkthrough/*.ipynb` | Rerun when upstream JSON, CSV or figures change; check numbers written into the text (e.g. takeaways) |
+| `docs/index.html` | The Atlas version, sample size or page text changes |
+| `docs/demo/index.html` | Numbers or captions it states change (most numbers are computed in `app.js` from `data.js`; rerun `modeling/05_demo_data.py` when model outputs, `selection_*.json`, `drift_auc.json`, `tags_compare.csv`, `cover_merge.json` or `books.parquet` change) |
+| `docs/project-brief.md` | Only when the course requirements change |
+| `reports/slides/` (deck, storyboard, `video_script.md`) | Results in `modeling/out/` or the assumptions in `08_impact.py` change: rerun `build_deck.js`, then check the layout once in PowerPoint |
 
-- 文件裡的數字以程式輸出為準，不要憑記憶改。
-- 新增 `.md` 檔或子資料夾的 README 時，把它加進這張表。
+- Numbers in documents follow program output, not memory.
+- When adding a `.md` file or a README for a subfolder, add it to this table.

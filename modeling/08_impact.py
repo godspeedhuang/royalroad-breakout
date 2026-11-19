@@ -1,13 +1,18 @@
-"""商業影響（簡報與影片用）：每季固定幾個推薦版位，模型和規則各挑中多少熱門書、值多少錢。
+"""Business impact (for the deck and video): with a fixed number of recommendation slots per quarter,
+how many future hits the model and the rule each pick, and what that is worth.
 
-這裡的「版位」是每季給新書的推薦位置（例如 Rising Stars 那種榜單，網站上每個類型最多 50 本），
-每季挑分數最高的 SLOTS 本。和 03_compare.py 的 Recall@名額不同：那邊名額 = 該季熱門書數（約 200），
-這裡名額是固定的業務參數。名額越少，模型和規則的差距越大。
+A "slot" here is a recommendation position for new serials each quarter (like the Rising Stars list,
+which shows at most 50 serials per genre on the site); each quarter takes the SLOTS highest scores.
+This differs from Recall@slots in 03_compare.py, where slots = that quarter's number of hits (about 200);
+here the number of slots is a fixed business parameter. The fewer the slots, the larger the model's lead.
 
-所有假設都在下面這一區，改完重跑本檔，再重跑 reports/slides/build_deck.js，簡報數字就會更新。
-金額的邏輯：推薦位讓上面那本書的瀏覽量多 LIFT（假設），Royal Road 每千次瀏覽賺 CPM 美元（假設）。
-模型和規則挑的書累積的瀏覽量不同，差額 × LIFT × CPM 就是模型多帶來的廣告收入。
-瀏覽量是 2025 年的累積數字，所以這是「同樣的版位給對書」的差別，不含讀者留下來多看別本的效果，偏保守。
+All assumptions are in the block below. After changing them, rerun this file and then
+reports/slides/build_deck.js, and the deck's numbers update.
+Money logic: a slot lifts the views of the serial on it by LIFT (assumed), and Royal Road earns CPM dollars
+per 1,000 views (assumed). The model's and the rule's picks collect different views; the difference
+x LIFT x CPM is the extra ad revenue from the model. Views are cumulative as of 2025, so this is the value
+of "giving the same slots to the right serials"; it leaves out readers staying on to read other serials
+and is conservative.
 """
 import json
 
@@ -17,15 +22,15 @@ import pyarrow.parquet as pq
 
 from features import EMB, OUT, RECENT_YEAR, TEST_YEAR
 
-# ==== 假設（改這裡） ====
-SLOTS = 50                                   # 每季推薦版位數（base case）
-SLOTS_GRID = [25, 50, 100, 200, 400]         # 版位數敏感度
-LIFT = {"low": 0.05, "base": 0.10, "high": 0.20}   # 上推薦位讓那本書的瀏覽量多幾 %
-CPM = {"low": 2.0, "base": 3.0, "high": 5.0}       # 每千次瀏覽的廣告收入（美元）
-EDITOR_MIN_PER_BOOK = 10                     # 編輯人工初篩一本新書要幾分鐘
-EDITOR_SHORTLIST = 200                       # 有模型之後，編輯每季只讀模型的前幾名
-EDITOR_HOURLY = 30.0                         # 編輯時薪（美元）
-B = 500                                      # bootstrap 次數
+# ==== Assumptions (edit here) ====
+SLOTS = 50                                   # recommendation slots per quarter (base case)
+SLOTS_GRID = [25, 50, 100, 200, 400]         # sensitivity over the number of slots
+LIFT = {"low": 0.05, "base": 0.10, "high": 0.20}   # how much a slot lifts that serial's views
+CPM = {"low": 2.0, "base": 3.0, "high": 5.0}       # ad revenue per 1,000 views (USD)
+EDITOR_MIN_PER_BOOK = 10                     # minutes for an editor to screen one new serial
+EDITOR_SHORTLIST = 200                       # with the model, editors only read its top N each quarter
+EDITOR_HOURLY = 30.0                         # editor hourly cost (USD)
+B = 500                                      # bootstrap replicates
 # ======================
 
 MODELS = ["rule_fast_update", "rule_hot_genre", "rule_known_author", "lr_S", "lr_SA", "lr_SAT", "lr_T", "gb_SAT", "mlp_T", "mlp_SAT"]
@@ -41,7 +46,7 @@ nq = test.quarter.nunique()
 
 
 def picks(d, m, k):
-    """每季分數最高的 k 本（子群組時 k 依該群佔比縮小）。"""
+    """The k highest-scoring serials in each quarter (for a subgroup, k is scaled by its share)."""
     return pd.concat([g.nlargest(k, m) for _, g in d.groupby("quarter")])
 
 
@@ -50,7 +55,7 @@ def prec(d, m, k):
 
 
 def boot(d, fns, k):
-    """在每一季裡重抽書（保留每季名額的結構），回傳每個函數的 B 個值。"""
+    """Resample books within each quarter (keeping the per-quarter slot structure); return B values per function."""
     by_q = [np.flatnonzero(d.quarter.values == q) for q in d.quarter.unique()]
     out = {name: np.empty(B) for name in fns}
     for i in range(B):
@@ -64,7 +69,7 @@ ci = lambda v: [r3(np.percentile(v, 2.5)), r3(np.percentile(v, 97.5))]
 res = {"assumptions": {"slots_per_quarter": SLOTS, "lift": LIFT, "cpm_usd": CPM, "editor_minutes_per_book": EDITOR_MIN_PER_BOOK,
                        "editor_shortlist": EDITOR_SHORTLIST, "editor_hourly_usd": EDITOR_HOURLY, "test_year": TEST_YEAR}}
 
-# ---- 1. 每季 SLOTS 個版位的命中率（precision），全部模型 ----
+# ---- 1. Hit rate (precision) of SLOTS slots per quarter, all models ----
 bt = boot(test, {m: (lambda s, k, m=m: prec(s, m, k)) for m in MODELS}, SLOTS)
 res["precision_at_slots"] = {m: {"value": r3(prec(test, m, SLOTS)), "ci95": ci(bt[m]), "recent_2024": r3(prec(recent, m, SLOTS))} for m in MODELS}
 res["precision_at_slots"]["random"] = {"value": r3(test.top10.mean())}
@@ -73,14 +78,14 @@ res["diff_pp"] = {n: {"diff": round(100 * (res["precision_at_slots"][a]["value"]
                       "ci95": [round(100 * x, 1) for x in np.percentile(bt[a] - bt[c], [2.5, 97.5])]} for n, (a, c) in pairs.items()}
 res["hits_per_quarter"] = {m: round(res["precision_at_slots"][m]["value"] * SLOTS, 1) for m in [RULE, MAIN, "random"]}
 
-# ---- 2. 第一次寫書／有前作：版位依該群佔比分配 ----
+# ---- 2. First-time / returning authors: slots split by each group's share ----
 res["by_group"] = {}
 for gname, gm in {"first_time_author": test.first_time_author.values, "returning_author": ~test.first_time_author.values}.items():
     d = test[gm]
     k = max(1, round(SLOTS * gm.mean()))
     res["by_group"][gname] = {"slots_per_quarter": k, **{m: r3(prec(d, m, k)) for m in [RULE, MAIN]}}
 
-# ---- 3. 第 30 天版本（同樣 SLOTS 個版位） ----
+# ---- 3. Day-30 version (same SLOTS slots) ----
 bd = boot(test, {"day30": lambda s, k: prec(s, "day30", k), MAIN: lambda s, k: prec(s, MAIN, k)}, SLOTS)
 ft = test[test.first_time_author]
 kft = max(1, round(SLOTS * test.first_time_author.mean()))
@@ -90,7 +95,7 @@ res["day30"] = {"test": {MAIN: r3(prec(test, MAIN, SLOTS)), "day30": r3(prec(tes
                 "test_first_time": {MAIN: r3(prec(ft, MAIN, kft)), "day30": r3(prec(ft, "day30", kft))},
                 "recent_2024": {MAIN: r3(prec(recent, MAIN, SLOTS)), "day30": r3(prec(recent, "day30", SLOTS))}}
 
-# ---- 4. 錢：版位上的書的瀏覽量 → 多出來的廣告收入 ----
+# ---- 4. Money: views of the serials in the slots -> extra ad revenue ----
 def views_per_q(m, k):
     return picks(test, m, k).total_views.sum() / nq
 
@@ -109,19 +114,19 @@ res["money"] = {"by_slots": money, "base": {"slots": SLOTS, "ratio_model_to_rule
                                             "low": base["extra_revenue_per_year"]["low_low"], "high": base["extra_revenue_per_year"]["high_high"]},
                 "views_share_top10": r3(test.total_views[test.top10].sum() / test.total_views.sum())}
 
-# ---- 5. 編輯人力（補充） ----
+# ---- 5. Editor time (supplementary) ----
 bpq = len(test) / nq
 h_before, h_after = bpq * EDITOR_MIN_PER_BOOK / 60, EDITOR_SHORTLIST * EDITOR_MIN_PER_BOOK / 60
 res["editor"] = {"books_per_quarter": round(bpq), "hours_per_quarter_before": round(h_before), "hours_per_quarter_after": round(h_after),
                  "hours_saved_per_year": round((h_before - h_after) * 4), "usd_saved_per_year": round((h_before - h_after) * 4 * EDITOR_HOURLY)}
 
-# ---- 6. 影片開場的例子：2023 年新作者、後來進前 10%、第 3 章時模型就排進當季前 SLOTS 名 ----
+# ---- 6. Example for the video opening: a 2023 first-time author, later in the top 10%, ranked in the quarter's top SLOTS at chapter 3 ----
 test["rank_in_quarter"] = test.groupby("quarter")[MAIN].rank(ascending=False, method="first").astype(int)
 test["books_in_quarter"] = test.groupby("quarter").fiction_id.transform("size")
 ex = test[test.first_time_author & test.top10 & (test.rank_in_quarter <= SLOTS)].sort_values("followers", ascending=False)
 res["example_candidates"] = ex.head(5)[["fiction_id", "title", "author", "quarter", "rank_in_quarter", "books_in_quarter", "followers"]].to_dict("records")
 
-# ---- 7. 事後檢查：2023 + 2024 合併（8 季）時，boosting / MLP 是否穩定贏 LR。2024 標籤還沒成熟，只當旁證。
+# ---- 7. Post-hoc check: with 2023 and 2024 pooled (8 quarters), do boosting / MLP reliably beat LR? 2024 labels are immature; supporting evidence only.
 both = pd.concat([test, recent], ignore_index=True)
 bt2 = boot(both, {m: (lambda s, k, m=m: prec(s, m, k)) for m in ["lr_SAT", "gb_SAT", "mlp_SAT"]}, SLOTS)
 res["diff_pp_2023_2024"] = {n: {"diff": round(100 * (prec(both, a, SLOTS) - prec(both, c, SLOTS)), 1),

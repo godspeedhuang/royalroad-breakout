@@ -287,22 +287,22 @@
  "rho_age_followers": 0.3546847307082815,
  "rho_nchap_followers": 0.5586399693365346,
  "age_table": {
-  "<3個月": {
+  "<3 months": {
    "n": 6387,
    "top10_rate": 0.0272,
    "med_followers": 2.0
   },
-  "3-12個月": {
+  "3-12 months": {
    "n": 11325,
    "top10_rate": 0.0692,
    "med_followers": 3.0
   },
-  "1-3年": {
+  "1-3 years": {
    "n": 16184,
    "top10_rate": 0.1097,
    "med_followers": 6.0
   },
-  ">3年": {
+  ">3 years": {
    "n": 24101,
    "top10_rate": 0.1275,
    "med_followers": 15.0

@@ -1,10 +1,10 @@
 #!/bin/sh
-# 把要花錢才算得出來的向量檔，上傳到公開的 Hugging Face dataset，讓隊友和評分者不用重打 API。
-# 用法：./embedding/14_publish_hf.sh <hf-username>/royalroad-breakout
-# 前提：uv run hf auth login（token 要有 write 權限）
-# HF 上的路徑和這個 repo 一樣（embedding/out/...），所以下載時 --local-dir . 就會放到對的位置。
+# Upload the vector files that cost money to compute to the public Hugging Face dataset, so teammates and graders do not have to call the API again.
+# Usage: ./embedding/14_publish_hf.sh <hf-username>/royalroad-breakout
+# Requires: uv run hf auth login (the token needs write access)
+# Paths on HF mirror this repo (embedding/out/...), so downloading with --local-dir . puts files in the right place.
 set -e
-REPO="${1:?用法：$0 <hf-username>/<repo-name>}"
+REPO="${1:?usage: $0 <hf-username>/<repo-name>}"
 cd "$(dirname "$0")/.."
 
 for f in books.parquet books_meta.parquet atlas.parquet atlas_pca.parquet; do

@@ -1,11 +1,11 @@
-"""步驟 5–6：把塊向量合併成章與書的向量，再算 PCA / UMAP 2D 座標與最近鄰。
+"""Steps 5–6: pool chunk vectors into chapter and book vectors, then compute PCA / UMAP 2D coordinates and nearest neighbors.
 
-輸出（out/）：
-  chapters.parquet  一章一列：原文、tags、warnings、章節向量
-  books.parquet     一本一列：書向量、第一章向量、簡介向量、2D 座標、所有欄位
-  atlas.parquet     給 Embedding Atlas 的輕量版（沒有 1536 維向量，只有座標、篩選欄位與摘錄）
+Outputs (out/):
+  chapters.parquet  one row per chapter: text, tags, warnings, chapter vector
+  books.parquet     one row per book: book vector, chapter-1 vector, blurb vector, 2D coordinates, all fields
+  atlas.parquet     light version for Embedding Atlas (no 1,536-d vectors; coordinates, filter fields and excerpts only)
 
-用法：python 03_pool_project.py
+Usage: python 03_pool_project.py
 """
 import json
 from pathlib import Path
@@ -29,7 +29,7 @@ def normalize(m):
 
 
 def weighted_group_mean(keys, vecs, w):
-    """依 keys 分組，對 vecs 做加權平均後正規化。keys 需已排序。"""
+    """Group by keys, take the weighted mean of vecs, then normalize. keys must be sorted."""
     starts = np.r_[0, np.flatnonzero(keys[1:] != keys[:-1]) + 1]
     summed = np.add.reduceat(vecs * w[:, None], starts, axis=0)
     return keys[starts], normalize(summed), np.add.reduceat(w, starts)
@@ -46,16 +46,16 @@ def main():
     meta = pd.read_parquet(OUT / "chunks_input.parquet", columns=["chunk_uid", "fiction_id", "chapter_idx", "n_tokens"])
     meta = meta.set_index("chunk_uid").loc[uid].reset_index()
     missing = len(pd.read_parquet(OUT / "chunks_input.parquet", columns=["chunk_uid"])) - len(uid)
-    print(f"塊向量 {len(uid):,}（缺 {missing}）")
+    print(f"chunk vectors {len(uid):,} ({missing} missing)")
 
-    # ---- 章節向量：同一章的塊依 token 數加權 ----
+    # ---- Chapter vectors: chunks of the same chapter, weighted by token count ----
     meta["ckey"] = meta.fiction_id.astype(np.int64) * 10 + meta.chapter_idx
     order = np.argsort(meta.ckey.values, kind="stable")
     ckeys, CV, ctok = weighted_group_mean(meta.ckey.values[order], V[order], meta.n_tokens.values[order].astype(np.float32))
     cfid, cidx = ckeys // 10, ckeys % 10
     chapvec = pd.DataFrame({"fiction_id": cfid, "chapter_idx": cidx, "row": np.arange(len(ckeys))})
 
-    # ---- 書向量：第 1–3 章依 token 數加權；另存第一章、簡介 ----
+    # ---- Book vectors: chapters 1–3 weighted by token count; chapter 1 and the blurb are stored separately ----
     body = chapvec[chapvec.chapter_idx > 0]
     bkeys, BV, _ = weighted_group_mean(body.fiction_id.values, CV[body.row.values], ctok[body.row.values])
     books = pd.read_parquet(OUT / "books_meta.parquet").set_index("fiction_id").loc[bkeys].reset_index()
@@ -68,27 +68,27 @@ def main():
         return out
     C1, DV = pick(1), pick(0)
 
-    # ---- 降維（所有年份一起擬合）----
+    # ---- Dimensionality reduction (fitted on all years together) ----
     pca = PCA(n_components=50, random_state=42).fit(BV)
     P = pca.transform(BV)
     books["pca_x"], books["pca_y"] = P[:, 0], P[:, 1]
     ev = pca.explained_variance_ratio_
-    print(f"PCA 前兩軸解釋 {ev[:2].sum():.1%}（PC1 {ev[0]:.1%}、PC2 {ev[1]:.1%}），前 50 軸 {ev.sum():.1%}")
+    print(f"PCA: first two axes explain {ev[:2].sum():.1%} (PC1 {ev[0]:.1%}, PC2 {ev[1]:.1%}), first 50 axes {ev.sum():.1%}")
     import umap
     U = umap.UMAP(n_neighbors=30, min_dist=0.1, random_state=42).fit_transform(P)
     books["umap_x"], books["umap_y"] = U[:, 0], U[:, 1]
 
-    # ---- 最近鄰（cosine，分批矩陣乘法）----
+    # ---- Nearest neighbors (cosine, batched matrix products) ----
     nb_ids, nb_dist = [], []
     for s in range(0, len(BV), 2000):
         sim = BV[s:s + 2000] @ BV.T
-        np.put_along_axis(sim, (np.arange(sim.shape[0]) + s)[:, None], -np.inf, axis=1)  # 排除自己
+        np.put_along_axis(sim, (np.arange(sim.shape[0]) + s)[:, None], -np.inf, axis=1)  # exclude the book itself
         idx = np.argpartition(-sim, K_NEIGHBORS, axis=1)[:, :K_NEIGHBORS]
         srt = np.take_along_axis(sim, idx, axis=1).argsort(axis=1)[:, ::-1]
         idx = np.take_along_axis(idx, srt, axis=1)
         nb_ids += idx.tolist(); nb_dist += (1 - np.take_along_axis(sim, idx, axis=1)).round(4).tolist()
 
-    # ---- 寫檔 ----
+    # ---- Write files ----
     tbl = pa.Table.from_pandas(books, preserve_index=False)
     tbl = tbl.append_column("book_vec", vec_col(BV)).append_column("chap1_vec", vec_col(np.nan_to_num(C1))) \
              .append_column("desc_vec", vec_col(np.nan_to_num(DV)))
@@ -103,13 +103,13 @@ def main():
     ctbl = pa.Table.from_pandas(chapters, preserve_index=False).append_column("vector", vec_col(CV[np.asarray(rows[ok], dtype=int)]))
     pq.write_table(ctbl, OUT / "chapters.parquet")
 
-    # Embedding Atlas 用的輕量檔
+    # Light file for Embedding Atlas
     first = chapters[chapters.chapter_idx == 1].set_index("fiction_id").text
     tags = books.tags.map(lambda s: json.loads(s) if isinstance(s, str) and s else [])
     atlas = pd.DataFrame({
         "fiction_id": books.fiction_id, "title": books.title, "author": books.author, "author_id": books.author_id,
         "first_release": pd.to_datetime(books.first_release, utc=True).dt.tz_localize(None),
-        "year": books.year.astype(int), "quarter": books.quarter, "top10": np.where(books.top10, "前 10%", "其他"),
+        "year": books.year.astype(int), "quarter": books.quarter, "top10": np.where(books.top10, "top 10%", "other"),
         "pct_in_quarter": books.pct_in_quarter.round(4), "followers": books.followers, "log_followers": books.log_followers.round(3),
         "tags": tags.map(", ".join), "n_tags": tags.map(len), "is_original": books.is_original,
         "first3_tokens": books.first3_tokens, "first3_truncated": books.first3_truncated,
@@ -123,7 +123,7 @@ def main():
     atlas.to_parquet(OUT / "atlas.parquet", index=False)
     json.dump({"pca_explained": ev[:10].round(4).tolist(), "n_books": len(books), "missing_chunks": int(missing)},
               open(OUT / "projection_summary.json", "w"), indent=1)
-    print("寫出 books", len(books), "chapters", len(chapters), "atlas", atlas.shape)
+    print("wrote books", len(books), "chapters", len(chapters), "atlas", atlas.shape)
 
 
 if __name__ == "__main__":

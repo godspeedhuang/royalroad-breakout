@@ -1,13 +1,13 @@
-"""口味漂移：固定測試年，換不同年代的訓練資料，看 AUC 會不會隨年代差距下降。
+"""Drift: fix the test year, train on data from different periods, and see whether AUC drops as the gap grows.
 
-測試年固定，題目難度就固定。每個訓練窗都是連續 2 年、抽一樣多本（N），
-所以唯一的差別是「訓練資料有多舊」。如果讓書紅的東西一直在變，訓練資料越舊，AUC 應該越低。
-這回答的是：模型多久要重新訓練一次。
+A fixed test year keeps the difficulty fixed. Every training window is 2 consecutive years with the same number of books (N),
+so the only difference is how old the training data is. If what makes books take off keeps changing, older training data should give lower AUC.
+This answers how often the model must be retrained.
 
-特徵分開看：只用 tags 等結構化特徵（S）、只用前三章向量（T）。
-訓練窗最早從 2017 年起（2016 年 75% 的書含浮水印）。C 沿用 01_ml.py 在驗證年選到的值。
+Features are tested separately: structured features such as tags only (S), first-three-chapter vector only (T).
+Training windows start in 2017 at the earliest (75% of 2016 books carry watermarks). C reuses the value 01_ml.py picked on the validation year.
 
-輸出：out/drift_auc.json、out/figs/drift_auc.png
+Outputs: out/drift_auc.json, out/figs/drift_auc.png
 """
 import json
 
@@ -33,7 +33,7 @@ for names in ["S", "T"]:
     for ty in TESTS:
         te = yr == ty
         res[names][ty] = {}
-        for gap in range(1, ty - FIRST_YEAR):  # 訓練窗 = (ty-gap-1, ty-gap)
+        for gap in range(1, ty - FIRST_YEAR):  # training window = (ty-gap-1, ty-gap)
             pool = np.flatnonzero((yr == ty - gap - 1) | (yr == ty - gap))
             aucs = []
             for _ in range(REPS):
@@ -42,17 +42,17 @@ for names in ["S", "T"]:
                 aucs.append(roc_auc_score(y[te], m.decision_function(Z[te])))
             res[names][ty][gap] = {"train_years": [ty - gap - 1, ty - gap], "auc": round(float(np.mean(aucs)), 4), "sd": round(float(np.std(aucs)), 4)}
         print(names, ty, {g: v["auc"] for g, v in res[names][ty].items()}, flush=True)
-    # 每多隔一年 AUC 變多少：同一測試年內比較（扣掉各測試年自己的平均）
+    # AUC change per extra year of gap: compared within each test year (each test year's own mean removed)
     g = np.array([gap for ty in TESTS for gap in res[names][ty]], float)
     a = np.concatenate([np.array([v["auc"] for v in res[names][ty].values()]) - np.mean([v["auc"] for v in res[names][ty].values()]) for ty in TESTS])
     gc = np.concatenate([np.array(list(res[names][ty]), float) - np.mean(list(res[names][ty])) for ty in TESTS])
     res[names]["auc_change_per_year_of_gap"] = round(float((gc @ a) / (gc @ gc)), 4)
-    print(names, "每多隔一年 AUC 變化：", res[names]["auc_change_per_year_of_gap"], flush=True)
+    print(names, "AUC change per extra year of gap:", res[names]["auc_change_per_year_of_gap"], flush=True)
 
 (OUT / "drift_auc.json").write_text(json.dumps({"n_train": N, "reps": REPS, **res}, indent=1))
 
-# ---- 圖：兩個特徵各一格，同一個 y 軸 ----
-COLORS = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100"]  # dataviz 預設色盤 1–4，測試年依固定順序
+# ---- figure: one panel per feature set, shared y axis ----
+COLORS = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100"]  # dataviz default palette 1–4, test years in a fixed order
 TITLE = {"S": "Tags and structure only", "T": "First-3-chapter text only"}
 fig, axes = plt.subplots(1, 2, figsize=(10, 4.2), sharey=True)
 for ax, names in zip(axes, ["S", "T"]):
@@ -66,7 +66,7 @@ for ax, names in zip(axes, ["S", "T"]):
     ax.spines[["top", "right"]].set_visible(False); ax.grid(axis="y", color="#0b0b0b", alpha=0.08); ax.tick_params(colors="#52514e")
     ax.set_facecolor("#fcfcfb")
 axes[0].set_ylabel("AUC on the fixed test year", fontsize=9.5, color="#52514e")
-axes[1].legend(frameon=False, fontsize=9, loc="lower left")  # 右邊那格左下角是空的
+axes[1].legend(frameon=False, fontsize=9, loc="lower left")  # the lower-left corner of the right panel is empty
 fig.suptitle(f"Does an older training set predict worse? (each window: 2 years, {N:,} books)", x=0.01, ha="left", fontsize=12, fontweight="bold")
 fig.tight_layout()
 (OUT / "figs").mkdir(exist_ok=True)

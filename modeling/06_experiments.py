@@ -1,23 +1,28 @@
-"""驗證年實驗：想讓主模型更好、但都只在 2022 驗證年比較，測試年 2023 完全不碰。
+"""Validation-year experiments: attempts to improve the main model, compared on the 2022 validation year only.
+The 2023 test year is not touched.
 
-每一組都用 2017–2021 訓練、2022 打分數，報 AUC 與 Recall@名額（名額命中率）。
-LR 的 C 在同一組格點裡用驗證年 AUC 挑。2022 年有 571 本熱門書，命中率的標準誤差約 0.02，
-差距小於這個數字的結果都當成「沒差」。
+Each experiment trains on 2017–2021 and scores 2022, reporting AUC and Recall@slots. LR's C is chosen from the
+same grid by validation AUC. 2022 has 571 hits, so Recall@slots has a standard error of about 0.02;
+differences smaller than that count as no difference.
 
-1. dims      ：只取 book_vec 前 k 維（v3 embedding 截短後重新正規化 = 較小的版本），看維度的邊際效益，
-               用來推估換成 text-embedding-3-large（3,072 維）值不值得。
-2. chapters  ：三章怎麼組成文字特徵。token 加權平均（現在的 T）、等權平均、三章並列（3 × 1,536）、單一章。
-3. knn       ：鄰居特徵。每本書找 cosine 最像的 50 本「至少早 365 天開始連載、不同作者」的書，
-               算其中進前 10% 的比例、平均同季排名、依相似度加權的比例。
-4. style     ：從前三章原文算 17 個文風統計（句長、對話佔比、[ ] 面板、小寫 i……）。
-5. target_loss：改訓練目標或 loss。Ridge 猜 0/1、Ridge 猜同季排名（連續目標）、
-               同季內配對的排序 loss（紅 vs 沒紅；依排名差 ≥ 0.2），後者是 RankNet 的線性版。
-6. test_slot_quality：唯一用到 2023 的部分，只描述已定案的主模型與規則，不拿來選任何東西：
-               版位裡的書有多少比例在同季前 20%、沒命中的書排在哪。
+1. dims       : keep only the first k dimensions of book_vec (a truncated, renormalized v3 embedding behaves
+                like a smaller model) to see the marginal value of dimensions, and so estimate whether
+                text-embedding-3-large (3,072-d) would be worth it.
+2. chapters   : how to combine the three chapters into the text feature: token-weighted mean (the current T),
+                equal-weight mean, the three vectors side by side (3 x 1,536), or a single chapter.
+3. knn        : neighbour features. For each book, the 50 most similar books by cosine that started at least
+                365 days earlier and have a different author: their share in the top 10%, their mean quarter
+                rank, and a similarity-weighted share.
+4. style      : 17 stylometric statistics from the raw text of chapters 1–3 (sentence length, dialogue share,
+                [ ] status boxes, lowercase "i", ...).
+5. target_loss: a different target or loss. Ridge on 0/1, Ridge on the quarter rank (continuous target), and a
+                pairwise ranking loss within each quarter (hit vs non-hit; rank gap >= 0.2), a linear RankNet.
+6. test_slot_quality: the only part that uses 2023. It only describes the already-chosen main model and rule
+                and selects nothing: the share of slot picks in the quarter's top 20%, and where the misses rank.
 
-需要：embedding/out/books.parquet、embedding/out/chapters.parquet（逐章向量與原文，不在 HF，
-要用 embedding/01–03 重建）、out/preds_ml.parquet（01_ml.py 的輸出）。
-輸出：out/experiments_val.json。文風特徵快取在 out/style_trainval.parquet。約 8 分鐘（Mac CPU）。
+Needs: embedding/out/books.parquet, embedding/out/chapters.parquet (per-chapter vectors and text, not on HF;
+rebuild with embedding/01–03), out/preds_ml.parquet (from 01_ml.py).
+Output: out/experiments_val.json. Style features are cached in out/style_trainval.parquet. About 6 minutes (Mac CPU).
 """
 import json
 import re
@@ -47,7 +52,7 @@ def ev(s):
 
 
 def lr(Z, Cs=CS):
-    """各 C 訓練一次，回傳驗證年 AUC 最高的那組。"""
+    """Fit once per C and return the result with the highest validation AUC."""
     res = []
     for C in Cs:
         s = make_pipeline(StandardScaler(), LogisticRegression(C=C, max_iter=3000)).fit(Z[tr], y[tr]).decision_function(Z[va])
@@ -66,11 +71,11 @@ def unit(v):
 
 SA, T = block(X, "SA"), X["T"]
 
-# ---- 1. 維度 ----
+# ---- 1. Dimensions ----
 for k in [128, 256, 512, 1024, 1536]:
     rec("dims", f"T first {k}", lr(unit(T[:, :k])))
 
-# ---- 2. 三章怎麼組 ----
+# ---- 2. Combining the three chapters ----
 ch = pd.read_parquet(EMB / "chapters.parquet", columns=["fiction_id", "chapter_idx", "vector"])
 row = pd.Series(np.arange(len(b)), index=b.fiction_id.values).reindex(ch.fiction_id.values).values
 ok = ~np.isnan(row)
@@ -79,7 +84,7 @@ have = np.zeros((len(b), 3), bool)
 r_, k_ = row[ok].astype(int), ch.chapter_idx.values[ok] - 1
 V[r_, k_] = np.stack(ch.vector.values[ok])
 have[r_, k_] = True
-for i in range(3):  # 少數書缺某一章的向量（截到 20,000 token 上限後沒剩），用書向量補
+for i in range(3):  # a few books lack a chapter vector (nothing left after the 20,000-token cap); fill with the book vector
     V[~have[:, i], i] = T[~have[:, i]]
 del ch
 R["chapters_note"] = {"books_missing_a_chapter_vector": int((~have.all(1)).sum())}
@@ -94,7 +99,7 @@ for name, Z in [("S+A (no text)", SA), ("S+A+T (main)", block(X, "SAT")), ("S+A+
     rec("chapters", name, lr(Z, [1e-4] + CS))
 del cat
 
-# ---- 3. 鄰居特徵 ----
+# ---- 3. Neighbour features ----
 K, LAG = 50, 365
 day = b.first_release.values.astype("datetime64[D]").astype(np.int64)
 auth = b.author_id.astype("category").cat.codes.values
@@ -110,12 +115,12 @@ for s in range(0, len(rows), 2000):
     n = np.maximum(okw.sum(1), 1)
     wp = np.where(okw, np.maximum(w, 0), 0)
     F[r] = np.c_[(y[nn] * okw).sum(1) / n, (pct[nn] * okw).sum(1) / n, (wp * y[nn]).sum(1) / np.maximum(wp.sum(1), 1e-9)]
-    F[r[okw.sum(1) == 0]] = [0.1, 0.5, 0.1]  # 最早的書沒有夠早的鄰居，給全體平均
+    F[r[okw.sum(1) == 0]] = [0.1, 0.5, 0.1]  # the earliest books have no early-enough neighbours; use the overall average
 rec("knn", "neighbour top10 share alone", ev(F[va, 0]))
 rec("knn", "S+A+knn", lr(np.hstack([SA, F])))
 rec("knn", "S+A+T+knn", lr(np.hstack([block(X, "SAT"), F])))
 
-# ---- 4. 文風統計 ----
+# ---- 4. Stylometric statistics ----
 STYLE = OUT / "style_trainval.parquet"
 if not STYLE.exists():
     keep = b.fiction_id[tr | va].tolist()
@@ -133,7 +138,7 @@ if not STYLE.exists():
         d = {k: len(p.findall(t)) for k, p in P.items() if k != "dialog"}
         d.update(fid=fid, chars=len(t), dialog_chars=sum(map(len, P["dialog"].findall(t))),
                  letters=sum(map(len, P["words"].findall(t))))
-        if idx == 1:  # 詞彙豐富度：第一章前 1,000 字的 type-token ratio
+        if idx == 1:  # vocabulary richness: type-token ratio of the first 1,000 words of chapter 1
             w = [x.lower() for x in P["words"].findall(t)[:1000]]
             d["ttr"] = len(set(w)) / len(w) if len(w) >= 200 else np.nan
         out.append(d)
@@ -159,7 +164,7 @@ rec("style", "style alone", lr(Fs))
 rec("style", "S+A+style", lr(np.hstack([SA, Fs])))
 rec("style", "S+A+T+style", lr(np.hstack([block(X, "SAT"), Fs])))
 
-# ---- 5. 訓練目標與 loss（S+A+T，標準化只用訓練年 fit） ----
+# ---- 5. Training target and loss (S+A+T; the scaler is fit on training years only) ----
 SAT = block(X, "SAT")
 Z = StandardScaler().fit(SAT[tr]).transform(SAT).astype(np.float32)
 del SAT
@@ -171,7 +176,7 @@ itr = np.flatnonzero(tr)
 
 
 def pairs(kind, seed, m=6000):
-    """同一季內配對：binary = 一本紅的 vs 一本沒紅的；graded = 同季排名差 ≥ 0.2 的兩本。"""
+    """Pairs within a quarter: binary = one hit vs one non-hit; graded = two books whose quarter ranks differ by >= 0.2."""
     rng = np.random.default_rng(seed)
     A, B = [], []
     for qq in np.unique(q[itr]):
@@ -201,7 +206,7 @@ for kind in ["binary", "graded"]:
                                                    "recall": round(float(np.mean([r["recall"] for r in rs])), 4),
                                                    "recall_by_seed": [r["recall"] for r in rs], "C": C})
 
-# ---- 6. 測試年描述：版位裡的書離前 10% 有多近（主模型與規則已定案，這裡不選任何東西） ----
+# ---- 6. Test-year description: how close the slot picks come to the top 10% (main model and rule already chosen; nothing is selected here) ----
 p = pd.read_parquet(OUT / "preds_ml.parquet", columns=["fiction_id", "rule_hot_genre", "lr_SAT"])
 p = p.merge(b[["fiction_id", "year", "quarter", "top10", "pct_in_quarter"]], on="fiction_id")
 p = p[p.year == 2023]

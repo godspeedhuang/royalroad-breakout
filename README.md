@@ -8,6 +8,8 @@ MIT 15.071 *The AI Edge*, Fall 2026, Project 1 (predictive AI).
 
 **Interactive atlas.** <https://godspeedhuang.github.io/royalroad-breakout/> (served by GitHub Pages from `docs/`): 45,245 books placed by the embedding of their first three chapters, in a PCA view and a UMAP view.
 
+**Start here.** [`walkthrough/`](walkthrough/) tells the story in six short notebooks that only read saved results (no data download needed): 01 problem and target, 02 main model, 03 leakage checks, 04 drift and retraining, 05 cover experiment, 06 business value. [`EXPERIMENTS.md`](EXPERIMENTS.md) lists everything we tried, the result, and the decision. The demo page [`docs/demo/`](docs/demo/) shows which serials each model would recommend in a given quarter and whether they became hits (open `docs/demo/index.html` directly in a browser; it also works on GitHub Pages).
+
 ## Data
 
 [OmniAICreator/RoyalRoad-1.61M](https://huggingface.co/datasets/OmniAICreator/RoyalRoad-1.61M) on Hugging Face: 1.61M chapters from 86,959 serials on royalroad.com, one row per chapter, 12 GB.
@@ -29,8 +31,12 @@ Things that shaped the design:
 | `embedding/04–12` | Tag trends, embedding drift, watermark check, direction explanation |
 | `embedding/06, 08, 13` | Launch the atlas locally; export the public static atlas to `docs/atlas/` |
 | `embedding/out/` | Small results (JSON, CSV, figures) are tracked; parquet files are not |
-| `modeling/` | Rule baselines, logistic regression, gradient boosting, PyTorch MLP, drift test; results in `modeling/out/` |
-| `reports/` | EDA figures, HTML report sources, and the draft slide deck (`reports/slides/`) |
+| `modeling/` | Rule baselines, logistic regression, gradient boosting, PyTorch MLP, drift test, demo data, validation-year experiments, day-30 re-ranking and business impact; results in `modeling/out/` |
+| `cover/` | Cover images: which covers predate chapter 3, frozen image embeddings (01–02 run on Colab), and a two-stage merge into the main model (03); results in `cover/out/` |
+| `walkthrough/` | Six narrative notebooks, in slide order, that read the saved results |
+| `EXPERIMENTS.md` | What we tried, what happened, what we decided |
+| `docs/demo/` | Demo page (cover, why, target, model choice, the model's picks, checks, business value; ↓/↑ to move, space to play or pause): pick a quarter, number of slots, model and author group, and see which serials each model recommends and whether they became hits; data from `modeling/05_demo_data.py` |
+| `reports/` | EDA figures, HTML report sources, and the draft slide deck and video script (`reports/slides/`) |
 
 ## Reproduce
 
@@ -56,6 +62,7 @@ uv run python embedding/09_pca_trajectory.py
 uv run python embedding/10_tags_compare.py
 uv run python embedding/11_watermark_check.py
 uv run python embedding/12_explain_direction.py   # calls the embedding endpoint for 18 probe sentences
+uv run python embedding/12_explain_direction.py --plot-only   # redraw its figure from the saved JSON only
 
 # Atlas
 ./embedding/06_atlas.sh          # UMAP view, http://localhost:5055
@@ -69,9 +76,17 @@ uv run python 01_ml.py        # rules, logistic regression, gradient boosting
 uv run python 02_dl.py        # MLP on the frozen embeddings
 uv run python 03_compare.py   # → out/results.json, results.md, figs/model_comparison.png
 uv run python 04_drift.py     # → out/drift_auc.json, figs/drift_auc.png
-uv run python 05_experiments.py   # validation-year attempts to improve the main model → out/experiments_val.json
-uv run python 06_day30.py     # day-30 re-ranking with posting rhythm → out/day30.json
-uv run python 07_impact.py    # business impact at a fixed number of slots → out/impact.json (assumptions at the top of the file)
+uv run python 05_demo_data.py # → ../docs/demo/data.js (needs out/preds_*.parquet from 01 and 02)
+uv run python 06_experiments.py   # validation-year attempts to improve the main model → out/experiments_val.json
+uv run python 07_day30.py     # day-30 re-ranking with posting rhythm → out/day30.json
+uv run python 08_impact.py    # business impact at a fixed number of slots → out/impact.json (assumptions at the top of the file)
+cd ..
+
+# Covers: 01–02 run on Colab (see cover/README.md); 03 needs their outputs in data/cover/
+cd cover && uv run jupyter nbconvert --to notebook --execute --inplace 03_cover_merge.ipynb && cd ..
+
+# Walkthrough (reads saved results only, a few seconds)
+cd walkthrough && for f in 0*.ipynb; do uv run jupyter nbconvert --to notebook --execute --inplace "$f"; done
 ```
 
 ## Large files
@@ -119,9 +134,10 @@ Train 2017–2021, tune on 2022, test once on 2023 (8,075 books, 811 positives).
 - **First-time authors** (two thirds of books) are harder: recall 0.43, still well above the rule's 0.25.
 - **Blurbs are excluded on purpose.** The blurb is the 2025 version, and 7.8% of test books have blurbs mentioning Amazon, Kindle, Patreon, Audible or a second volume; 46% of those are hits. Adding the blurb lifts recall to 0.57, but that is an upper bound contaminated by edits made after success.
 - **Tried and not adopted** (validation year only): more embedding dimensions, separate vectors per chapter, chapter 1 only, nearest-neighbour hit rates, 17 stylometric features, a continuous rank target and pairwise ranking loss. None beat the main model beyond noise; text embeddings already capture what the extra features add. See [`modeling/README.md`](modeling/README.md).
-- **Does it matter.** With a fixed 50 slots per quarter (the size of a Rising Stars list), the model fills 68% of slots with future hits against 28% for the best rule, 34 vs 14 hits per quarter. The top 10% of each quarter take 86% of all views, so the model's picks gather 5.5x the views of the rule's. If a slot lifts a serial's views by 10% and ads earn $3 per 1,000 views, that is about $39k a year (range $13k to $130k). Assumptions live at the top of `modeling/07_impact.py`; the pitch deck and video script in `reports/slides/` are generated from its output.
-- **A second look at day 30.** Adding the first month's posting rhythm (future hits post a median 15 chapters in their first 30 days, others 6) lifts recall from 0.454 to 0.506 on the 2022 validation year but only from 0.482 to 0.490 on 2023 (+0.7 pp, 95% CI −2.0 to +3.1); first-time authors gain +2.4 pp, also not significant. Treat it as a confirmation pass to A/B test, not a replacement. See `modeling/06_day30.py`.
+- **Does it matter.** With a fixed 50 slots per quarter (the size of a Rising Stars list), the model fills 68% of slots with future hits against 28% for the best rule, 34 vs 14 hits per quarter. The top 10% of each quarter take 86% of all views, so the model's picks gather 5.5x the views of the rule's. If a slot lifts a serial's views by 10% and ads earn $3 per 1,000 views, that is about $39k a year (range $13k to $130k). Assumptions live at the top of `modeling/08_impact.py`; the pitch deck and video script in `reports/slides/` are generated from its output.
+- **A second look at day 30.** Adding the first month's posting rhythm (future hits post a median 15 chapters in their first 30 days, others 6) lifts recall from 0.454 to 0.506 on the 2022 validation year but only from 0.482 to 0.490 on 2023 (+0.7 pp, 95% CI −2.0 to +3.1); first-time authors gain +2.4 pp, also not significant. Treat it as a confirmation pass to A/B test, not a replacement. See `modeling/07_day30.py`.
 - **Retraining.** Holding the test year fixed, each extra year of age in the training window costs 0.026 AUC for a tags-only model and 0.008 for a text-only model. Retrain at least yearly.
+- **Covers are not used.** Covers uploaded after chapter 3 come with three times the hit rate (21% vs 7%), so only covers that predate chapter 3 are usable (42% of books). On those books a frozen CLIP embedding adds 4.0 points in 2023 (CI +1.2 to +8.4) but nothing in 2024, and merged into the ranking of all books it does not help (0.482 vs 0.481). Details in [`cover/README.md`](cover/README.md).
 
 ## Exploratory findings
 

@@ -1,11 +1,11 @@
-"""步驟 1–3：挑書、取前三章、算 Y 與欄位、切塊。
+"""Steps 1–3: pick books, take the first three chapters, compute Y and fields, split into chunks.
 
-輸出（都在 out/）：
-  books_meta.parquet     一本一列：Y、篩選欄位、事前與事後欄位
-  chapters_meta.parquet  一章一列：前三章原文與 token 數
-  chunks_input.parquet   要送去 embedding 的每一塊（含簡介）
+Outputs (all in out/):
+  books_meta.parquet     one row per book: Y, filter fields, fields known before and after chapter 3
+  chapters_meta.parquet  one row per chapter: text of the first three chapters and token counts
+  chunks_input.parquet   every chunk to send for embedding (blurbs included)
 
-用法：python 01_prepare.py
+Usage: python 01_prepare.py
 """
 import hashlib
 import math
@@ -24,8 +24,8 @@ OUT = HERE / "out"
 OUT.mkdir(exist_ok=True)
 
 YEARS = (2016, 2024)
-BOOK_CAP = 20_000   # 前三章合計上限（token）
-CHUNK_MAX = 8_000   # 單塊上限，模型上限約 8,191
+BOOK_CAP = 20_000   # cap on the first three chapters combined (tokens)
+CHUNK_MAX = 8_000   # cap per chunk; the model limit is about 8,191
 DESC_MAX = 8_000
 
 enc = tiktoken.get_encoding("cl100k_base")
@@ -33,7 +33,7 @@ ntok = lambda s: len(enc.encode(s, disallowed_special=()))
 
 
 def split_even(text, n_tokens, k):
-    """把一章平均切成 k 塊，盡量在段落邊界；單一段落太長才硬切。"""
+    """Split one chapter evenly into k chunks, at paragraph boundaries where possible; only a single overlong paragraph is cut hard."""
     paras = [p for p in re.split(r"\n\s*\n", text) if p.strip()]
     target = n_tokens / k
     chunks, cur, cur_n = [], [], 0
@@ -45,7 +45,7 @@ def split_even(text, n_tokens, k):
     if cur:
         chunks.append("\n\n".join(cur))
     out = []
-    for c in chunks:                       # 保證每塊都在上限內
+    for c in chunks:                       # make sure every chunk is under the cap
         ids = enc.encode(c, disallowed_special=())
         for i in range(0, len(ids), CHUNK_MAX):
             out.append(enc.decode(ids[i:i + CHUNK_MAX]))
@@ -53,7 +53,7 @@ def split_even(text, n_tokens, k):
 
 
 def main():
-    # ---- 選書：用 EDA 已建好的章節索引 ----
+    # ---- Pick books: use the chapter index built by the EDA ----
     ch = pd.read_parquet(INTERIM / "chapters_47.parquet", columns=["fiction_id", "chapter_id", "release_datetime"])
     ch["t"] = pd.to_datetime(ch.release_datetime, utc=True, errors="coerce")
     ch = ch.sort_values(["fiction_id", "t", "chapter_id"])
@@ -64,7 +64,7 @@ def main():
     first3["chapter_idx"] = first3.groupby("fiction_id").cumcount() + 1
     print("books", len(book), "chapters", len(first3))
 
-    # ---- 取前三章原文 ----
+    # ---- Text of the first three chapters ----
     dset = ds.dataset(sorted(RAW.glob("*.parquet")))
     ids = first3.chapter_id.dropna().astype("float64").tolist()
     txt = dset.to_table(columns=["fiction_id", "chapter_id", "chapter_title", "text"],
@@ -72,7 +72,7 @@ def main():
     chap = first3.merge(txt, on=["fiction_id", "chapter_id"], how="left")
     chap["text"] = chap.text.fillna("")
 
-    # ---- 小說層級欄位 ----
+    # ---- Book-level fields ----
     fi = pd.read_parquet(INTERIM / "fictions_47.parquet").set_index("fiction_id")
     au = (dset.to_table(columns=["fiction_id", "author_url"], filter=ds.field("fiction_id").isin(book.index.tolist()))
           .to_pandas().drop_duplicates("fiction_id").set_index("fiction_id"))
@@ -85,7 +85,7 @@ def main():
     b["top10"] = b.followers >= b.groupby("quarter").followers.transform(lambda s: s.quantile(.9))
     b["log_followers"] = np.log10(1 + b.followers)
 
-    # ---- 截斷與切塊 ----
+    # ---- Truncate and chunk ----
     chap["n_tokens_raw"] = chap.text.map(ntok)
     rows, kept = [], []
     for fid, grp in chap.groupby("fiction_id", sort=False):
@@ -107,14 +107,14 @@ def main():
     kept = pd.DataFrame(kept, columns=["fiction_id", "chapter_idx", "n_tokens", "truncated"])
     chap = chap.merge(kept, on=["fiction_id", "chapter_idx"])
 
-    # 簡介當成第 0 章
+    # The blurb is treated as chapter 0
     for fid, desc in b.description.fillna("").items():
         if desc.strip():
             ids_ = enc.encode(desc, disallowed_special=())[:DESC_MAX]
             rows.append((f"{fid}-c0-p0", fid, 0, 0, 1, len(ids_), enc.decode(ids_)))
     chunks = pd.DataFrame(rows, columns=["chunk_uid", "fiction_id", "chapter_idx", "part", "n_parts", "n_tokens", "text"])
 
-    # ---- 書層級的前三章摘要欄位 ----
+    # ---- Book-level summary fields for the first three chapters ----
     agg = chap.groupby("fiction_id").agg(first3_tokens=("n_tokens", "sum"), first3_truncated=("truncated", "any"),
                                          first3_last=("t", "max"))
     b = b.join(agg)

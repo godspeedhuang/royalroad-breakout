@@ -1,22 +1,27 @@
-"""第 30 天版本：在第 3 章的主模型（S+A+T）上，再加開張後 30 天的更新節奏（V）。
+"""Day-30 version: the chapter-3 main model (S+A+T) plus the first 30 days of posting rhythm (V).
 
-給推薦團隊的第二輪篩選：第 3 章先推一批，第 30 天用更新節奏重排。預測時間點是第一章後 30 天
-（第 3 章比第 30 天還晚的書，就在第 3 章時預測），V 只用這段時間內發布的章節，不會偷看未來。
+A second pass for the recommendation team: recommend a first batch at chapter 3, then re-rank at day 30
+using posting rhythm. The prediction point is 30 days after chapter 1 (books whose chapter 3 comes later
+than day 30 are scored at chapter 3). V only uses chapters released in that window, so it does not look ahead.
 
-V（7 個，計數取 log1p）：第一天、前 7 天、前 30 天各發幾章；前 30 天有幾天有更新；
-最長斷更幾天；第 30 天時離上次更新幾天；前 30 天總字數。來源 data/interim/chapters_47.parquet
-（全部 86,959 本書每一章的發布時間，eda/01_eda.ipynb 產生）。
+V (7 features, counts log1p): chapters posted on day 1, in the first 7 days and in the first 30 days;
+days with an update in the first 30 days; longest gap; days since the last update at day 30;
+total characters in the first 30 days. Source: data/interim/chapters_47.parquet
+(release time of every chapter of all 86,959 books, produced by eda/01_eda.ipynb).
 
-另外在驗證年比較「完整作者歷史」（F）：用全部書（含不到 3 章、2016 年以前）重算作者經驗，
-只看這本開始之前：前作本數、寫不到 3 章就停的前作數、前作總章數、寫作年資、開張前 30 天有沒有在寫別本。
+Also compares, on the validation year only, a full author history (F): author experience recomputed
+from all books (including those with fewer than 3 chapters and those before 2016), counting only what
+came before this book: earlier books, earlier books abandoned before chapter 3, earlier chapters,
+writing tenure, and whether the author was writing another book in the 30 days before.
 
-流程和 01_ml.py 一樣：2017–2021 訓練、2022 選 C，2017–2022 重新訓練，打 2023 與 2024 一次。
-第 3 章的對照用 01_ml.py 的 lr_SAT 與 rule_hot_genre 原本的分數。
+Same procedure as 01_ml.py: train 2017–2021, choose C on 2022, refit on 2017–2022, score 2023 and 2024 once.
+The chapter-3 comparison uses the original lr_SAT and rule_hot_genre scores from 01_ml.py.
 
-ponytail: 有些書紅了以後把後面章節下架（stubbed），通常保留前面幾十章，前 30 天大多還在，
-影響偏保守；沒紅的作者刪章則會讓節奏看起來比實際差，這個資料集查不到。
+ponytail: some books pull later chapters after they succeed (stubbed) but usually keep the first few dozen,
+so the first 30 days are mostly intact and the effect is conservative; authors of unsuccessful books who
+delete chapters would make their rhythm look worse than it was, which this dataset cannot detect.
 
-輸出：out/day30.json、out/preds_day30.parquet（不進 git）
+Outputs: out/day30.json, out/preds_day30.parquet (not in git)
 """
 import glob
 import hashlib
@@ -40,14 +45,14 @@ sp = splits(b)
 y, q = b.top10.values, b.quarter.values
 tr, va, ev = sp["train"], sp["val"], sp["test"] | sp["recent"]
 
-# ---- 章節發布時間（全部書） ----
+# ---- Chapter release times (all books) ----
 ch = pd.read_parquet(HERE_DATA / "interim" / "chapters_47.parquet", columns=["fiction_id", "release_datetime", "n_chars"])
 ch["t"] = pd.to_datetime(ch.release_datetime, utc=True, errors="coerce")
 ch = ch.dropna(subset=["t"])
 ch["t0"] = ch.groupby("fiction_id").t.transform("min")
-ch["d"] = (ch.t - ch.t0) / DAY  # 距第一章幾天（用 Timedelta 算，不受時間解析度影響）
+ch["d"] = (ch.t - ch.t0) / DAY  # days since chapter 1 (via Timedelta, independent of time resolution)
 
-# ---- V：前 30 天更新節奏 ----
+# ---- V: posting rhythm in the first 30 days ----
 w = ch[ch.d <= 30].sort_values(["fiction_id", "t"])
 w["gap"] = w.groupby("fiction_id").d.diff()
 g = w.groupby("fiction_id")
@@ -61,10 +66,10 @@ for c in ["n_day1", "n_7d", "n_30d", "active_days_30d", "max_gap_30d", "chars_30
     V[c] = np.log1p(V[c])
 X["V"] = V.values.astype(np.float32)
 
-# ---- F：完整作者歷史（只看這本開始之前） ----
+# ---- F: full author history (only before this book started) ----
 au = pd.concat([pd.read_parquet(f, columns=["fiction_id", "author", "author_url"]).drop_duplicates("fiction_id")
                 for f in sorted(glob.glob(str(HERE_DATA / "raw" / "data" / "*.parquet")))]).drop_duplicates("fiction_id")
-au["author_id"] = au.author_url.fillna(au.author).map(lambda s: hashlib.sha1(str(s).encode()).hexdigest()[:12])  # 同 embedding/01_prepare.py
+au["author_id"] = au.author_url.fillna(au.author).map(lambda s: hashlib.sha1(str(s).encode()).hexdigest()[:12])  # same as embedding/01_prepare.py
 cc = ch[["fiction_id", "t"]].merge(au[["fiction_id", "author_id"]], on="fiction_id")
 tgt = b[["fiction_id", "author_id"]].merge(ch.groupby("fiction_id").t0.first().reset_index(), on="fiction_id")
 m = tgt.merge(cc.rename(columns={"fiction_id": "pf"}), on="author_id")
@@ -80,7 +85,7 @@ hidden_prior = float((F.prior_books_all[b.first_time_author.values] > 0).mean())
 X["F"] = np.log1p(F.clip(lower=0)).values.astype(np.float32)
 
 
-# ---- 驗證年選 C，再用 2017–2022 重新訓練 ----
+# ---- Choose C on the validation year, then refit on 2017–2022 ----
 def fit(Z, rows):
     return make_pipeline(StandardScaler(), LogisticRegression(C=C_, max_iter=3000)).fit(Z[rows], y[rows])
 
@@ -108,7 +113,7 @@ preds["day30"] = day30[ev]
 preds = preds.merge(pd.read_parquet(OUT / "preds_ml.parquet")[["fiction_id", "lr_SAT", "rule_hot_genre"]], on="fiction_id")
 preds.to_parquet(OUT / "preds_day30.parquet", index=False)
 
-# ---- 測試年與 2024：全部／第一次寫書／有前作 ----
+# ---- Test year and 2024: all / first-time authors / returning authors ----
 MODELS = ["rule_hot_genre", "lr_SAT", "day30"]
 r4 = lambda x: round(float(x), 4)
 for key, yr in [("test", TEST_YEAR), ("recent_2024", RECENT_YEAR)]:
@@ -117,7 +122,7 @@ for key, yr in [("test", TEST_YEAR), ("recent_2024", RECENT_YEAR)]:
     res[key] = {gname: {"n": int(gm.sum()), **{mm: {k: r4(v) for k, v in metrics(d.top10.values[gm], d[mm].values[gm], d.quarter.values[gm]).items()}
                                                for mm in MODELS}} for gname, gm in groups.items()}
 
-# ---- 成對 bootstrap：第 30 天 − 第 3 章（百分點），在每一季裡重抽書 ----
+# ---- Paired bootstrap: day 30 minus chapter 3 (percentage points), resampling books within each quarter ----
 test = preds[preds.year == TEST_YEAR].reset_index(drop=True)
 res["test_day30_minus_main_pp"] = {}
 for gname, gm in {"all": np.ones(len(test), bool), "first_time_author": test.first_time_author.values}.items():

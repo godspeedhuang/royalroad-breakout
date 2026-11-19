@@ -1,207 +1,215 @@
 # modeling
 
-Project 1 的主模型：規則 baseline → machine learning → deep learning，加上口味漂移測試。
+The Project 1 main model: rule baselines → machine learning → deep learning, plus a drift test.
 
-## 怎麼跑
+## How to run
 
-需要 `embedding/out/books.parquet` 和 `embedding/out/watermark_books.csv`。全部跑完約 3 分鐘（Mac，CPU）。
+Needs `embedding/out/books.parquet` and `embedding/out/watermark_books.csv`. The whole folder runs in about 3 minutes (Mac, CPU).
 
 ```bash
 cd modeling
-uv run python features.py     # 自我檢查：切分大小、作者歷史沒偷看、指標算得對
-uv run python 01_ml.py        # 規則、logistic regression、gradient boosting
+uv run python features.py     # self-check: split sizes, author history does not peek ahead, metrics are right
+uv run python 01_ml.py        # rules, logistic regression, gradient boosting
 uv run python 02_dl.py        # PyTorch MLP
-uv run python 03_compare.py   # 比較、信賴區間、分組、leak 檢查、影響換算
-uv run python 04_drift.py     # 固定測試年，換訓練年代
-uv run python 05_experiments.py   # 驗證年實驗：想改進主模型的嘗試（約 6 分鐘，需要 chapters.parquet）
-uv run python 06_day30.py     # 第 30 天版本：主模型 + 前 30 天更新節奏（需要 data/interim/chapters_47.parquet 和 data/raw）
-uv run python 07_impact.py    # 商業影響：每季固定版位下的命中率與金額（需要 01、02、06 的預測）
+uv run python 03_compare.py   # comparison, confidence intervals, groups, leak checks, impact
+uv run python 04_drift.py     # fixed test year, training data of different ages
+uv run python 05_demo_data.py # data for the demo page (docs/demo/data.js)
+uv run python 06_experiments.py   # validation-year attempts to improve the main model (about 6 minutes; needs chapters.parquet)
+uv run python 07_day30.py     # day-30 version: main model + first-30-day posting rhythm (needs data/interim/chapters_47.parquet and data/raw)
+uv run python 08_impact.py    # business impact: hit rate and money at a fixed number of slots (needs predictions from 01, 02 and 07)
 ```
 
-| 檔案 | 產出 |
+| File | Output |
 |---|---|
-| `features.py` | 共用：特徵區塊、時間切分、指標 |
-| `01_ml.py`、`02_dl.py` | `out/preds_*.parquet`（每本書每個模型的分數，不進 git）、`out/selection_*.json`（選到的超參數與驗證分數） |
-| `03_compare.py` | `out/results.json`、`out/results.md`、`out/figs/model_comparison.png` |
-| `04_drift.py` | `out/drift_auc.json`、`out/figs/drift_auc.png` |
-| `05_experiments.py` | `out/experiments_val.json`（文風特徵快取在 `out/style_trainval.parquet`，不進 git） |
-| `06_day30.py` | `out/day30.json`、`out/preds_day30.parquet`（不進 git） |
-| `07_impact.py` | `out/impact.json`（簡報與影片的數字都從這裡讀） |
+| `features.py` | Shared: feature blocks, time split, metrics |
+| `01_ml.py`, `02_dl.py` | `out/preds_*.parquet` (every model's score for every book, not in git), `out/selection_*.json` (chosen hyperparameters and validation scores) |
+| `03_compare.py` | `out/results.json`, `out/results.md`, `out/figs/model_comparison.png` |
+| `04_drift.py` | `out/drift_auc.json`, `out/figs/drift_auc.png` |
+| `05_demo_data.py` | `../docs/demo/data.js`: every 2023 and 2024 book's score under each model, with title, tags, cover URL, genre tint and outcome; 20 serials per 2016 quarter and each quarter's hit threshold for the target animation; tag and warning lists; the hyperparameter grids from `selection_*.json`; two example first-three-chapter vectors and the hit direction (2017–2022, no watermarks); a 4,000-serial PCA/UMAP sample with yearly paths and the 1,536-d 2017→2024 shift cosine; screen 0's numbers (including the hits' share of 2023 views and followers) and cover wall; the top pick's first lines (≤ 200 characters, from `atlas.parquet`) with their cl100k_base tokens and its chapter-1 vector; two standardized raw dimensions of the map sample; the cover model's scores from `cover/out/preds_cover.parquet` when present (checked against `cover_merge.json`); views per serial for the business screen; the drift, tag-lift and cover-experiment numbers the page charts. Prints the 50-slot numbers and the ad revenue used in the deck |
+| `06_experiments.py` | `out/experiments_val.json` (stylometric features cached in `out/style_trainval.parquet`, not in git) |
+| `07_day30.py` | `out/day30.json`, `out/preds_day30.parquet` (not in git) |
+| `08_impact.py` | `out/impact.json` (the deck and video read their numbers from here) |
 
-## 設計
+## Design
 
-- **單位**：一本書一列。資料來源 `embedding/out/books.parquet`（45,245 本，2016–2024 年開始連載、至少 3 章）。
-- **Y**：`top10`，同一季開始連載的書裡 followers 是否 ≥ 90 百分位。只跟同季比，是為了消掉「連載越久 followers 越多」。
-- **切分（依時間）**：
+- **Unit**: one book per row, from `embedding/out/books.parquet` (45,245 books first released 2016–2024 with at least 3 chapters).
+- **Y**: `top10`, whether followers are at or above the 90th percentile among books first released in the same quarter. Comparing within the quarter removes the "older books have more followers" effect.
+- **Split (by time)**:
 
-| | 年份 | 本數 | 用途 |
+| | Years | Books | Use |
 |---|---|---|---|
-| train | 2017–2021 | 17,100 | 訓練 |
-| val | 2022 | 5,700 | 選超參數、選主模型 |
-| test | 2023 | 8,075 | 只在最後打一次分數 |
-| recent | 2024 | 12,165 | 補充。觀察時間只有 0.5–1.5 年，「前 10%」還不穩 |
+| train | 2017–2021 | 17,100 | Training |
+| val | 2022 | 5,700 | Hyperparameters and choosing the main model |
+| test | 2023 | 8,075 | Scored once at the end |
+| recent | 2024 | 12,165 | Supplementary. Observed for only 0.5–1.5 years, so its top 10% is not settled |
 
-  2016 年不用（75% 的書含浮水印）。選好超參數後用 2017–2022 重新訓練，再打 2023 和 2024。同一位作者的舊書在 train、新書在 test 是允許的，上線時本來就看得到作者以前的書。
+  2016 is not used (75% of its books carry watermarks). After tuning, models are refit on 2017–2022 and scored on 2023 and 2024. An author's older book in train and newer book in test is allowed: in production the author's earlier books are visible too.
 
-- **指標**：AUC、AP、**Recall@名額**。每一季的推薦名額 = 該季熱門書的數量（約 10%，2023 年每季約 203 個），看這些名額有多少比例給到了真正的熱門書。隨機挑是 0.10。
-- **特徵區塊**（代號用在模型名稱裡，例如 `lr_SAT`）：
+- **Metrics**: AUC, AP, and **Recall@slots**. Each quarter gets as many slots as it has true hits (about 10%, roughly 203 a quarter in 2023); Recall@slots is the share of those slots that go to a true hit. Random picks score 0.10.
+- **Feature blocks** (the letters appear in model names, e.g. `lr_SAT`):
 
-| 代號 | 內容 | 維度 | 可以用嗎 |
+| Code | Content | Dims | Usable? |
 |---|---|---|---|
-| S | tags、warnings、`is_original`、前三章長度與發布間隔 | 75 | 可以 |
-| A | 作者經驗：是不是第一次寫書、以前寫過幾本 | 2 | 可以 |
-| T | 前三章向量 `book_vec` | 1,536 | 可以 |
-| P | 前作有沒有進同季前 10% | 1 | **有 leak 疑慮**。前作的 followers 是 2025 年快照，這本書紅了會回頭拉高前作 |
-| D | 簡介向量 `desc_vec` + 簡介長度 | 1,537 | **有 leak 疑慮**。簡介是 2025 年的版本，見下面 |
+| S | tags, warnings, `is_original`, length of chapters 1–3 and days between them | 75 | Yes |
+| A | author experience: first book or not, number of earlier books | 2 | Yes |
+| T | first-three-chapter vector `book_vec` | 1,536 | Yes |
+| P | whether an earlier book reached its quarter's top 10% | 1 | **Leak-prone**: earlier books' followers are a 2025 snapshot, and a new hit pulls readers back to them |
+| D | blurb vector `desc_vec` + blurb length | 1,537 | **Leak-prone**: the blurb is the 2025 version, see below |
 
-  不能當特徵（事後才有）：`followers`、`total_views`、`average_views`、`favorites`、`ratings`、`n_chapters`、`pct_in_quarter`、`log_followers`、`status`、`cover_url`。前作的 followers 原始數字也不用。
+  Not usable as features (only known afterwards): `followers`, `total_views`, `average_views`, `favorites`, `ratings`, `n_chapters`, `pct_in_quarter`, `log_followers`, `status`, `cover_url`. Raw follower counts of earlier books are not used either.
 
-- **主模型**不是看測試分數選的：從沒有 leak 疑慮的三個候選（`lr_SAT`、`gb_SAT`、`mlp_SAT`）裡挑驗證年 AUC 最高的，結果是 `lr_SAT`。
+- **The main model is not chosen on test scores**: among the three leak-free candidates (`lr_SAT`, `gb_SAT`, `mlp_SAT`) the one with the highest validation AUC wins, which is `lr_SAT`.
 
-## 結果（測試年 2023，8,075 本，811 本熱門）
+## Results (2023 test year, 8,075 books, 811 hits)
 
 ![model comparison](out/figs/model_comparison.png)
 
-| 模型 | AUC | Recall@名額（95% CI） | 2024 |
+| Model | AUC | Recall@slots (95% CI) | 2024 |
 |---|---|---|---|
-| 規則：更新最快的優先 | 0.625 | 0.170（0.144–0.196） | 0.195 |
-| 規則：老作者優先 | 0.565 | 0.148（0.127–0.176） | 0.177 |
-| 規則：熱門類型優先 | 0.742 | 0.261（0.239–0.295） | 0.282 |
-| LR：S | 0.810 | 0.387（0.359–0.420） | 0.405 |
-| LR：S+A | 0.814 | 0.398（0.372–0.436） | 0.414 |
-| **LR：S+A+T（主模型）** | **0.887** | **0.482（0.455–0.515）** | 0.453 |
-| Gradient boosting：S+A+T | 0.865 | 0.476（0.445–0.503） | 0.470 |
-| MLP：S+A+T | 0.886 | 0.493（0.466–0.527） | 0.456 |
-| LR：只用 T | 0.856 | 0.406（0.376–0.440） | 0.377 |
-| MLP：只用 T | 0.858 | 0.425（0.395–0.457） | 0.388 |
-| LR：S+A+T+P † | 0.896 | 0.515（0.491–0.548） | 0.490 |
-| LR：S+A+T+P+D † | 0.918 | 0.573（0.547–0.603） | 0.566 |
-| LR：只用 D † | 0.873 | 0.506（0.481–0.538） | 0.491 |
+| Rule: fastest updates first | 0.625 | 0.170 (0.144–0.196) | 0.195 |
+| Rule: experienced authors first | 0.565 | 0.148 (0.127–0.176) | 0.177 |
+| Rule: popular genres first | 0.742 | 0.261 (0.239–0.295) | 0.282 |
+| LR: S | 0.810 | 0.387 (0.359–0.420) | 0.405 |
+| LR: S+A | 0.814 | 0.398 (0.372–0.436) | 0.414 |
+| **LR: S+A+T (main)** | **0.887** | **0.482 (0.455–0.515)** | 0.453 |
+| Gradient boosting: S+A+T | 0.865 | 0.476 (0.445–0.503) | 0.470 |
+| MLP: S+A+T | 0.886 | 0.493 (0.466–0.527) | 0.456 |
+| LR: T only | 0.856 | 0.406 (0.376–0.440) | 0.377 |
+| MLP: T only | 0.858 | 0.425 (0.395–0.457) | 0.388 |
+| LR: S+A+T+P † | 0.896 | 0.515 (0.491–0.548) | 0.490 |
+| LR: S+A+T+P+D † | 0.918 | 0.573 (0.547–0.603) | 0.566 |
+| LR: D only † | 0.873 | 0.506 (0.481–0.538) | 0.491 |
 
-† 有 leak 疑慮，只當上限參考。完整數字在 `out/results.json`。
+† Leak-prone; upper bound only. Full numbers in `out/results.json`.
 
-**每一步多了多少**（Recall@名額，百分點，成對 bootstrap 95% CI）：
+**What each step adds** (Recall@slots, percentage points, paired bootstrap 95% CI):
 
-| 比較 | 差 | 95% CI | 結論 |
+| Comparison | Difference | 95% CI | Reading |
 |---|---|---|---|
-| 主模型 vs 最好的規則 | +22.1 | +18.2 到 +25.3 | 模型明顯比規則好 |
-| 加作者經驗（S → S+A） | +1.1 | −0.2 到 +3.0 | 不顯著 |
-| 加前三章文字（S+A → S+A+T） | +8.4 | +4.8 到 +11.2 | 顯著，文字有用 |
-| Gradient boosting vs LR | −0.6 | −3.8 到 +1.8 | 沒差 |
-| MLP vs LR | +1.1 | −0.8 到 +2.8 | 沒差 |
-| 加前作表現（† P） | +3.3 | +1.5 到 +5.5 | 顯著，但有 leak 疑慮 |
-| 加簡介（† D） | +5.8 | +3.2 到 +8.5 | 顯著，但有 leak 疑慮 |
+| Main model vs best rule | +22.1 | +18.2 to +25.3 | Model clearly beats the rule |
+| Add author experience (S → S+A) | +1.1 | −0.2 to +3.0 | Not significant |
+| Add chapter text (S+A → S+A+T) | +8.4 | +4.8 to +11.2 | Significant: the text helps |
+| Gradient boosting vs LR | −0.6 | −3.8 to +1.8 | No difference |
+| MLP vs LR | +1.1 | −0.8 to +2.8 | No difference |
+| Add earlier books' success († P) | +3.3 | +1.5 to +5.5 | Significant, but leak-prone |
+| Add blurb († D) | +5.8 | +3.2 to +8.5 | Significant, but leak-prone |
 
-**分組**（主模型 `lr_SAT`）：
+**By author group** (main model `lr_SAT`):
 
-| 組別 | 本數 | AUC | Recall@名額 | 最好的規則 |
+| Group | Books | AUC | Recall@slots | Best rule |
 |---|---|---|---|---|
-| 全部 | 8,075 | 0.887 | 0.482 | 0.261 |
-| 第一次寫書的作者 | 5,383 | 0.878 | 0.430 | 0.246 |
-| 有前作的作者 | 2,692 | 0.894 | 0.536 | 0.317 |
+| All | 8,075 | 0.887 | 0.482 | 0.261 |
+| First-time authors | 5,383 | 0.878 | 0.430 | 0.246 |
+| Returning authors | 2,692 | 0.894 | 0.536 | 0.317 |
 
-第一次寫書的作者比較難猜，但模型還是比規則好很多。
+First-time authors are harder to call, but the model still beats the rule by a wide margin.
 
-**影響換算**（2023 年平均每季約 2,019 本新書、203 個名額）：
+**Impact** (2023: about 2,019 new books and 203 slots per quarter on average):
 
-| 排法 | 每季挑中的熱門書 | 被推薦的書最後累積的 followers |
+| Ranking | Future hits per quarter | Eventual followers of the picks |
 |---|---|---|
-| 隨機 | 20 | 約 4.2 萬 |
-| 熱門類型優先 | 53 | 約 11.8 萬 |
-| 主模型 | 98 | 約 23.8 萬 |
-| 完美預測 | 203 | 約 37.2 萬 |
+| Random | 20 | about 42k |
+| Popular genres first | 53 | about 118k |
+| Main model | 98 | about 238k |
+| Perfect foresight | 203 | about 372k |
 
-followers 是事後數字，只用來表達「推薦位有沒有給對書」，不是推薦造成的增量。
+Followers are an after-the-fact number, used only to show whether slots went to the right books; they are not an effect caused by recommending.
 
-**沒命中的版位給了誰**（`05_experiments.py` 第 6 部分，只描述、不拿來選模型）：主模型的版位有 48.2% 給了同季前 10% 的書、67.4% 給了前 20%；沒命中的那些書，中位數排在同季第 76 百分位。熱門類型優先的規則分別是 26.1%、42.5%、第 65 百分位；隨機挑是 10%、20%、第 50 百分位。
+**Who got the slots the model missed** (`06_experiments.py` part 6; descriptive only, not used to choose a model): 48.2% of the main model's slots go to books in their quarter's top 10% and 67.4% to the top 20%; the misses have a median rank at the quarter's 76th percentile. For the popular-genres rule the numbers are 26.1%, 42.5% and the 65th percentile; for random picks, 10%, 20% and the 50th percentile.
 
-## 第 30 天版本（`06_day30.py`）
+## Day-30 version (`07_day30.py`)
 
-給推薦團隊的第二輪篩選：第 3 章先推一批，第一章發布後第 30 天再用更新節奏重排。特徵是主模型的 S+A+T，再加 V：第一天、前 7 天、前 30 天各發幾章，前 30 天有幾天有更新，最長斷更幾天，第 30 天時離上次更新幾天，前 30 天總字數。V 只用前 30 天發布的章節（來源 `data/interim/chapters_47.parquet`），在第 30 天都看得到。
+A second pass for the recommendation team: recommend a first batch at chapter 3, then re-rank on day 30 after chapter 1 using posting rhythm. Features are the main model's S+A+T plus V: chapters posted on day 1, in the first 7 days and in the first 30 days, days with an update in the first 30 days, the longest gap, days since the last update at day 30, and total characters in the first 30 days. V only uses chapters released in the first 30 days (source `data/interim/chapters_47.parquet`), all visible on day 30.
 
-訓練年和驗證年裡，熱門書前 30 天中位數發了 15 章，其他書 6 章。
+In the training and validation years, future hits post a median of 15 chapters in their first 30 days; other books post 6.
 
-| | 第 3 章（`lr_SAT`） | 第 30 天（S+A+T+V） | 差（百分點，成對 bootstrap 95% CI） |
+| | Chapter 3 (`lr_SAT`) | Day 30 (S+A+T+V) | Difference (pp, paired bootstrap 95% CI) |
 |---|---|---|---|
-| 驗證年 2022，Recall@名額 | 0.454 | 0.506 | |
-| 測試年 2023，全部 | 0.482 | 0.490 | +0.7（−2.0 到 +3.1），不顯著 |
-| 測試年 2023，第一次寫書 | 0.430 | 0.455 | +2.4（−1.1 到 +6.4），不顯著 |
-| 2024，全部 | 0.453 | 0.516 | |
-| 2024，第一次寫書 | 0.383 | 0.464 | |
+| Validation 2022, Recall@slots | 0.454 | 0.506 | |
+| Test 2023, all | 0.482 | 0.490 | +0.7 (−2.0 to +3.1), not significant |
+| Test 2023, first-time authors | 0.430 | 0.455 | +2.4 (−1.1 to +6.4), not significant |
+| 2024, all | 0.453 | 0.516 | |
+| 2024, first-time authors | 0.383 | 0.464 | |
 
-驗證年看起來有用（+5.2），到了測試年 2023 只剩 +0.7。2024 年又多了 6.3，但 2024 年的書觀察時間最短（0.5–1.5 年），followers 還很接近「開張頭幾個月的熱度」，更新節奏本來就會跟它很像，所以 2024 的提升可能高估。結論：當成第二輪的確認，上線前要做 A/B test，不取代第 3 章的主模型。
+It looks useful on the validation year (+5.2) but only +0.7 remains on the 2023 test year. 2024 gains another 6.3, but 2024 books have the shortest observation time (0.5–1.5 years): their followers still mostly reflect the first few months, which posting rhythm naturally tracks, so the 2024 gain is probably overstated. Conclusion: use it as a confirmation pass, A/B test before launch, and do not replace the chapter-3 main model.
 
-「完整作者歷史」（F：用全部書重算，含不到 3 章就停的前作和 2016 年以前的書）只在驗證年比過：Recall@名額 0.454 → 0.462，第一次寫書那組沒變。原本被標成「第一次寫書」的作者，有 5.3% 其實寫過（前作不到 3 章或在 2016 年以前），影響很小，不採用。
+A full author history (F: recomputed from all books, including earlier books abandoned before chapter 3 and books before 2016) was compared on the validation year only: Recall@slots 0.454 → 0.462, no change for first-time authors. Of the authors labelled first-time, 5.3% had in fact written before (earlier books with fewer than 3 chapters or before 2016). The effect is small; not adopted.
 
-已知風險：書紅了以後把後面章節下架（stubbed）通常保留前面幾十章，前 30 天大多還在，影響偏保守；沒紅的作者刪章會讓節奏看起來比實際差，這個資料集查不到。上線後要防作者把一章拆成好幾章灌數字，所以特徵裡有字數。
+Known risks: books that get stubbed after succeeding usually keep their first few dozen chapters, so the first 30 days are mostly intact and the effect is conservative; authors of unsuccessful books who delete chapters would make their rhythm look worse than it was, which this dataset cannot detect. In production, authors could split chapters to inflate counts, which is why character count is a feature.
 
-## 商業影響（`07_impact.py`）
+## Business impact (`08_impact.py`)
 
-簡報用的版本：每季固定 50 個推薦版位（對應 Rising Stars 每個類型最多 50 本），每季挑分數最高的 50 本。和上面的 Recall@名額不同，那邊名額 = 該季熱門書數（2023 年約 203 個）。所有假設都在 `07_impact.py` 最上面，改完重跑 07 和 `reports/slides/build_deck.js`。
+The deck's version: a fixed 50 recommendation slots per quarter (Rising Stars shows at most 50 serials per genre), filled with the 50 highest scores each quarter. This differs from Recall@slots above, where slots = the quarter's number of hits (about 203 per quarter in 2023). All assumptions sit at the top of `08_impact.py`; after changing them, rerun 08 and `reports/slides/build_deck.js`.
 
-2023 測試年，每季 50 個版位：
+2023 test year, 50 slots per quarter:
 
-| 排法 | 版位命中率（95% CI） | 每季挑中的熱門書 |
+| Ranking | Share of slots that are hits (95% CI) | Hits per quarter |
 |---|---|---|
-| 隨機 | 10% | 5 |
-| 規則：熱門類型優先 | 28%（22%–35%） | 14 |
-| LR：S+A | 53%（46%–60%） | |
-| **LR：S+A+T（主模型）** | **68%（61%–75%）** | **34** |
-| Gradient boosting：S+A+T | 71%（63%–77%） | |
-| MLP：S+A+T | 74%（65%–78%） | |
+| Random | 10% | 5 |
+| Rule: popular genres first | 28% (22%–35%) | 14 |
+| LR: S+A | 53% (46%–60%) | |
+| **LR: S+A+T (main)** | **68% (61%–75%)** | **34** |
+| Gradient boosting: S+A+T | 71% (63%–77%) | |
+| MLP: S+A+T | 74% (65%–78%) | |
 
-加前三章文字 +15.5 點（CI +7.5 到 +23.5）；MLP 比 LR +5.5（CI −2.0 到 +9.8）、boosting +3.0，在 2023 都不顯著，所以主模型維持 LR。事後把 2024 也併進來（8 季）再看一次：MLP +6.2（CI +1.0 到 +9.3），boosting +5.2（CI −0.7 到 +10.1）。MLP 在名單最前段可能真的多幾個點，但 2024 標籤還沒成熟、這個比較是看完結果才做的，所以只當「每年重訓時再比一次」的理由（`impact.json` 的 `diff_pp_2023_2024`）。名額越少，模型和規則差越多：每季 25 個版位時，版位上的書累積瀏覽量是規則的 7.7 倍，50 個 5.5 倍，200 個 2.3 倍，400 個 1.7 倍。
+Chapter text adds +15.5 points (CI +7.5 to +23.5). MLP over LR is +5.5 (CI −2.0 to +9.8) and boosting +3.0, neither significant in 2023, so the main model stays LR. A post-hoc look with 2024 pooled in (8 quarters): MLP +6.2 (CI +1.0 to +9.3), boosting +5.2 (CI −0.7 to +10.1). The MLP may really add a few points at the very top of the list, but 2024 labels are immature and this comparison was made after seeing the results, so it only counts as a reason to compare again at each yearly retrain (`diff_pp_2023_2024` in `impact.json`). The fewer the slots, the larger the gap between model and rule: the slot picks' cumulative views are 7.7x the rule's at 25 slots per quarter, 5.5x at 50, 2.3x at 200 and 1.7x at 400.
 
-金額（base case：上推薦位讓那本書的瀏覽量多 10%，每千次瀏覽 $3 廣告收入）：模型的版位每年多帶來約 1,300 萬次瀏覽、約 $3.9 萬；lift 5–20%、CPM $2–5 的範圍是 $1.3 萬到 $13 萬。只算「同樣的版位給對書」，不含讀者因此留下來多看別本，偏保守。2023 年同季前 10% 的書拿走 86% 的總瀏覽量，這也是用前 10% 定義「熱門」的理由。
+Money (base case: a slot lifts that serial's views by 10%; $3 of ad revenue per 1,000 views): the model's slots bring about 13 million extra views and about $39k a year; lift 5–20% and CPM $2–5 give a range of $13k to $130k. This only counts giving the same slots to the right serials, not readers staying on to read other serials, so it is conservative. In 2023 the quarter's top 10% took 86% of all views, which is also why "hit" is defined as the top 10%.
 
-補充：編輯每篩一本 10 分鐘、有模型後每季只讀前 200 名，一年省約 1,200 小時（時薪 $30 約 $3.6 萬）。這是「讓人工把關變得做得到」，不是 Royal Road 現在真的有在花的錢。
+Supplementary: if an editor needs 10 minutes per serial and, with the model, reads only the top 200 each quarter, that saves about 1,200 hours a year (about $36k at $30 an hour). This is what makes human review feasible, not money Royal Road spends today.
 
-`impact.json` 也列出影片開場用的例子：2023 年新作者、後來進前 10%、第 3 章時模型就排進當季前 50 名的書（第一名是 "Reborn as a Demonic Tree"，2023Q1 在 1,775 本裡排第 31，現在 15,595 個 followers）。
+`impact.json` also lists examples for the video opening: 2023 first-time authors whose serials later reached the top 10% and that the model already ranked in the quarter's top 50 at chapter 3 (the first is "Reborn as a Demonic Tree": ranked 31st of 1,775 in 2023Q1, now 15,595 followers).
 
-## 口味漂移（`04_drift.py`）
+## Drift (`04_drift.py`)
 
 ![drift](out/figs/drift_auc.png)
 
-固定測試年，換不同年代的訓練資料（每個訓練窗 2 年、抽 5,000 本）。同一個測試年內，訓練資料每多舊一年：
+Fix the test year and train on data of different ages (2-year windows, 5,000 books each). Within the same test year, each extra year of training-data age costs:
 
-- 只用 tags 等結構化特徵：AUC 掉 0.026。
-- 只用前三章文字：AUC 掉 0.008。
+- Tags and other structured features only: 0.026 AUC.
+- First-three-chapter text only: 0.008 AUC.
 
-意思是：tags 的規則老得快，文字的訊號比較耐用。tags 掉得快有一部分是標籤系統本身在變（例如 Progression 這個 tag 是後來才普及的），不全是讀者口味變了。給推薦團隊的建議：模型至少每年重訓一次。
+Rules built on tags go stale fast; the text signal lasts longer. Part of the tags decline is the tagging system itself changing (Progression, for example, only became common later), not only reader taste. Recommendation for the team: retrain at least once a year.
 
-## Leak 檢查
+## Leak checks
 
-- **簡介（D）有問題。** 測試年 7.8% 的書，簡介裡有 Amazon、Kindle、Patreon、Audible、"Book 2"、Discord 這類字。這些書有 45.5% 是熱門書（整體是 10%），光用這個旗標 AUC 就有 0.652。這些字多半是作者紅了之後才加的，所以 D 不放進主模型。只用簡介的模型拿掉這些書後 AUC 從 0.873 掉到 0.837。
-- **浮水印對模型沒影響。** 測試年 9.7% 的書含浮水印，其中 11.1% 是熱門書（和整體差不多），旗標本身 AUC 0.506。拿掉這些書後主模型 AUC 0.889（原本 0.887）。所以不需要為了建模重做 embedding。
-- **還沒排除的**：tags 和章節內容也是 2025 年的版本，作者可能事後改過（補 tag、在章節裡加作者留言）。這個資料集沒辦法還原當時的版本。
+- **The blurb (D) leaks.** In the test year, 7.8% of blurbs mention Amazon, Kindle, Patreon, Audible, "Book 2" or Discord. 45.5% of those books are hits (10% overall), and the flag alone has an AUC of 0.652. Authors mostly add these words after a book takes off, so D stays out of the main model. Dropping those books lowers the blurb-only model's AUC from 0.873 to 0.837.
+- **Watermarks do not affect the model.** 9.7% of test books contain watermarks; 11.1% of them are hits (about the overall rate), and the flag alone has an AUC of 0.506. Dropping them gives a main-model AUC of 0.889 (was 0.887), so there is no need to redo the embeddings for modeling.
+- **Not ruled out**: tags and chapter text are also 2025 versions, and authors may have edited them later (added tags, author notes in chapters). This dataset cannot recover the earlier versions.
 
-## 驗證年實驗（`05_experiments.py`，2026-11-16）
+## Validation-year experiments (`06_experiments.py`, 2026-11-16)
 
-想讓主模型更好的嘗試。**全部只在 2022 驗證年比較**（2017–2021 訓練），測試年 2023 沒有碰，所以這些數字不能跟上面的測試年結果直接比。2022 年有 571 本熱門書，命中率的標準誤差約 0.02，差距比這小的都當成沒差。完整數字在 `out/experiments_val.json`。
+Attempts to improve the main model. **All compared on the 2022 validation year only** (trained on 2017–2021); the 2023 test year was not touched, so these numbers cannot be compared directly with the test-year results above. 2022 has 571 hits, so Recall@slots has a standard error of about 0.02; differences smaller than that count as no difference. Full numbers in `out/experiments_val.json`.
 
-基準是主模型 `lr_SAT`：驗證年 AUC 0.8775、Recall@名額 0.454。
+The baseline is the main model `lr_SAT`: validation AUC 0.8775, Recall@slots 0.454.
 
-| 嘗試 | 做法 | 驗證年 AUC | Recall@名額 | 結論 |
+| Attempt | How | Validation AUC | Recall@slots | Conclusion |
 |---|---|---|---|---|
-| 換更大的 embedding | 只取 `book_vec` 前 k 維當作較小的模型（v3 embedding 可以截短），看維度的邊際效益。只用文字：512 維 0.839、1,024 維 0.846、1,536 維 0.849 | | | 邊際效益已經很小，推估換 `text-embedding-3-large`（3,072 維，貴 6.5 倍）只會多約 0.005–0.015 AUC，沒做 |
-| 三章並列 | 三章向量各自當特徵（3 × 1,536 = 4,608 欄），取代平均 | 0.869 | 0.427 | 變差。欄位變三倍、正則化要更強，三章各自的差異多半是雜訊 |
-| 只用第一章 | 第一章向量取代前三章平均 | 0.867 | 0.431 | 變差。只用文字時第 1、2、3 章各約 0.82，三章平均 0.85 |
-| 第一章加在前三章旁邊 | S+A+T+第一章 | 0.875 | 0.450 | 沒差 |
-| **三章等權平均** | 三章向量直接平均（現在是依 token 數加權） | **0.881** | **0.461** | 唯一小贏，在每個 C 都比較好。加權時很長的那一章會主導整本書的向量 |
-| 鄰居特徵（kNN） | 找最像的 50 本「早至少 365 天、不同作者」的書，算進前 10% 的比例、平均排名、加權比例 | 0.878 | 0.457 | 沒差。單獨用有訊號（AUC 0.756；S+A+鄰居 0.843），但 T 已經涵蓋 |
-| 文風統計 | 前三章原文的 17 個統計（句長、段落長、對話佔比、`[ ]` 面板、小寫 i、破折號、-ly 副詞、詞彙豐富度等） | 0.877 | 0.452 | 沒差。單獨 AUC 0.660，加在 S+A 上有幫助（0.818 → 0.826），加在主模型上沒有 |
-| 連續目標 | Ridge 猜同季排名 `pct_in_quarter`，取代猜 0/1 | 0.861 | 0.431 | 變差。模型被迫去分辨版位用不到的中下段 |
-| Ridge 猜 0/1 | 對照組：只把 log loss 換成平方誤差 | 0.875 | 0.457 | 沒差 |
-| 排序 loss（紅 vs 沒紅） | 同一季內配對一本紅的、一本沒紅的，LR 學哪本排前面（RankNet 的線性版），3 組隨機配對平均 | 0.875 | 0.467 | 命中率 +1.3 個百分點但在雜訊內（三次 0.457–0.475），AUC 略低，不換 |
-| 排序 loss（依排名） | 同季排名差 ≥ 0.2 的兩本配對 | 0.854 | 0.410 | 變差，原因同連續目標 |
+| Larger embedding | Keep only the first k dimensions of `book_vec` as a smaller model (v3 embeddings can be truncated) to see the marginal value of dimensions. Text only: 512-d 0.839, 1,024-d 0.846, 1,536-d 0.849 | | | The marginal gain is already small; `text-embedding-3-large` (3,072-d, 6.5x the price) would add an estimated 0.005–0.015 AUC. Not done |
+| Chapters side by side | The three chapter vectors as separate features (3 x 1,536 = 4,608 columns) instead of their mean | 0.869 | 0.427 | Worse. Three times the columns needs stronger regularization, and the differences between chapters are mostly noise |
+| Chapter 1 only | The chapter-1 vector instead of the three-chapter mean | 0.867 | 0.431 | Worse. Text only: chapters 1, 2 and 3 each score about 0.82, the three-chapter mean 0.85 |
+| Chapter 1 next to the mean | S+A+T+chapter 1 | 0.875 | 0.450 | No difference |
+| **Equal-weight chapter mean** | Plain mean of the three chapter vectors (currently weighted by tokens) | **0.881** | **0.461** | The only small win, better at every C. With token weights a very long chapter dominates the book vector |
+| Neighbour features (kNN) | The 50 most similar books that started at least 365 days earlier and have a different author: share in the top 10%, mean rank, weighted share | 0.878 | 0.457 | No difference. They carry signal alone (AUC 0.756; S+A+neighbours 0.843), but T already covers it |
+| Stylometry | 17 statistics from the raw text of chapters 1–3 (sentence and paragraph length, dialogue share, `[ ]` status boxes, lowercase "i", dashes, -ly adverbs, vocabulary richness and more) | 0.877 | 0.452 | No difference. AUC 0.660 alone, helps on top of S+A (0.818 → 0.826), not on top of the main model |
+| Continuous target | Ridge on the quarter rank `pct_in_quarter` instead of 0/1 | 0.861 | 0.431 | Worse. The model is pushed to separate the lower ranks that slots never use |
+| Ridge on 0/1 | Control: only swaps log loss for squared error | 0.875 | 0.457 | No difference |
+| Pairwise ranking loss (hit vs non-hit) | Within each quarter, pair one hit with one non-hit and let LR learn which ranks higher (a linear RankNet); mean of 3 random pairings | 0.875 | 0.467 | +1.3 points of recall but within noise (0.457–0.475 across the three), slightly lower AUC; not adopted |
+| Pairwise ranking loss (by rank) | Pairs of books whose quarter ranks differ by at least 0.2 | 0.854 | 0.410 | Worse, for the same reason as the continuous target |
 
-文風統計裡單獨最有關的：破折號用得多（AUC 0.605）、-ly 副詞多（0.586）、`[ ]` 遊戲面板多（0.581），小寫 i 多的書比較不會紅（0.468）。
+Among the stylometric features alone, the strongest are frequent dashes (AUC 0.605), -ly adverbs (0.586) and `[ ]` game status boxes (0.581); books with more lowercase "i" are less likely to become hits (0.468).
 
-**結論**：主模型在現有資訊下已經接近上限。加維度、拆章節、鄰居、文風都被前三章向量涵蓋了；改目標或 loss 也沒有穩定的進步。唯一可以採用的是三章等權平均（AUC +0.003，命中率 +0.7 個百分點，都在雜訊內），還沒改進主模型。要再往上，要換一種資訊來源（LLM 評分開頭、fine-tune 文字模型）。
+**Conclusion**: with the information available, the main model is close to its ceiling. More dimensions, separate chapters, neighbours and stylometry are all covered by the three-chapter vector, and changing the target or loss gives no reliable gain. The only candidate is the equal-weight chapter mean (AUC +0.003, recall +0.7 points, both within noise), not yet applied to the main model. Going further needs a different kind of information (an LLM rating the opening, or a fine-tuned text model).
 
-## 已知限制
+## Known limitations
 
-- DL 這邊文字編碼器是凍結的，只訓練接在向量後面的 MLP，結果和 LR 沒有差別。要再往上要 fine-tune 文字模型（`chapters.parquet` 有原文），成本高一個量級。
-- 作者經驗只算樣本內的書（2016–2024、至少 3 章），更早的或不到 3 章的前作沒算進來。
-- 隊友先前的版本（2021–2023、至少 5 章、13,998 本）報的 Recall@10% 約 50%，其中有用標題和簡介。這裡不用簡介是 48%，用了是 57%，量級一致，但樣本和切分不同，不能直接比。
-- 2016–2017 年每季前 10% 只有 52–60 本；followers 為 0 的書在同季排名並列。
+- On the deep learning side the text encoder is frozen; only the MLP on top is trained, and it does no better than LR. Going further would mean fine-tuning a text model (`chapters.parquet` has the text), an order of magnitude more expensive.
+- Author experience counts only books in the sample (2016–2024, at least 3 chapters); earlier books, or books with fewer than 3 chapters, are not counted.
+- A teammate's earlier version (2021–2023, at least 5 chapters, 13,998 books) reported Recall@10% of about 50% using titles and blurbs. Here it is 48% without blurbs and 57% with them, the same order of magnitude, but the samples and splits differ, so the numbers are not directly comparable.
+- 2016–2017 have only 52–60 top-10% books per quarter; books with 0 followers tie in the within-quarter ranking.
+- Gradient boosting is not exactly reproducible across machines: tiny floating-point differences in the PCA step change which of four near-tied settings wins on 2022. Rerun on another machine (Apple M5 Pro, scikit-learn 1.9.1) it picked learning rate 0.03 with 31 leaves and scored 0.465 instead of 0.476; still not better than LR. The rules, all LR models and the MLP reproduce exactly.
+- The editors' rule has many tied scores (books with the same tags score the same), so its hit count can move by one book with the tie-break. The demo breaks ties by book id.
+
+## Covers
+
+All cover experiments are in `cover/`; see `cover/README.md`. Covers show some signal among books with a valid cover in 2023 (+4.0 points) but none in 2024, and merging them into the model for all books does not help (0.482 vs 0.481), so the main model stays S+A+T. Everything we tried and decided is in `EXPERIMENTS.md` at the repo root.
