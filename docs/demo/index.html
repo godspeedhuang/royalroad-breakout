@@ -76,7 +76,7 @@
   </div>
 </section>
 
-<!-- The filter bar sticks only over screens 2 and 3, the two it drives -->
+<!-- The filter bar sticks only over screens 2, 3 and 4, the ones it drives -->
 <div class="filtered">
 <div id="filters"><div class="inner">
   <span class="brand">Royal Road Breakout</span>
@@ -116,9 +116,9 @@
         <div class="formula small" id="fx-share"></div>
         <div class="chart-box" id="models-chart"></div>
       </div>
-      <div class="card">
-        <h3>First-time authors</h3>
-        <div class="kpi-inline"><div class="big accent" id="ft-mult"></div><p class="cap" id="ft-cap"></p></div>
+      <div class="card kpi-pair">   <!-- two results from the deck: first-time authors, and the day-30 second pass -->
+        <div><h3>First-time authors</h3><div class="kpi-inline"><div class="big accent" id="ft-mult"></div><p class="cap" id="ft-cap"></p></div></div>
+        <div id="d30-card"><h3>Second look at day 30</h3><div class="kpi-inline"><div class="big" id="d30-big"></div><p class="cap" id="d30-cap"></p></div></div>
       </div>
     </div>
     <div class="card builder">
@@ -139,11 +139,56 @@
   <p class="bigcap" id="model-cap"></p>
 </section>
 
-<!-- 3: the model's picks on the test year -->
+<!-- 3: checks (before the picks; under the filter bar, which also drives its leak chart) -->
+<section class="screen" id="checks">
+  <header>
+    <div class="titles">
+      <h2><span class="n">3</span>What else we checked</h2>
+      <p class="lede">The model only uses what existed at chapter 3, and taste drifts, so it has to be retrained.</p>
+    </div>
+    <div class="steps"><button class="primary" data-play="checks">▶ Play</button></div>
+  </header>
+  <div class="cols" id="check-cols">   <!-- before training: what we left out, how taste moves; then what follows: retrain every year -->
+    <div class="card" id="leak-card">
+      <h3>Left out: anything edited after the fact</h3>
+      <p class="sub" id="leak-sub"></p>
+      <div class="legend"><span><i style="background:var(--other)"></i>the rest</span><span><i style="background:var(--accent)"></i>blurb names Patreon, "Book 2"…, or cover added after chapter 3</span></div>
+      <div class="chart-box" id="leak-chart"></div>
+      <p class="cap">Authors add "Book 2", Patreon links or a new cover once a serial takes off. Using them would be reading the answer.</p>
+    </div>
+    <div class="card" id="taste-card">
+      <h3>Taste over time</h3>
+      <div class="take-box">   <!-- measured in all 1,536 numbers: it holds for every tab below -->
+        <p class="take" id="taste-take"></p>
+        <div class="formula small" id="fx-shift"></div>
+      </div>
+      <div class="layers">
+        <button data-taste="pca" class="on">Story map: PCA</button>
+        <button data-taste="tags">Tag lift</button>
+        <button data-taste="umap">Story map: UMAP</button>
+      </div>
+      <p class="sub" id="taste-sub"></p>
+      <div class="formula small" id="fx-lift"></div>
+      <div class="legend" id="taste-legend"></div>
+      <div class="chart-box" id="taste-chart"></div>
+      <p class="cap" id="taste-cap"></p>
+    </div>
+    <div class="card" id="drift-card">
+      <h3>Retrain every year</h3>
+      <p class="sub">Test year 2023, training data of different ages. AUC, higher is better.</p>
+      <div class="chart-box" id="drift-chart"></div>
+      <p class="cap">A tags model loses 0.026 AUC per year of age; the story signal only 0.008.</p>
+    </div>
+  </div>
+  <p class="next"><b>Next step:</b> score every new serial at chapter 3, pilot one quarter with half the slots chosen by the model, retrain once a year.</p>
+  <p class="cap">Data: Hugging Face OmniAICreator/RoyalRoad-1.61M (snapshot June 2025). Page data: modeling/05_demo_data.py. No author names. <a href="../atlas/umap/">Explore all serials in the Embedding Atlas</a>.</p>
+</section>
+
+<!-- 4: the model's picks on the test year -->
 <section class="screen" id="picks">
   <header>
     <div class="titles">
-      <h2><span class="n">3</span>The model's picks</h2>
+      <h2><span class="n">4</span>The model's picks</h2>
       <p class="lede" id="picks-cap"></p>
     </div>
     <div class="steps"><button class="primary" data-play="picks">▶ Play</button></div>
@@ -178,50 +223,6 @@
 </section>
 </div>
 
-<!-- 4: checks -->
-<section class="screen full" id="checks">
-  <header>
-    <div class="titles">
-      <h2><span class="n">4</span>What else we checked</h2>
-      <p class="lede">The model only uses what existed at chapter 3, and taste drifts, so it has to be retrained.</p>
-    </div>
-    <div class="steps"><button class="primary" data-play="checks">▶ Play</button></div>
-  </header>
-  <div class="cols" id="check-cols">
-    <div class="card" id="leak-card">
-      <h3>Left out: anything edited after the fact</h3>
-      <p class="sub" id="leak-sub"></p>
-      <div class="legend"><span><i style="background:var(--other)"></i>the rest</span><span><i style="background:var(--accent)"></i>blurb names Patreon, "Book 2"…, or cover added after chapter 3</span></div>
-      <div class="chart-box" id="leak-chart"></div>
-      <p class="cap">Authors add "Book 2", Patreon links or a new cover once a serial takes off. Using them would be reading the answer.</p>
-    </div>
-    <div class="card" id="drift-card">
-      <h3>Retrain every year</h3>
-      <p class="sub">Test year 2023, training data of different ages. AUC, higher is better.</p>
-      <div class="chart-box" id="drift-chart"></div>
-      <p class="cap">A tags model loses 0.026 AUC per year of age; the story signal only 0.008.</p>
-    </div>
-    <div class="card" id="taste-card">
-      <h3>Taste over time</h3>
-      <div class="take-box">   <!-- measured in all 1,536 numbers: it holds for every tab below -->
-        <p class="take" id="taste-take"></p>
-        <div class="formula small" id="fx-shift"></div>
-      </div>
-      <div class="layers">
-        <button data-taste="pca" class="on">Story map: PCA</button>
-        <button data-taste="tags">Tag lift</button>
-        <button data-taste="umap">Story map: UMAP</button>
-      </div>
-      <p class="sub" id="taste-sub"></p>
-      <div class="formula small" id="fx-lift"></div>
-      <div class="legend" id="taste-legend"></div>
-      <div class="chart-box" id="taste-chart"></div>
-      <p class="cap" id="taste-cap"></p>
-    </div>
-  </div>
-  <p class="next"><b>Next step:</b> score every new serial at chapter 3, pilot one quarter with half the slots chosen by the model, retrain once a year.</p>
-  <p class="cap">Data: Hugging Face OmniAICreator/RoyalRoad-1.61M (snapshot June 2025). Page data: modeling/05_demo_data.py. No author names. <a href="../atlas/umap/">Explore all serials in the Embedding Atlas</a>.</p>
-</section>
 
 <div id="peek"></div><!-- cover card that follows the mouse over the mosaic -->
 

@@ -17,9 +17,9 @@ const CONFIG = {
   },
   tPhaseMs: 1100,          // first-three-chapters animation: time per phase
   blocks: { S: "#45a89c", A: "#9a8ad6", T: "#5d9be0", C: "#d585a8" },   // one color per input block (kept quiet next to the orange)
-  colors: { accent: "#e2662a", picked: "#5d9be0", rule: "#95a0a6", other: "#46545c", text: "#f2f4f5", muted: "#7a878e", light: "#e8e9ea", panel: "#000000" },
+  colors: { accent: "#d27a50", picked: "#5d9be0", rule: "#95a0a6", other: "#46545c", text: "#f2f4f5", muted: "#7a878e", light: "#e8e9ea", panel: "#000000" },
   sans: '"Helvetica Neue", Helvetica, Arial, sans-serif',   // labels inside canvases
-  team: ["Hongyu Yue", "Syuanbo Huang", "Yinqi Yu"],   // names on the cover page
+  team: ["Yinqi (Erich) Yu", "Hongyu Yue", "Syuan-Bo Huang"],   // names on the cover page, as on the deck
   stories: {               // the four story buttons in the filter bar
     1: { model: "rule_hot_genre", authors: "all" },
     2: { model: "lr_S", authors: "all" },
@@ -47,7 +47,7 @@ function coverImg(src, alt = "") {   // a Royal Road cover; removes itself if th
   im.onerror = () => im.remove();
   return im;
 }
-const VEC_BASE = [24, 26, 29], VEC_POS = [255, 118, 48], VEC_NEG = [70, 160, 255];   // vector grids: zero, above zero, below zero (colors on a square-root scale)
+const VEC_BASE = [24, 26, 29], VEC_POS = [236, 138, 92], VEC_NEG = [70, 160, 255];   // vector grids: zero, above zero, below zero (colors on a square-root scale)
 const FX = {   // formulas shown on the page (KaTeX): [formula, legend, optional second formula]
   target: [String.raw`y_i = \mathbf{1}\!\left[\, f_i \ge Q_{0.9}\{\, f_j : q_j = q_i \,\}\right]`, "f: followers in June 2025 · q: start quarter · Q₀.₉: 90th percentile"],
   share: [String.raw`\textstyle \text{share of slots} = \frac{1}{4K}\sum_{q=1}^{4}\ \sum_{i\,\in\,\mathrm{Top}_K(q)} y_i`, "Topₖ(q): the K highest scores in quarter q · random ≈ 10%"],
@@ -86,9 +86,10 @@ function pool(authors = $("f-authors").value) {
   for (let i = 0; i < N; i++) if (byQ.has(B.q[i]) && (authors === "all" || B.first[i])) byQ.get(B.q[i]).push(i);
   return byQ;
 }
-function pick(byQ, model, k) {           // each quarter: the k highest scores (ties broken by id)
+const tie = (a, c) => (B.ord ? B.ord[a] - B.ord[c] : B.id[a] - B.id[c]);   // equal scores: the deck's order (modeling/08_impact.py)
+function pick(byQ, model, k) {           // each quarter: the k highest scores, picked exactly as the deck does
   const s = B.score[model], out = new Map();
-  for (const [q, idx] of byQ) out.set(q, [...idx].sort((a, c) => s[c] - s[a] || B.id[a] - B.id[c]).slice(0, Math.min(k, idx.length)));
+  for (const [q, idx] of byQ) out.set(q, [...idx].sort((a, c) => s[c] - s[a] || tie(a, c)).slice(0, Math.min(k, idx.length)));
   return out;
 }
 function hits(picks) { let h = 0, n = 0; for (const ix of picks.values()) for (const i of ix) { h += B.y[i]; n++; } return { h, n, share: h / n }; }
@@ -391,6 +392,7 @@ const METHODS = [
   { key: "mlp", name: "Neural network", summary: "MLP, two hidden layers" },
 ];
 const sh = (m) => pct(hits(pick(pool(), m, slots())).share);
+const deckDefault = () => slots() === 50 && $("f-quarter").value === "Y2023" && $("f-authors").value === "all";   // the deck's setting: its confidence intervals apply
 function modelOf() {   // the trained model behind the current choice, or null if we never trained that combination
   if (S3.method === "rule") return "rule_hot_genre";
   const id = `${S3.method}_${["S", "A", "T", "C"].filter((k) => S3.inputs.has(k)).join("")}`;
@@ -399,6 +401,7 @@ function modelOf() {   // the trained model behind the current choice, or null i
 function syncBuilder() {   // model picked in the filter bar → builder
   const m = $("f-model").value;
   if (m === "rule_hot_genre") { S3.method = "rule"; return; }
+  if (m === "day30") { S3.method = "lr"; S3.inputs = new Set("SAT"); return; }   // the day-30 second pass builds on LR S+A+T
   const [meth, key] = m.split("_"); S3.method = meth; S3.inputs = new Set(key);
 }
 function manualMode() { players.model.pause(); S3.say = null; }
@@ -418,14 +421,19 @@ function builderClick(kind, key, toggle) {   // toggle = the switch on an input 
 }
 function modelIntro() {   // Play: every bar grows at once, with the chosen model (logistic regression on S+A+T) lit
   S3.method = "lr"; S3.inputs = new Set(["S", "A", "T"]); S3.focus = "lr"; S3.dkey = null;
-  S3.say = () => `Logistic regression on S+A+T gives ${sh("lr_SAT")} of the slots to future hits; the editors' rule, ${sh("rule_hot_genre")}. Boosting (${sh("gb_SAT")}) and the MLP (${sh("mlp_SAT")}) do not differ significantly${D.models.lr_SATC ? ` and the cover adds nothing (${sh("lr_SATC")})` : ""}, so we keep the simple one. Click any item to look inside.`;
+  S3.say = () => {
+    const dk = D.deck, def = deckDefault(), ci = def && dk ? ` (95% CI ${pct(dk.precision_at_slots.lr_SAT.ci95[0], 0)} to ${pct(dk.precision_at_slots.lr_SAT.ci95[1], 0)})` : "";
+    const lead = dk && dk.diff_pp_2023_2024 ? `; over 2023 and 2024 together the MLP leads by ${dk.diff_pp_2023_2024.mlp_vs_lr.diff.toFixed(1)} points (95% CI ${dk.diff_pp_2023_2024.mlp_vs_lr.ci95[0].toFixed(1)} to ${dk.diff_pp_2023_2024.mlp_vs_lr.ci95[1].toFixed(1)})` : "";
+    return `LR on S+A+T gives ${sh("lr_SAT")} of the slots to future hits${ci}; the editors' rule, ${sh("rule_hot_genre")}. Boosting (${sh("gb_SAT")}) and the MLP (${sh("mlp_SAT")}) are not significantly better in 2023${lead}. We keep the simple, explainable model and recheck at each yearly retrain.`;
+  };
   $("f-model").value = "lr_SAT"; render();
   animateIn($("models-chart"), false);
 }
 function flashBars(key) {   // an input was clicked: every bar whose model uses it flashes once in the input's color
   document.querySelectorAll("#models-chart g[data-id]").forEach((g) => {
     const id = g.dataset.id;
-    if (id === "rule_hot_genre" || !id.split("_")[1].includes(key)) return;
+    const used = id === "day30" ? "SAT" : id.split("_")[1] || "";
+    if (id === "rule_hot_genre" || !used.includes(key)) return;
     g.style.setProperty("--fc", CONFIG.blocks[key]); g.classList.remove("flash"); g.getBBox(); g.classList.add("flash");
   });
 }
@@ -434,6 +442,7 @@ function labelParts(m) {   // "S+A+T" with each block letter in its color
   const C = CONFIG.blocks;
   if (m === "rule_hot_genre") return [["Editors' rule", null]];
   if (m === "lr_T") return [["Text only", C.T]];
+  if (m === "day30") return [["S", C.S], ["+", null], ["A", C.A], ["+", null], ["T", C.T], [" + day 30", null]];
   const [meth, key] = m.split("_");
   const parts = key.split("").flatMap((k, i) => [...(i ? [["+", null]] : []), [k === "C" ? "Cover" : k, C[k]]]);
   return [...(meth === "gb" ? [["Boosting ", null]] : meth === "mlp" ? [["MLP ", null]] : []), ...parts];
@@ -495,9 +504,18 @@ function renderBuilder(byQ, k) {
     S3.inputs.has("C") ? "Not trained: the cover was only added on top of S+A+T with logistic regression." :
     S3.method === "lr" ? "Not trained: logistic regression ran on S, S+A, S+A+T and T alone." : "Not trained: boosting and the MLP ran on S+A+T only.";
   $("model-cap").textContent = S3.say ? S3.say() : manual;
-  const ft = pool("first"), mft = hits(pick(ft, "lr_SAT", k)), rft = hits(pick(ft, "rule_hot_genre", k));
+  const all = [...pool("all").values()].flat(), kf = Math.max(1, Math.round((k * all.filter((i) => B.first[i]).length) / all.length));
+  const ft = pool("first"), mft = hits(pick(ft, "lr_SAT", kf)), rft = hits(pick(ft, "rule_hot_genre", kf));
   $("ft-mult").textContent = (mft.share / rft.share).toFixed(1) + "×";
-  $("ft-cap").textContent = `the editors' rule: ${mft.h} vs ${rft.h} hits in ${mft.n} slots reserved for first-time authors (${pct(mft.share, 0)} vs ${pct(rft.share, 0)})`;
+  $("ft-cap").textContent = `the editors' rule. With their share of the slots (${kf} of ${k} a quarter), ${pct(mft.share, 0)} of first-time authors' slots go to future hits, against ${pct(rft.share, 0)} (${mft.h} vs ${rft.h})`;
+  const d30 = D.deck && D.deck.day30;
+  if (D.models.day30) {
+    $("d30-big").textContent = sh("day30");
+    $("d30-cap").textContent = `of the slots once the first month's posting rhythm is added (S+A+T alone ${sh("lr_SAT")}). A second pass, to A/B test first.`;
+  } else if (d30) {
+    $("d30-big").textContent = pct(d30.test.day30, 0);
+    $("d30-cap").textContent = `of 50 slots in 2023 once the first month's posting rhythm is added, up from ${pct(d30.test.lr_SAT, 0)} (+${d30.test.diff_pp.toFixed(1)} points, 95% CI ${d30.test.diff_ci95[0].toFixed(1)} to ${d30.test.diff_ci95[1].toFixed(1)}); first-time authors ${pct(d30.test_first_time.lr_SAT, 0)} → ${pct(d30.test_first_time.day30, 0)}. A second pass, to A/B test first.`;
+  } else $("d30-card").style.display = "none";
 }
 
 // Detail panel: what is inside the focused input or algorithm (always fits the panel, no scrolling)
@@ -828,7 +846,7 @@ function renderDetail() {
     const cb = el("div", { class: "chart-box", style: "height:150px;flex:none" });
     section(box, "Share of slots that went to hits (slots = true hits)", lg, cb);
     pairBars(cb, D.extras.cover_experiment.map((g) => ({ label: g.label, a: g.without, b: g.with })), { aLabel: "main model", bLabel: "+ cover", max: 0.6, bColor: CONFIG.blocks.C });
-    box.append(para(`Covers changed after chapter 3 come with three times the hit rate (21% vs 7%, 2017–2022), so only earlier covers are fair: ${pct(valid, 0)} of 2023–24 serials. The adjustment helps on those in 2023, not in 2024, and drifts upward on newer serials, so across all serials it changes nothing.`, "note small"));
+    box.append(para(`Covers changed after chapter 3 come with three times the hit rate (21% vs 7%, 2017–2022), so only covers set before chapter 3 are fair: ${D.extras.valid_cover_share_all ? pct(D.extras.valid_cover_share_all, 0) + " of all serials (2016–2024) had one, " : ""}${pct(valid, 0)} in 2023–24. The adjustment helps on those in 2023, not in 2024, and drifts upward on newer serials, so across all serials it changes nothing.`, "note small"));
   } else if (f === "rule") {
     set("Editors' rule · baseline", "What an editor could do without a model");
     section(box, "How it scores a serial", para("The average past hit rate of its tags (2017–2022). A LitRPG serial inherits LitRPG's hit rate, and so on. No text, no author.", "note big-note"));
@@ -1137,13 +1155,16 @@ const BIZ = [   // the sliders; tex + note open under each one
     tex: String.raw`\text{views from the slot} = \lambda \times \text{views of the pick}`, note: () => "Not knowable from this data: the picks would partly have been read anyway. An A/B pilot would measure it." },
   { id: "cpm", label: "Ad revenue per 1,000 views", short: "per 1,000 views", sym: "CPM", min: 0.5, max: 10, step: 0.5, value: 3, fmt: (v) => "$" + v.toFixed(2),
     tex: String.raw`\text{revenue per view} = \text{CPM} / 1000`, note: () => "What the platform earns from 1,000 page views." },
-  { id: "wage", label: "Editor cost per hour", short: "editor hour", sym: "w", min: 15, max: 120, step: 5, value: 35, fmt: (v) => "$" + v,
-    tex: String.raw`\text{cost} = \text{hours} \times w`, note: () => "Salary and overhead of one editor hour." },
-  { id: "mins", label: "Minutes to vet one serial", short: "per serial", sym: "m", min: 5, max: 60, step: 5, value: 20, fmt: (v) => v + " min",
-    tex: String.raw`K'_q = \min\{\,k : \text{hits in the rule's top } k \ge \text{hits in the model's top } K\,\}`,
-    note: () => "To find as many hits as the model's K picks, editors following the rule read K′ serials; each takes m minutes. (Our definition: the deck's editor-time formula is not in the repo.)" },
+  { id: "short", label: "Serials editors screen with the model", short: "editors screen", sym: "S", min: 50, max: 1000, step: 10, value: 200, fmt: (v) => String(v),
+    tex: String.raw`\text{hours saved} = \sum_q \big(N_q - S\big) \times m / 60`,
+    note: (b) => `Without the model, editors would screen all ${Math.round(b.perQ).toLocaleString()} new serials a quarter (N); with it, only the model's top S. The deck uses 200.` },
+  { id: "mins", label: "Minutes to screen one serial", short: "per serial", sym: "m", min: 5, max: 60, step: 5, value: 10, fmt: (v) => v + " min",
+    tex: String.raw`\text{hours} = \text{serials} \times m / 60`, note: () => "Time for an editor to look at one new serial. The deck assumes 10 minutes." },
+  { id: "wage", label: "Editor cost per hour", short: "editor hour", sym: "w", min: 15, max: 120, step: 5, value: 30, fmt: (v) => "$" + v,
+    tex: String.raw`\text{cost} = \text{hours} \times w`, note: () => "Salary and overhead of one editor hour. The deck assumes $30." },
 ];
 const bizVal = (id) => Number($(`biz-${id}`).value);
+const bizA = () => ({ lambda: bizVal("lambda"), cpm: bizVal("cpm"), short: bizVal("short"), mins: bizVal("mins"), wage: bizVal("wage") });   // the current assumptions
 const bizReal = (b, raw) => (b.real ? b.real(raw) : raw);   // slider position → value (only the slots slider differs)
 let sensVar = "k";
 function bizInit() {
@@ -1182,60 +1203,56 @@ function bizPrep(byQ) {   // per quarter: both rankings with running sums of vie
   if (bizCache.key === key) return bizCache;
   const s = B.score.lr_SAT, r = B.score.rule_hot_genre, run = (ix, f) => { const a = [0]; ix.forEach((i, j) => a.push(a[j] + f(i))); return a; };
   const qs = [...byQ.values()].map((idx) => {
-    const ms = [...idx].sort((a, c) => s[c] - s[a] || B.id[a] - B.id[c]), rs = [...idx].sort((a, c) => r[c] - r[a] || B.id[a] - B.id[c]);
-    return { n: idx.length, mV: run(ms, (i) => B.views[i]), rV: run(rs, (i) => B.views[i]), mH: run(ms, (i) => B.y[i]), rH: run(rs, (i) => B.y[i]) };
+    const ms = [...idx].sort((a, c) => s[c] - s[a] || tie(a, c)), rs = [...idx].sort((a, c) => r[c] - r[a] || tie(a, c));
+    return { n: idx.length, mV: run(ms, (i) => B.views[i]), rV: run(rs, (i) => B.views[i]) };
   });
   bizCache = { key, qs };
   return bizCache;
 }
-function bizNumbers(byQ, k) {   // views of each side's top K, and how far down the rule's list editors must read to match the model's hits
-  const out = { vm: 0, vr: 0, readRule: 0, readModel: 0, n: 0, nq: byQ.size, k };
-  for (const q of bizPrep(byQ).qs) {
-    const kk = Math.min(k, q.n), hm = q.mH[kk];
-    out.vm += q.mV[kk]; out.vr += q.rV[kk]; out.readModel += kk; out.n += q.n;
-    let j = kk; while (j < q.n && q.rH[j] < hm) j++;
-    out.readRule += j;
-  }
+function bizNumbers(byQ, k) {   // views of each side's top K per quarter, and how many new serials there are to screen
+  const out = { vm: 0, vr: 0, n: 0, nq: byQ.size, k };
+  for (const q of bizPrep(byQ).qs) { const kk = Math.min(k, q.n); out.vm += q.mV[kk]; out.vr += q.rV[kk]; out.n += q.n; }
   out.perQ = out.n / out.nq;
   return out;
 }
-function bizMoney(bz, a) {   // a = { lambda, cpm, wage, mins }
+function bizMoney(bz, a) {   // ad revenue: model minus rule (the deck's headline); editor time, as in the deck: screen the model's top S, not every new serial
   const adM = bz.vm * a.lambda * a.cpm / 1000, adR = bz.vr * a.lambda * a.cpm / 1000;
-  const costR = bz.readRule * a.mins / 60 * a.wage, costM = bz.readModel * a.mins / 60 * a.wage;
-  return { adM, adR, ad: adM - adR, costR, costM, labor: costR - costM, total: adM - adR + costR - costM };
+  const screened = Math.min(bz.n, bz.nq * a.short), hours = (bz.n - screened) * a.mins / 60;
+  return { adM, adR, ad: adM - adR, screened, hours, costAll: bz.n * a.mins / 60 * a.wage, costShort: screened * a.mins / 60 * a.wage, labor: hours * a.wage };
 }
+const roundEven = (x) => { const f = Math.floor(x), d = x - f; return d > 0.5 || (d === 0.5 && f % 2) ? f + 1 : f; };   // rounds .5 to even, like Python (so hours match the deck)
 const usd = (v) => (v < 0 ? "−$" : "$") + Math.abs(Math.round(v)).toLocaleString();
 function renderBiz(byQ) {
   if (!B.views) { $("biz-cap").textContent = "This data.js has no view counts: rerun modeling/05_demo_data.py."; return; }   // an older data.js must not break the rest of the page
-  const k = slots(), bz = bizNumbers(byQ, k), a = { lambda: bizVal("lambda"), cpm: bizVal("cpm"), wage: bizVal("wage"), mins: bizVal("mins") }, mo = bizMoney(bz, a);
+  const k = slots(), bz = bizNumbers(byQ, k), a = bizA(), mo = bizMoney(bz, a);
   $("biz-k").value = posOfK(k); $("biz-k-val").textContent = k.toLocaleString();
   const per = bz.nq === 4 ? "per year" : bz.nq === 1 ? "per quarter" : `over ${bz.nq} quarters`;
   const money = $("biz-money"); money.replaceChildren();
   const cell = (cls, label, value, sub) => { const c = el("div", { class: "mcell " + cls }); c.append(el("span", {}, label), el("b", {}, value), el("small", {}, sub)); return c; };
   const rowOf = (title, cells) => { const r = el("div", { class: "mrow" }); r.append(el("div", { class: "mtitle" }, title)); cells.forEach((c, i) => { if (i) r.append(el("div", { class: "m-op" }, i === 1 ? "−" : "=")); r.append(c); }); money.append(r); };
   rowOf("Ad revenue", [cell("model", "Our model's picks", usd(mo.adM), `${(bz.vm / 1e6).toFixed(1)}M views × λ × CPM`), cell("rule", "Editors' rule picks", usd(mo.adR), `${(bz.vr / 1e6).toFixed(1)}M views × λ × CPM`), cell("net", "gained", "+" + usd(mo.ad), per)]);
-  rowOf("Editor time", [cell("rule", "Reading with the rule", usd(mo.costR), `${bz.readRule.toLocaleString()} serials × m × w`), cell("model", "Reading our picks", usd(mo.costM), `${bz.readModel.toLocaleString()} serials × m × w`), cell("net", "saved", "+" + usd(mo.labor), `${Math.round((bz.readRule - bz.readModel) * a.mins / 60).toLocaleString()} hours ${per}`)]);
-  const tot = el("div", { class: "mtotal" }); tot.append(el("span", {}, `Net value ${per}`), el("b", {}, "+" + usd(mo.total)), el("small", {}, "= ad revenue gained + editor time saved, both measured against the editors' rule"));
+  rowOf("Editor time (apart)", [cell("rule", "Screening every new serial", usd(mo.costAll), `${bz.n.toLocaleString()} serials × m × w`), cell("model", `Screening the model's top ${a.short}`, usd(mo.costShort), `${mo.screened.toLocaleString()} serials × m × w`), cell("net", "saved", "+" + usd(mo.labor), `${roundEven(mo.hours).toLocaleString()} hours ${per}`)]);
+  const tot = el("div", { class: "mtotal" }); tot.append(el("span", {}, `Extra ad revenue ${per}`), el("b", {}, "+" + usd(mo.ad)), el("small", {}, "the deck's headline. Editor time saved is shown apart and not added: it is measured against screening every new serial, not against the rule"));
   money.append(tot);
   for (const b of BIZ) { const f = $(`biz-${b.id}-fx`); if (!f.dataset.done) { f.dataset.done = 1; FX[`biz_${b.id}`] = [b.tex]; fx(`biz_${b.id}`, f); } $(`biz-${b.id}-note`).textContent = b.note(bz); }
   const n = (v) => Math.round(v).toLocaleString().replace(/,/g, "{,}");
-  FX.biz = [String.raw`\text{Value} = \sum_{q}\Big[\big(V^{\text{model}}_{q} - V^{\text{rule}}_{q}\big)\,\lambda\,\tfrac{\text{CPM}}{1000}\Big] + \sum_{q}\Big[\big(K'_{q} - K\big)\,\tfrac{m}{60}\,w\Big]`,
-            "Vq: total views (June 2025) of the K serials each side picks in quarter q · K′q: serials read down the rule's list to match the model's hits"];
-  FX.biz_num = [String.raw`= \big[${n(bz.vm)} - ${n(bz.vr)}\big] \times ${a.lambda.toFixed(2)} \times \tfrac{${a.cpm}}{1000} \; + \; \big[${n(bz.readRule)} - ${n(bz.readModel)}\big] \times \tfrac{${a.mins}}{60} \times ${a.wage}`, "",
-                String.raw`= (\$${n(mo.adM)} - \$${n(mo.adR)}) + (\$${n(mo.costR)} - \$${n(mo.costM)}) = \$${n(mo.ad)} + \$${n(mo.labor)} = \$${n(mo.total)}`];
+  FX.biz = [String.raw`\text{Extra ad revenue} = \sum_{q}\big(V^{\text{model}}_{q} - V^{\text{rule}}_{q}\big)\,\lambda\,\tfrac{\text{CPM}}{1000}`,
+            "Vq: total views (June 2025) of the K serials each side picks in quarter q · Nq: new serials in quarter q · as in modeling/08_impact.py",
+            String.raw`\text{Editor time saved} = \sum_{q}\big(N_{q} - S\big)\,\tfrac{m}{60}\,w`];
+  FX.biz_num = [String.raw`= \big[${n(bz.vm)} - ${n(bz.vr)}\big] \times ${a.lambda.toFixed(2)} \times \tfrac{${a.cpm}}{1000} = \$${n(mo.ad)}`, "",
+                String.raw`\text{editor time: } \big[${n(bz.n)} - ${n(mo.screened)}\big] \times \tfrac{${a.mins}}{60} \times ${a.wage} = \$${n(mo.labor)}\ \ (${n(roundEven(mo.hours))}\text{ hours})`];
   fx("biz", $("fx-biz")); fx("biz_num", $("fx-biz-num")); fitFormulas($("biz"));
-  $("biz-cap").textContent = `${quarterLabel(byQ)} · ${whoLabel()} · our model = logistic regression on S+A+T. Views are a June 2025 snapshot and would partly have come anyway, so λ, CPM, w and m are assumptions to be measured in a pilot.`;
+  $("biz-cap").textContent = `${quarterLabel(byQ)} · ${whoLabel()} · our model = logistic regression on S+A+T. Defaults as in the deck (modeling/08_impact.py): 10% lift, $3 per 1,000 views, 200 serials screened, 10 minutes, $30 an hour. Views are a June 2025 snapshot and would partly have come anyway, so these are assumptions to be measured in a pilot.`;
   if ($("biz-drawer").classList.contains("open")) renderSens(byQ);
 }
 const SENS_LINES = [   // lines in the sensitivity chart; click a legend entry to show or hide it
   { key: "adM", label: "our model's picks: ad revenue", color: "#4c9bff", on: true },
   { key: "adR", label: "editors' rule picks: ad revenue", color: "#7f8287", on: true },
-  { key: "total", label: "net value (gap + time saved)", color: "#e2662a", on: true, bold: true },
-  { key: "ad", label: "ad revenue gained", color: "#e8c547", on: false, dash: true },
-  { key: "labor", label: "editor time saved", color: "#f08fc0", on: false, dash: true },
+  { key: "ad", label: "ad revenue gained (the gap)", color: "#d27a50", on: true, bold: true },
+  { key: "labor", label: "editor time saved (apart)", color: "#f08fc0", on: false, dash: true },
 ];
 function renderSens(byQ, retry = true) {   // money (per year) as one assumption moves; the others stay put
-  const a = { lambda: bizVal("lambda"), cpm: bizVal("cpm"), wage: bizVal("wage"), mins: bizVal("mins") }, k = slots();
+  const a = bizA(), k = slots();
   document.querySelectorAll("[data-sens]").forEach((b) => {   // the chips show the current values (the sliders may be folded away)
     const sp = BIZ.find((x) => x.id === b.dataset.sens);
     b.classList.toggle("on", b.dataset.sens === sensVar);
@@ -1265,21 +1282,21 @@ function renderSens(byQ, retry = true) {   // money (per year) as one assumption
   svg("text", { class: "muted", x: (L + W - R) / 2, y: H - 6, "text-anchor": "middle" }, s, logK ? `${spec.label} (K, log scale: up to all ${nMax.toLocaleString()} serials of a quarter)` : `${spec.label} (${spec.sym})`);
   for (const l of on) svg("path", { d: pts.map((p, i) => `${i ? "L" : "M"}${X(p.x)},${Y(p[l.key])}`).join(""), class: "sline" + (l.bold ? " hot" : ""), style: `stroke:${l.color};stroke-width:${l.bold ? 3.5 : 2.4};${l.dash ? "stroke-dasharray:7 5" : ""}` }, s);
   svg("line", { x1: X(cur), x2: X(cur), y1: T, y2: H - Bm, class: "scur" }, s);
-  if (SENS_LINES[2].on) { svg("circle", { cx: X(cur), cy: Y(curPt.total), r: 5, class: "sdot" }, s); svg("text", { class: "val", x: X(cur) + 10, y: Y(curPt.total) + 18 }, s, `now ${usd(curPt.total)}`); }
+  if (SENS_LINES.find((l) => l.key === "ad").on) { svg("circle", { cx: X(cur), cy: Y(curPt.ad), r: 5, class: "sdot" }, s); svg("text", { class: "val", x: X(cur) + 10, y: Y(curPt.ad) + 18 }, s, `now ${usd(curPt.ad)}`); }
   let note = "Every unit adds the same amount: the money is a straight line in this assumption.";
   if (logK) {   // the peak of the net value, and the turning point on the way up (smoothed: single blockbusters make the curve jagged)
-    const sm = pts.map((p, i) => { const w = pts.slice(Math.max(0, i - 3), i + 4); return w.reduce((t, q) => t + q.total, 0) / w.length; });
+    const sm = pts.map((p, i) => { const w = pts.slice(Math.max(0, i - 3), i + 4); return w.reduce((t, q) => t + q.ad, 0) / w.length; });
     const iPeak = sm.indexOf(Math.max(...sm)), pk = pts[iPeak];
     const up = sm.slice(0, iPeak + 1), y0 = Math.min(...up), y1 = Math.max(...up);
     let iKnee = 0, best = -1; up.forEach((v, i) => { const dd = (v - y0) / (y1 - y0 || 1) - i / Math.max(1, up.length - 1); if (dd > best) { best = dd; iKnee = i; } });
     const kn = pts[iKnee];
-    if (SENS_LINES[2].on) {
-      svg("circle", { cx: X(pk.x), cy: Y(pk.total), r: 7, class: "speak" }, s);
-      svg("text", { class: "kneetxt", x: X(pk.x), y: Y(pk.total) - 14, "text-anchor": "middle" }, s, `peak: K ≈ ${pk.x} → ${usd(pk.total)} a year`);
-      svg("circle", { cx: X(kn.x), cy: Y(kn.total), r: 5, class: "skneedot" }, s);
-      svg("text", { class: "kneetxt dim", x: X(kn.x) - 8, y: Y(kn.total) - 10, "text-anchor": "end" }, s, `turning point ≈ ${kn.x}`);
+    if (SENS_LINES.find((l) => l.key === "ad").on) {
+      svg("circle", { cx: X(pk.x), cy: Y(pk.ad), r: 7, class: "speak" }, s);
+      svg("text", { class: "kneetxt", x: X(pk.x), y: Y(pk.ad) - 14, "text-anchor": "middle" }, s, `peak: K ≈ ${pk.x} → ${usd(pk.ad)} a year`);
+      svg("circle", { cx: X(kn.x), cy: Y(kn.ad), r: 5, class: "skneedot" }, s);
+      svg("text", { class: "kneetxt dim", x: X(kn.x) - 8, y: Y(kn.ad) - 10, "text-anchor": "end" }, s, `turning point ≈ ${kn.x}`);
     }
-    note = `Net value rises fast up to about ${kn.x} slots a quarter, peaks at about ${pk.x} (${usd(pk.total)} a year) and then falls: with very many slots both lists hold nearly the same serials, so the gap closes (at all ${nMax.toLocaleString()} serials it is $0).`;
+    note = `The ad revenue gained rises fast up to about ${kn.x} slots a quarter, peaks at about ${pk.x} (${usd(pk.ad)} a year) and then falls: with very many slots both lists hold nearly the same serials, so the gap closes (at all ${nMax.toLocaleString()} serials it is $0).`;
   }
   $("sens-cap").textContent = note;
   if (retry && box.clientHeight + 2 < H) return renderSens(byQ, false);   // the caption grew and squeezed the chart: draw it once more at the new height
@@ -1298,8 +1315,8 @@ function render() {
   renderBiz(byQ);
 }
 
-const SCREENS = ["title", "why", "hit", "model", "picks", "checks", "biz", "p2"];
-const barOffset = (id) => (id === "model" || id === "picks" ? $("filters").offsetHeight : 0);   // the filter bar sticks over these two
+const SCREENS = ["title", "why", "hit", "model", "checks", "picks", "biz", "p2"];
+const barOffset = (id) => (["model", "checks", "picks"].includes(id) ? $("filters").offsetHeight : 0);   // the filter bar sticks over these three
 const topOf = (id) => $(id).getBoundingClientRect().top + scrollY - barOffset(id);
 function currentScreen() {
   return SCREENS.reduce((best, id, k) => (Math.abs(topOf(id) - scrollY) < Math.abs(topOf(SCREENS[best]) - scrollY) ? k : best), 0);
@@ -1382,7 +1399,7 @@ function init() {
     else if (e.key === " ") { e.preventDefault(); players[SCREENS[currentScreen()]].toggle(); }
   });
   // every content screen gets a 1920 × 1080 stage that is scaled to the window, like a slide; the cover and Project Two fill the window as they are
-  for (const id of ["why", "hit", "model", "picks", "checks", "biz"]) {
+  for (const id of ["why", "hit", "model", "checks", "picks", "biz"]) {
     const scr = $(id), st = el("div", { class: "stage" + (scr.classList.contains("full") ? " full" : "") });
     while (scr.firstChild) st.append(scr.firstChild);
     scr.append(st); scr.classList.add("scaled");

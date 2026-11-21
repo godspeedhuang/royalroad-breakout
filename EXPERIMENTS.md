@@ -47,7 +47,7 @@ Known limit we cannot fix with this dataset: tags, chapter text and followers ar
 |---|---|---|---|
 | 16 | Hits per slot with a fixed 50 slots per quarter | Rule 28%, S+A 53%, S+A+T 68% (34 vs 14 hits per quarter), boosting 71%, MLP 74% (2023). `modeling/05_demo_data.py` reproduces them with a newer boosting/MLP run (70.5%, 72.5%) | `modeling/08_impact.py`, `05_demo_data.py` |
 | 17 | Day-30 re-rank with the first month's posting rhythm | 50 slots: 68% → 76% (+8.0 pp, CI +0.5 to +14.0). Recall@slots: +5.2 pp on 2022 validation but +0.7 pp on 2023 (CI −2.0 to +3.1), first-time authors +2.4 pp (CI −1.1 to +6.4), neither significant. Decision: a confirmation pass to A/B test, not a replacement | `modeling/07_day30.py` |
-| 18 | Ad revenue and editor time | Base case (lift 10%, CPM $3, 50 slots): about $39k a year, range $13k to $130k. Editor time: reading only the model's top 200 per quarter instead of every new serial saves about 1,200 hours (about $36k at $30 an hour). The demo's business screen uses its own editor-time definition (see `CLAUDE.md`) | `modeling/08_impact.py` |
+| 18 | Ad revenue and editor time | Base case (lift 10%, CPM $3, 50 slots): about $39k a year, range $13k to $130k. Editor time: reading only the model's top 200 per quarter instead of every new serial saves about 1,200 hours (about $36k at $30 an hour). The demo's business screen now uses the same definitions and defaults (2026-11-19); it shows editor time apart from the ad revenue, as the deck does | `modeling/08_impact.py` |
 
 ## Validation-year attempts to improve the main model
 
