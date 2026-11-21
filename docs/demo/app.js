@@ -1228,9 +1228,13 @@ function renderBiz(byQ) {
   $("biz-k").value = posOfK(k); $("biz-k-val").textContent = k.toLocaleString();
   const per = bz.nq === 4 ? "per year" : bz.nq === 1 ? "per quarter" : `over ${bz.nq} quarters`;
   const money = $("biz-money"); money.replaceChildren();
-  const cell = (cls, label, value, sub) => { const c = el("div", { class: "mcell " + cls }); c.append(el("span", {}, label), el("b", {}, value), el("small", {}, sub)); return c; };
+  const cell = (cls, label, value, sub) => {   // sub is text, or [big, rest]: the big part (the views) is set larger so it reads on video
+    const c = el("div", { class: "mcell " + cls }), s = el("small");
+    if (Array.isArray(sub)) s.append(el("em", {}, sub[0]), sub[1]); else s.textContent = sub;
+    c.append(el("span", {}, label), el("b", {}, value), s); return c;
+  };
   const rowOf = (title, cells) => { const r = el("div", { class: "mrow" }); r.append(el("div", { class: "mtitle" }, title)); cells.forEach((c, i) => { if (i) r.append(el("div", { class: "m-op" }, i === 1 ? "−" : "=")); r.append(c); }); money.append(r); };
-  rowOf("Ad revenue", [cell("model", "Our model's picks", usd(mo.adM), `${(bz.vm / 1e6).toFixed(1)}M views × λ × CPM`), cell("rule", "Editors' rule picks", usd(mo.adR), `${(bz.vr / 1e6).toFixed(1)}M views × λ × CPM`), cell("net", "gained", "+" + usd(mo.ad), per)]);
+  rowOf("Ad revenue", [cell("model", "Our model's picks", usd(mo.adM), [`${(bz.vm / 1e6).toFixed(1)}M views`, " × λ × CPM"]), cell("rule", "Editors' rule picks", usd(mo.adR), [`${(bz.vr / 1e6).toFixed(1)}M views`, " × λ × CPM"]), cell("net", "gained", "+" + usd(mo.ad), bz.vr > 0 ? [`${(bz.vm / bz.vr).toFixed(1)}×`, ` the rule's views, ${per}`] : per)]);
   rowOf("Editor time (apart)", [cell("rule", "Screening every new serial", usd(mo.costAll), `${bz.n.toLocaleString()} serials × m × w`), cell("model", `Screening the model's top ${a.short}`, usd(mo.costShort), `${mo.screened.toLocaleString()} serials × m × w`), cell("net", "saved", "+" + usd(mo.labor), `${roundEven(mo.hours).toLocaleString()} hours ${per}`)]);
   const tot = el("div", { class: "mtotal" }); tot.append(el("span", {}, `Extra ad revenue ${per}`), el("b", {}, "+" + usd(mo.ad)), el("small", {}, "the deck's headline. Editor time saved is shown apart and not added: it is measured against screening every new serial, not against the rule"));
   money.append(tot);
